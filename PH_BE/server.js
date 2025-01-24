@@ -7,6 +7,7 @@ const db = require("./models");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const http = require("http");
+const { ProductRouter } = require("./routes");
 //khoi tao web server
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(
         credentials: true,
     })
 );
+app.use("/product", ProductRouter)
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: "64mb" }));
 app.use(bodyParser.urlencoded({ limit: "64mb", extended: true }));
