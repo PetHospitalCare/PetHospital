@@ -8,8 +8,8 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-
+import { ArrowUpDown, ChevronDown, MoreHorizontal,Pen, Trash2 } from "lucide-react";
+import { } from '@heroicons/react/20/solid'
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -144,26 +144,14 @@ export default function Product_Managerment() {
         },
         {
             id: "actions",
+            header: () => <div className="text-center font-semibold">...</div>,
             cell: ({ row }) => {
-                const payment = row.original;
                 return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
-                                Copy payment ID
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>View customer</DropdownMenuItem>
-                            <DropdownMenuItem>View payment details</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex items-center justify-center">
+                        <Pen className="size-6 mr-2 p-1 bg-green-400 text-white rounded"/>
+
+                        <Trash2 className="size-6 p-1 bg-red-400 text-white rounded "/>
+                    </div>
                 );
             },
         },
