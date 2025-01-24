@@ -61,4 +61,29 @@ const getAllProduct = async (req, res) => {
         });
     }
 };
-module.exports = { CreateNewProduct };
+const deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        // Tìm và xóa sản phẩm theo id
+        const deletedProduct = await Product.findByIdAndDelete(id);
+
+        // Kiểm tra xem sản phẩm có tồn tại không
+        if (!deletedProduct) {
+            return res.status(404).json({
+                success: false,
+                message: "Sản phẩm không tìm thấy",
+            });
+        }
+        // Trả về phản hồi thành công
+        res.status(200).json({
+            success: true,
+            message: "Sản phẩm đã được xóa thành công",
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+module.exports = { CreateNewProduct, getAllProduct, deleteProduct };

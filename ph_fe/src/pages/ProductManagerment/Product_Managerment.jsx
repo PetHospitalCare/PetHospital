@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     flexRender,
     getCoreRowModel,
@@ -8,8 +7,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Pen, Trash2 } from "lucide-react";
-import { } from '@heroicons/react/20/solid'
+import { ArrowUpDown, ChevronDown, Pen, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -17,9 +15,6 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -30,25 +25,41 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import Layout from "@/components/Sidebar/layout";
 import Page from "@/app/dashboard/page";
-
-const data = [
-    { id: "m5gr84i9", amount: 316, status: "success", email: "ken99@yahoo.com", imageUrl: "https://m.economictimes.com/thumb/msid-100966456,width-1200,height-900,resizemode-4,imgsize-63314/why-become-a-product-manager.jpg" },
-    { id: "3u1reuv4", amount: 242, status: "success", email: "Abe45@gmail.com", imageUrl: "/images/image2.jpg" },
-    { id: "derv1ws0", amount: 837, status: "processing", email: "Monserrat44@gmail.com", imageUrl: "/images/image3.jpg" },
-    { id: "5kma53ae", amount: 874, status: "success", email: "Silas22@gmail.com", imageUrl: "/images/image4.jpg" },
-    { id: "bhqecj4p", amount: 721, status: "failed", email: "carmella@hotmail.com", imageUrl: "/images/image5.jpg" },
-
-
-];
-
+import axios from "axios";
 
 export default function Product_Managerment() {
+    const [data, setData] = useState([]);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
+
+    // Gọi API để lấy danh sách sản phẩm
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get("http://localhost:9999/product/get-all"); // Thay bằng URL API của bạn
+                if (response.data.success) {
+                    const formattedData = response.data.products.map((product) => ({
+                        id: product._id,
+                        name: product.name,
+                        imageUrl: product.images.length > 0 ? product.images[0].url : "",
+                        description: product.description,
+                        price: product.price,
+                        quantity: product.quantity,
+                        category:
+                            product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
+                    }));
+                    setData(formattedData);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const columns = [
         {
@@ -62,10 +73,8 @@ export default function Product_Managerment() {
                         }
                         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                         aria-label="Select all"
-                        className=""
                     />
                 </div>
-
             ),
             cell: ({ row }) => (
                 <Checkbox
@@ -79,11 +88,7 @@ export default function Product_Managerment() {
         },
         {
             accessorKey: "imageUrl",
-            header: ({ column }) => (
-                <div className="text-center">
-                    Ảnh
-                </div>
-            ),
+            header: () => <div className="text-center">Ảnh</div>,
             cell: ({ row }) => (
                 <div className="flex justify-center">
                     <img
@@ -96,29 +101,18 @@ export default function Product_Managerment() {
             enableSorting: false,
             enableHiding: false,
         },
-
         {
-            accessorKey: "status",
-            header: ({ column }) => (
-                <div className="text-center">
-                    Tên sản phẩm
-                </div>
-
-            ),
-            cell: ({ row }) => <div className="capitalize ">{row.getValue("status")}</div>,
+            accessorKey: "name",
+            header: () => <div className="text-center">Tên sản phẩm</div>,
+            cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
         },
         {
-            accessorKey: "status",
-            header: ({ column }) => (
-                <div className="text-center">
-                    Danh mục
-                </div>
-
-            ),
-            cell: ({ row }) => <div className="capitalize ">{row.getValue("status")}</div>,
+            accessorKey: "category",
+            header: () => <div className="text-center">Danh mục</div>,
+            cell: ({ row }) => <div className="capitalize">{row.getValue("category")}</div>,
         },
         {
-            accessorKey: "email",
+            accessorKey: "quantity",
             header: ({ column }) => (
                 <div className="text-center">
                     <Button
@@ -129,37 +123,30 @@ export default function Product_Managerment() {
                         <ArrowUpDown />
                     </Button>
                 </div>
-
             ),
-            cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+            cell: ({ row }) => <div className="lowercase">{row.getValue("quantity")}</div>,
         },
-
         {
-            accessorKey: "amount",
+            accessorKey: "price",
             header: () => <div className="text-right">Giá tiền</div>,
             cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("amount"));
-                return <div className="text-right font-medium">${amount.toFixed(2)}</div>;
+                const amount = parseFloat(row.getValue("price"));
+                return <div className="text-right font-medium">{amount.toLocaleString()}₫</div>;
             },
         },
         {
             id: "actions",
             header: () => <div className="text-center font-semibold">...</div>,
-            cell: ({ row }) => {
-                return (
-                    <div className="flex items-center justify-center">
-                        <button>
-                            <Pen className="size-6 p-1 mr-2 bg-green-400 text-white rounded" />
-                        </button>
-                        <button>
-                            <Trash2 className="size-6 p-1 bg-red-400 text-white rounded " />
-                        </button>
-
-
-
-                    </div>
-                );
-            },
+            cell: ({ row }) => (
+                <div className="flex items-center justify-center">
+                    <button>
+                        <Pen className="size-6 p-1 mr-2 bg-green-400 text-white rounded" />
+                    </button>
+                    <button>
+                        <Trash2 className="size-6 p-1 bg-red-400 text-white rounded " />
+                    </button>
+                </div>
+            ),
         },
     ];
 
@@ -187,9 +174,9 @@ export default function Product_Managerment() {
             <div className="w-full">
                 <div className="flex items-center py-4">
                     <Input
-                        placeholder="Filter emails..."
-                        value={(table.getColumn("email")?.getFilterValue()) ?? ""}
-                        onChange={(e) => table.getColumn("email")?.setFilterValue(e.target.value)}
+                        placeholder="Tìm kiếm sản phẩm..."
+                        value={(table.getColumn("name")?.getFilterValue()) ?? ""}
+                        onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
                         className="max-w-sm"
                     />
                     <DropdownMenu>
@@ -199,15 +186,17 @@ export default function Product_Managerment() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            {table.getAllColumns().filter((col) => col.getCanHide()).map((col) => (
-                                <DropdownMenuCheckboxItem
-                                    key={col.id}
-                                    checked={col.getIsVisible()}
-                                    onCheckedChange={(value) => col.toggleVisibility(!!value)}
-                                >
-                                    {col.id}
-                                </DropdownMenuCheckboxItem>
-                            ))}
+                            {table.getAllColumns()
+                                .filter((col) => col.getCanHide())
+                                .map((col) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={col.id}
+                                        checked={col.getIsVisible()}
+                                        onCheckedChange={(value) => col.toggleVisibility(!!value)}
+                                    >
+                                        {col.id}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -238,7 +227,7 @@ export default function Product_Managerment() {
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={columns.length} className="text-center">
-                                        No results.
+                                        Không có kết quả.
                                     </TableCell>
                                 </TableRow>
                             )}
