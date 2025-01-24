@@ -8,7 +8,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal,Pen, Trash2 } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Pen, Trash2 } from "lucide-react";
 import { } from '@heroicons/react/20/solid'
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -148,9 +148,15 @@ export default function Product_Managerment() {
             cell: ({ row }) => {
                 return (
                     <div className="flex items-center justify-center">
-                        <Pen className="size-6 mr-2 p-1 bg-green-400 text-white rounded"/>
+                        <button>
+                            <Pen className="size-6 p-1 mr-2 bg-green-400 text-white rounded" />
+                        </button>
+                        <button>
+                            <Trash2 className="size-6 p-1 bg-red-400 text-white rounded " />
+                        </button>
 
-                        <Trash2 className="size-6 p-1 bg-red-400 text-white rounded "/>
+
+
                     </div>
                 );
             },
