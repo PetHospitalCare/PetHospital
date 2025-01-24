@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/table";
 import Layout from "@/components/Sidebar/layout";
 import Page from "@/app/dashboard/page";
+import Add_Modal from "./Add_Product_Modal";
 
 const data = [
     { id: "m5gr84i9", amount: 316, status: "success", email: "ken99@yahoo.com", imageUrl: "https://m.economictimes.com/thumb/msid-100966456,width-1200,height-900,resizemode-4,imgsize-63314/why-become-a-product-manager.jpg" },
@@ -49,6 +50,7 @@ export default function Product_Managerment() {
     const [columnFilters, setColumnFilters] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
+    const [open, setOpen] = React.useState(false)
 
     const columns = [
         {
@@ -192,7 +194,7 @@ export default function Product_Managerment() {
                         onChange={(e) => table.getColumn("email")?.setFilterValue(e.target.value)}
                         className="max-w-sm"
                     />
-                    <DropdownMenu>
+                    {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="ml-auto">
                                 Columns <ChevronDown />
@@ -209,7 +211,15 @@ export default function Product_Managerment() {
                                 </DropdownMenuCheckboxItem>
                             ))}
                         </DropdownMenuContent>
-                    </DropdownMenu>
+                    </DropdownMenu> */}
+                    <div className="text-center ml-auto">
+                        <button className="p-2 font-semibold bg-yellow-500  text-white" onClick={() => setOpen(true)}>
+                            Thêm sản phẩm
+                        </button>
+                        
+                    </div>
+                    <Add_Modal open={open} onClose={() => setOpen(false)}/>
+
                 </div>
                 <div className="rounded-md border">
                     <Table>
