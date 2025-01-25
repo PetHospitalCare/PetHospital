@@ -1,175 +1,183 @@
-// import React from "react";
 
-// export default function Add_Modal({ open, onClose }) {
-//   if (!open) return null;
+import { Input } from "@/components/ui/input";
+import React, { useState, useEffect } from "react";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import MultiSelect from "@/components/multi-select";
+import { Dog, Cat } from "lucide-react"
 
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-//       <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-//         <h2 className="text-lg font-bold mb-4">Thêm sản phẩm mới</h2>
-//         <form>
-//           <div className="mb-4">
-//             <label htmlFor="pName" className="block text-sm font-medium">Tên sản phẩm</label>
-//             <input
-//               type="text"
-//               id="pName"
-//               className="border rounded-md w-1/2 p-2 mt-1"
-//               placeholder="Enter your email"
-//             />
-//           </div>
-//           <div className="mb-4">
-//             <label htmlFor="quantity" className="block text-sm font-medium">số lượng</label>
-//             <input
-//               type="number"
-//               id="quantity"
-//               className="border rounded-md w-1/2 p-2 mt-1"
-//               placeholder="Enter your password"
-//             />
-//           </div>
-//           <div className="flex justify-between items-center">
-//           <button
-//               type="button"
-//               onClick={onClose}
-//               className="text-red-500 underline"
-//             >
-//               Cancel
-//             </button>
-//             <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Thêm sản phẩm</button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-import React, { useState } from "react";
+import axios from "axios";
+import { Textarea } from "@/components/ui/textarea";
+
+const frameworksList = [
+    { value: "Dog", label: "Chó", icon: Dog },
+    { value: "Cat", label: "Mèo", icon: Cat },
+];
 
 export default function Add_Modal({ open, onClose }) {
-  const [images, setImages] = useState([]);
+    const [images, setImages] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [productName, setProductName] = useState("");
+    const [productDescription, setProductDescription] = useState("");
+    const [price, setPrice] = useState("");
+    const [quantity, setQuantity] = useState("");
+    const [type, setType] = useState([]);
 
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    if (files.length + images.length > 9) {
-      alert("Bạn chỉ được tải tối đa 9 ảnh.");
-      return;
-    }
-    setImages([...images, ...files]);
-  };
+    // Fetch categories from the backend
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.get("http://localhost:9999/category/get-all");
+                if (response.data.success) {
+                    const formattedData = response.data.categories.map((category) => ({
+                        id: category._id,
+                        name: category.name,
+                    }));
+                    setCategories(formattedData);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy danh mục:", error);
+            }
+        };
 
-  const handleImageRemove = (index) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+        fetchCategories();
+    }, []);
 
-  if (!open) return null;
+    const handleImageUpload = (event) => {
+        const files = Array.from(event.target.files);
+        if (files.length + images.length > 9) {
+            alert("Bạn chỉ được tải tối đa 9 ảnh.");
+            return;
+        }
+        setImages([...images, ...files]);
+    };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-lg font-bold mb-4 text-left">Thêm sản phẩm mới</h2>
-        <form>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label htmlFor="pName" className="block text-sm font-medium text-left mb-1">Tên sản phẩm</label>
-              <input
-                type="text"
-                id="pName"
-                className="border rounded-md w-full p-2"
-                placeholder="Nhập tên sản phẩm"
-              />
+    const handleImageRemove = (index) => {
+        setImages(images.filter((_, i) => i !== index));
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (!productName || !selectedCategory || !productDescription || !type.length || !images.length) {
+            alert("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("name", productName);
+        images.forEach((image) => formData.append("imageUrl", image));
+        formData.append("description", productDescription);
+        formData.append("price", price);
+        formData.append("quantity", quantity);
+        formData.append("categoryId", selectedCategory);
+        formData.append("type", type.join(","));
+        
+
+        try {
+            const response = await axios.post("http://localhost:9999/product/create", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            if (response.data.message === "Tạo sản phẩm thành công") {
+                alert("Sản phẩm đã được thêm!");
+                window.location.reload()
+                onClose();
+            }
+        } catch (error) {
+            console.error("Lỗi khi thêm sản phẩm:", error);
+            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+        }
+    };
+
+    if (!open) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
+                <h2 className="text-xl font-bold mb-6 text-left">Thêm sản phẩm mới</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label htmlFor="pName" className="block text-sm font-medium text-left mb-2">Tên sản phẩm</label>
+                            <Input type="text" placeholder="Nhập tên sản phẩm" value={productName} onChange={(e) => setProductName(e.target.value)} />
+                        </div>
+                        <div>
+                            <label htmlFor="quantity" className="block text-sm font-medium text-left mb-2">Số lượng</label>
+                            <Input type="number" placeholder="Nhập số lượng" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label htmlFor="price" className="block text-sm font-medium text-left mb-2">Giá tiền</label>
+                            <Input type="number" placeholder="Nhập giá tiền" value={price} onChange={(e) => setPrice(e.target.value)} />
+                        </div>
+                        <div>
+                            <label htmlFor="category" className="block text-sm font-medium text-left mb-2">Danh mục</label>
+                            <Select onValueChange={(value) => setSelectedCategory(value)}>
+                                <SelectTrigger className="w-2xl">
+                                    <SelectValue placeholder="Chọn danh mục" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Danh mục</SelectLabel>
+                                        {categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <label htmlFor="pName" className="block text-sm font-medium text-left mb-2">Mô tả về sản phẩm</label>
+                            <Textarea placeholder="Hãy mô tả về sản phẩm của bạn" value={productDescription} onChange={(e) => setProductDescription(e.target.value)} />
+                        </div>
+                        <div>
+                            <label htmlFor="type" className="block text-sm font-medium text-left mb-2">Loài động vật</label>
+                            <MultiSelect
+                                options={frameworksList}
+                                onValueChange={(selected) => setType(selected)}
+                                value={type}
+                                placeholder="Chọn loài động vật"
+                                variant="inverted"
+                                animation={2}
+                                maxCount={2}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-left mb-2">Thêm ảnh (tối đa 9 ảnh)</label>
+                        <Input type="file" multiple accept="image/*" onChange={handleImageUpload} />
+                        <div className="grid grid-cols-4 gap-4 mt-4">
+                            {images.map((image, index) => (
+                                <div key={index} className="relative">
+                                    <img src={URL.createObjectURL(image)} alt="Uploaded preview" className="w-full h-32 object-cover rounded-md" />
+                                    <button type="button" className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex justify-center items-center" onClick={() => handleImageRemove(index)}>
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                        <button type="button" onClick={onClose} className="text-red-500 underline">Hủy bỏ</button>
+                        <button type="submit" className="bg-blue-500 text-white px-6 py-3 rounded">Thêm sản phẩm</button>
+                    </div>
+                </form>
             </div>
-            <div>
-              <label htmlFor="quantity" className="block text-sm font-medium text-left mb-1">Số lượng</label>
-              <input
-                type="number"
-                id="quantity"
-                className="border rounded-md w-full p-2"
-                placeholder="Nhập số lượng"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label htmlFor="price" className="block text-sm font-medium text-left mb-1">Giá tiền</label>
-              <input
-                type="number"
-                id="price"
-                className="border rounded-md w-full p-2"
-                placeholder="Nhập giá tiền"
-              />
-            </div>
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-left mb-1">Danh mục</label>
-              <select
-                id="category"
-                className="border rounded-md w-full p-2"
-                defaultValue=""
-              >
-                <option value="" disabled>Chọn danh mục</option>
-                <option value="Thuốc">Thuốc</option>
-                <option value="Phụ kiện">Phụ kiện</option>
-                <option value="Đồ ăn">Đồ ăn</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="type" className="block text-sm font-medium text-left mb-1">Loài động vật</label>
-              <select
-                id="type"
-                className="border rounded-md w-full p-2"
-                defaultValue=""
-              >
-                <option value="" disabled>Chọn loài động vật</option>
-                <option value="Dog">Chó</option>
-                <option value="Cat">Mèo</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-left mb-1">Thêm ảnh (tối đa 9 ảnh)</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="border rounded-md w-full p-2"
-            />
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              {images.map((image, index) => (
-                <div key={index} className="relative">
-                  <img
-                    src={URL.createObjectURL(image)}
-                    alt="Uploaded preview"
-                    className="w-full h-24 object-cover rounded-md"
-                  />
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex justify-center items-center"
-                    onClick={() => handleImageRemove(index)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-red-500 underline"
-            >
-              Hủy bỏ
-            </button>
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Thêm sản phẩm
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+        </div>
+    );
 }

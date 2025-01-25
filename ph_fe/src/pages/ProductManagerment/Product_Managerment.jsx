@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import {
     flexRender,
     getCoreRowModel,
@@ -69,6 +69,24 @@ export default function Product_Managerment() {
 
         fetchData();
     }, []);
+
+    const handleDelete = async (id) => {
+        console.log(id)
+        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
+            try {
+                const response = await axios.delete(`http://localhost:9999/product/delete${id}`);
+                if (response.data.success) {
+                    alert("Xóa sản phẩm thành công!");
+                    setData((prevData) => prevData.filter((p) => p.id !== id));
+                } else {
+                    alert(response.data.message || "Không thể xóa sản phẩm.");
+                }
+            } catch (error) {
+                console.error("Lỗi khi xóa sản phẩm:", error);
+                alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+            }
+        }
+    };
 
     const columns = [
         {
@@ -149,10 +167,10 @@ export default function Product_Managerment() {
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
                     <button>
-                        <Pen className="size-6 p-1 mr-2 bg-green-400 text-white rounded" />
+                        <Pen className="size-6 p-1 mr-1 " />
                     </button>
-                    <button>
-                        <Trash2 className="size-6 p-1 bg-red-400 text-white rounded " />
+                    <button onClick={() => handleDelete(row.original.id)}>
+                        <Trash2 className="size-6 p-1 " />
                     </button>
                 </div>
             ),
