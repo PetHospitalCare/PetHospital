@@ -19,8 +19,7 @@ app.use(
         credentials: true,
     })
 );
-app.use("/product", ProductRouter);
-app.use("/category", CategoryRouter);
+
 
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: "64mb" }));
@@ -29,7 +28,8 @@ app.use(bodyParser.urlencoded({ limit: "64mb", extended: true }));
 app.get("/test", async (req, res) => {
     return res.json({ message: "hello world" });
 })
-
+app.use("/product", ProductRouter);
+app.use("/category", CategoryRouter);
 server.listen(process.env.PORT || 9999, process.env.HOST_NAME || "localhost", () => {
     console.log(`Server in running at: http://${process.env.HOST_NAME}:${process.env.PORT}`);
     db.connect();

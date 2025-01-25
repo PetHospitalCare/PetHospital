@@ -1,5 +1,5 @@
 
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
     flexRender,
     getCoreRowModel,
@@ -35,6 +35,7 @@ import Add_Modal from "./Add_Product_Modal";
 
 
 import axios from "axios";
+import Edit_Modal from "./Edit_Product_Modal";
 
 export default function Product_Managerment() {
     const [data, setData] = useState([]);
@@ -43,6 +44,8 @@ export default function Product_Managerment() {
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
     const [open, setOpen] = React.useState(false)
+    const [openEdit, setOpenEdit] = React.useState(false)
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     // Gọi API để lấy danh sách sản phẩm
     useEffect(() => {
@@ -167,8 +170,13 @@ export default function Product_Managerment() {
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
                     <button>
-                        <Pen className="size-6 p-1 mr-1 " />
+                        <Pen className="size-6 p-1 mr-1 " onClick={() => {
+                            setOpenEdit(true);
+                            setSelectedProduct(row.original);
+                        }} />
+
                     </button>
+
                     <button onClick={() => handleDelete(row.original.id)}>
                         <Trash2 className="size-6 p-1 " />
                     </button>
@@ -230,10 +238,14 @@ export default function Product_Managerment() {
                         <button className="p-2 font-semibold bg-yellow-500  text-white" onClick={() => setOpen(true)}>
                             Thêm sản phẩm
                         </button>
-                        
-                    </div>
-                    <Add_Modal open={open} onClose={() => setOpen(false)}/>
 
+                    </div>
+                    <Add_Modal open={open} onClose={() => setOpen(false)} />
+                    <Edit_Modal
+                        open={openEdit}
+                        onClose={() => setOpenEdit(false)}
+                        ProductData={selectedProduct}
+                    />
                 </div>
                 <div className="rounded-md border">
                     <Table>
@@ -255,6 +267,7 @@ export default function Product_Managerment() {
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
+
                                             </TableCell>
                                         ))}
                                     </TableRow>
