@@ -160,10 +160,10 @@ export default function Add_Modal({ open, onClose }) {
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-left mb-2">Thêm ảnh (tối đa 9 ảnh)</label>
                         <Input type="file" multiple accept="image/*" onChange={handleImageUpload} />
-                        <div className="grid grid-cols-4 gap-4 mt-4">
+                        <div className="grid grid-cols-9 gap-4 mt-4">
                             {images.map((image, index) => (
                                 <div key={index} className="relative">
-                                    <img src={URL.createObjectURL(image)} alt="Uploaded preview" className="w-full h-32 object-cover rounded-md" />
+                                    <img src={URL.createObjectURL(image)} alt="Uploaded preview" className="w-32 h-32 object-cover rounded-md" />
                                     <button type="button" className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex justify-center items-center" onClick={() => handleImageRemove(index)}>
                                         ✕
                                     </button>
