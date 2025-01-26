@@ -1,11 +1,9 @@
 const db = require("../models");
 const Category = db.category;
 
-const CreateNewCategory= async (req, res) => {
+const CreateNewCategory = async (req, res) => {
     try {
-        const files = req.files; // Danh sách file ảnh
         const { name } = req.body;
-
         // Tạo một sản phẩm mới
         const newCategory = new Category({
             name,

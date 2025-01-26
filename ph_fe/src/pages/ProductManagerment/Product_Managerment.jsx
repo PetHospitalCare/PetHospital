@@ -1,5 +1,5 @@
 
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
     flexRender,
     getCoreRowModel,
@@ -230,9 +230,9 @@ export default function Product_Managerment() {
                         <button className="p-2 font-semibold bg-yellow-500  text-white" onClick={() => setOpen(true)}>
                             Thêm sản phẩm
                         </button>
-                        
+
                     </div>
-                    <Add_Modal open={open} onClose={() => setOpen(false)}/>
+                    <Add_Modal open={open} onClose={() => setOpen(false)} />
 
                 </div>
                 <div className="rounded-md border">

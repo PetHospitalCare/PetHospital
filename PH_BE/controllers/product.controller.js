@@ -1,10 +1,18 @@
 const db = require("../models");
 const Product = db.product;
+const cloudinary = require('cloudinary').v2;
 
+// Cấu hình Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+});
 const CreateNewProduct = async (req, res) => {
     try {
         const files = req.files; // Danh sách file ảnh
         const { name, description, price, quantity, categoryId, type } = req.body;
+        const parsedType = typeof type === "string" ? JSON.parse(type) : type;
 
         // Kiểm tra dữ liệu đầu vào
         // if (!name || !categoryId || !type || !files || files.length === 0) {
@@ -25,7 +33,7 @@ const CreateNewProduct = async (req, res) => {
             price,
             quantity,
             categoryId,
-            type
+            type: parsedType
         });
 
         // Lưu sản phẩm vào database
@@ -65,7 +73,8 @@ const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
         // Tìm và xóa sản phẩm theo id
-        const deletedProduct = await Product.findByIdAndDelete(id);
+        const deletedProduct = await Product.findById(id);
+
 
         // Kiểm tra xem sản phẩm có tồn tại không
         if (!deletedProduct) {
@@ -74,6 +83,15 @@ const deleteProduct = async (req, res) => {
                 message: "Sản phẩm không tìm thấy",
             });
         }
+        // Lấy danh sách publicId từ ảnh
+        const imagePublicIds = deletedProduct.images.map((image) => image.publicId);
+
+        // Xóa từng ảnh trên Cloudinary
+        const deleteImagePromises = imagePublicIds.map((publicId) =>
+            cloudinary.uploader.destroy(publicId)
+        );
+        await Promise.all(deleteImagePromises); // Đợi tất cả ảnh được xóa
+        await Product.findByIdAndDelete(id);
         // Trả về phản hồi thành công
         res.status(200).json({
             success: true,

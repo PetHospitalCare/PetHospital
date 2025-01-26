@@ -78,8 +78,8 @@ export default function Add_Modal({ open, onClose }) {
         formData.append("price", price);
         formData.append("quantity", quantity);
         formData.append("categoryId", selectedCategory);
-        formData.append("type", type.join(","));
-        
+        formData.append("type", JSON.stringify(type));
+
 
         try {
             const response = await axios.post("http://localhost:9999/product/create", formData, {
@@ -115,7 +115,7 @@ export default function Add_Modal({ open, onClose }) {
                             <Input type="number" placeholder="Nhập số lượng" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-6 mb-6">
                         <div>
                             <label htmlFor="price" className="block text-sm font-medium text-left mb-2">Giá tiền</label>

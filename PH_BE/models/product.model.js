@@ -26,7 +26,7 @@ const productSchema = new mongoose.Schema({
         required: true,
     }],
     type: {
-        type: String,
+        type: [String],
         enum: ["Dog", "Cat"],
         required: true,
     }
