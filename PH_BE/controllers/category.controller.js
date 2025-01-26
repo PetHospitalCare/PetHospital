@@ -4,25 +4,32 @@ const Category = db.category;
 const CreateNewCategory = async (req, res) => {
     try {
         const { name } = req.body;
-        // Tạo một sản phẩm mới
-        const newCategory = new Category({
-            name,
-        });
 
-        // Lưu sản phẩm vào database
+        // Kiểm tra nếu danh mục đã tồn tại
+        const existingCategory = await Category.findOne({ name });
+        if (existingCategory) {
+            return res.status(200).json({
+                success: true,
+                category: existingCategory,
+                message: "Danh mục đã tồn tại.",
+            });
+        }
+
+        // Tạo danh mục mới
+        const newCategory = new Category({ name });
         const savedCategory = await newCategory.save();
 
         return res.status(201).json({
-            message: "Tạo Danh Mục thành công",
-            Category: savedCategory,
+            success: true,
+            category: savedCategory,
+            message: "Danh mục đã được tạo thành công.",
         });
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            message: "Lỗi hệ thống Back-end"
-        });
+        console.error("Lỗi khi tạo danh mục:", error);
+        return res.status(500).json({ success: false, message: "Lỗi hệ thống." });
     }
 };
+
 const getAllCategory = async (req, res) => {
     try {
         const categories = await Category.find()
