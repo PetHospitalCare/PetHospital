@@ -61,18 +61,25 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
             setDescription(ProductData.description || "");
 
             // Handle category selection
-            setSelectedCategory(ProductData.category || "");
-            
+            setSelectedCategory(categories.find(cat => cat.label === ProductData.category)?.value);
 
             // Handle type selection - ensure it works with MultiSelect
             // If type is a string, convert to array, if it's already an array, use it
+
+            //setType(Array.isArray(ProductData.type) ? ProductData.type : [ProductData.type]);
+
+
             const typeValue = Array.isArray(ProductData.type)
                 ? ProductData.type
-                : (ProductData.type ? [ProductData.type] : []);
+                : ProductData.type ? [ProductData.type] : [];
             setType(typeValue);
+            console.log("Set type from product data:", typeValue);  // Kiểm tra giá trị đã được set
+            console.log(frameworksList.filter(item => typeValue.includes(item.value)));
+
 
             // Reset images and prepare for potential image editing
-            setImages([]);
+            setImages(ProductData.imageUrl);
+            console.log(ProductData)
         }
     }, [ProductData, open]);
 
@@ -159,8 +166,8 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                                 selected={selectedCategory}
                                 placeholder="Chọn danh mục"
                                 onChange={(selected) => {
-                                    console.log("Selected category:", selected);
                                     setSelectedCategory(selected.value);
+                                    console.log(selected.value)
                                 }}
                                 onCreate={(label) => handleCreateCategory(label)}
                             />
@@ -176,6 +183,7 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </div>
+
                         <div>
                             <label htmlFor="type" className="block text-sm font-medium text-left mb-2">Loài động vật</label>
                             <MultiSelect
@@ -185,14 +193,14 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                                     console.log("Selected types:", selected);
                                     setType(selected);
                                 }}
-                                value={type}
+                                value={["Dog", "Cat"]}
                                 placeholder="Chọn loài động vật"
                                 variant="inverted"
                                 animation={2}
                                 maxCount={2}
                             />
-                            
-                            
+
+
                         </div>
                     </div>
 
@@ -208,7 +216,7 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                             {images.map((image, index) => (
                                 <div key={index} className="relative">
                                     <img
-                                        src={URL.createObjectURL(image)}
+                                        src={image.url ? image.url : URL.createObjectURL(image)}
                                         alt="Uploaded preview"
                                         className="w-32 h-32 object-cover rounded-md"
                                     />

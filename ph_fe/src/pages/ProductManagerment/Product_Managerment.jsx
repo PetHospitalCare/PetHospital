@@ -63,6 +63,7 @@ export default function Product_Managerment() {
                         description: product.description,
                         price: product.price,
                         quantity: product.quantity,
+                        type: product.type,
                         category:
                             product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
                     }));
