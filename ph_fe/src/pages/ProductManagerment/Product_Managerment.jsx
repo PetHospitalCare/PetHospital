@@ -1,5 +1,8 @@
 
 import React, { useState, useEffect } from "react";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
+
 import {
     flexRender,
     getCoreRowModel,
@@ -56,7 +59,7 @@ export default function Product_Managerment() {
                     const formattedData = response.data.products.map((product) => ({
                         id: product._id,
                         name: product.name,
-                        imageUrl: product.images.length > 0 ? product.images[0].url : "",
+                        imageUrl: product.images,
                         description: product.description,
                         price: product.price,
                         quantity: product.quantity,
@@ -119,15 +122,22 @@ export default function Product_Managerment() {
         {
             accessorKey: "imageUrl",
             header: () => <div className="text-center">Ảnh</div>,
-            cell: ({ row }) => (
-                <div className="flex justify-center">
-                    <img
-                        src={row.getValue("imageUrl")}
-                        alt="Product"
-                        className="h-24 w-24 object-cover rounded-md"
-                    />
-                </div>
-            ),
+            cell: ({ row }) => {
+                const images = row.original.imageUrl; // Lấy danh sách ảnh từ API
+                return (
+                    <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
+                        {images.map((image, index) => (
+                            <Zoom>
+                                <img
+                                    src={image.url}
+                                    alt={`Product ${index}`}
+                                    className="h-28 w-28 object-cover rounded-md"
+                                />
+                            </Zoom>
+                        ))}
+                    </div>
+                );
+            },
             enableSorting: false,
             enableHiding: false,
         },
