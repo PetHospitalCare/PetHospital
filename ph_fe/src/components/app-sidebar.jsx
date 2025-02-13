@@ -24,12 +24,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
+
 const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/pethospital.png",
   },
   teams: [
     {
@@ -37,16 +37,16 @@ const data = {
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
+    // {
+    //   name: "Acme Corp.",
+    //   logo: AudioWaveform,
+    //   plan: "Startup",
+    // },
+    // {
+    //   name: "Evil Corp.",
+    //   logo: Command,
+    //   plan: "Free",
+    // },
   ],
   navMain: [
     {
@@ -58,10 +58,15 @@ const data = {
         {
           title: "Sản phẩm",
           url: "/Product_Managerment",
+
         },
         {
           title: "Dịch vụ",
           url: "/Service_Managerment",
+        },
+        {
+          title: "Tài Khoản",
+          url: "/Account_Managerment",
         },
       ],
     },
@@ -91,7 +96,7 @@ export function AppSidebar({
   return (
     (<Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={data?.teams} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

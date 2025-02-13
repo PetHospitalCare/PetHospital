@@ -57,6 +57,7 @@ export default function Service_Managerment() {
                 if (response.data.success) {
                     const formattedData = response.data.services.map((service) => ({
                         id: service._id,
+                        image: service.url,
                         name: service.name,
                         description: service.description,
                         price: service.price,
@@ -109,19 +110,34 @@ export default function Service_Managerment() {
                 </div>
             ),
             cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                />
+                <div className="text-center">
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                </div>
             ),
             enableSorting: false,
             enableHiding: false,
         },
         {
+            accessorKey: "image",
+            header: () => <div className="text-center">Hình ảnh</div>,
+            cell: ({ row }) => {
+                const imageUrl = row.getValue("image") || "/image_unavailable.jpg";
+                return (
+                    <div className="flex justify-center">
+                        <img src={imageUrl} alt="Dịch vụ" className="w-28 h-28 object-cover rounded-md" />
+                    </div>
+                );
+            },
+        },
+
+        {
             accessorKey: "name",
             header: () => <div className="text-center">Tên dịch vụ</div>,
-            cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+            cell: ({ row }) => <div className=" text-center capitalize">{row.getValue("name")}</div>,
         },
         {
             accessorKey: "price",
@@ -138,7 +154,7 @@ export default function Service_Managerment() {
                 const duration = row.getValue("duration");
                 const hours = Math.floor(duration / 60);
                 const minutes = duration % 60;
-                
+
                 let displayTime = "";
                 if (hours > 0) {
                     displayTime += `${hours} tiếng`;
@@ -146,15 +162,15 @@ export default function Service_Managerment() {
                 if (minutes > 0) {
                     displayTime += ` ${minutes} phút`;
                 }
-                
-                return <div className="capitalize">{displayTime.trim()}</div>;
+
+                return <div className="capitalize text-center">{displayTime.trim()}</div>;
             },
         },
         {
             accessorKey: "isAvailable",
             header: () => <div className="text-center">Trạng thái</div>,
             cell: ({ row }) => (
-                <div className="capitalize">
+                <div className="capitalize text-center">
                     {row.getValue("isAvailable") ? "Hoạt động" : "Vô hiệu"}
                 </div>
             ),
@@ -217,15 +233,15 @@ export default function Service_Managerment() {
                     </div>
                     <Add_Modal open={open} onClose={() => setOpen(false)} />
                     <Edit_Modal
-                    open={openEdit}
-                    onClose={() => {
-                        setOpenEdit(false);
-                        setSelectedService(null);
-                    }}
-                    ServiceData={selectedService}
-                />
+                        open={openEdit}
+                        onClose={() => {
+                            setOpenEdit(false);
+                            setSelectedService(null);
+                        }}
+                        ServiceData={selectedService}
+                    />
                 </div>
-                <div className="rounded-md border ">
+                <div className="rounded-md border  ">
                     <Table >
                         <TableHeader>
                             {table.getHeaderGroups().map((headerGroup) => (

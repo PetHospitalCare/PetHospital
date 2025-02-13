@@ -1,7 +1,8 @@
 import * as React from "react"
-import { useState } from 'react'
+
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
+import { useEffect, useState } from "react";
 import {
     Dialog,
     DialogPanel,
@@ -36,9 +37,21 @@ const callsToAction = [
 ]
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const [isScrolled, setIsScrolled] = useState(false);
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 0);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <header className="absolute top-0 left-0 w-full ">
+        <header
+            className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 
+    ${isScrolled ? "bg-[#FAF7F1] shadow-md" : "bg-transparent"}`}
+        >
             <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
                 <div className="flex lg:flex-1">
                     <Link to="/" className="-m-1.5 p-1.5">

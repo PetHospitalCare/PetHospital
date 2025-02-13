@@ -3,7 +3,7 @@ const Service = db.service;
 
 const CreateNewService = async (req, res) => {
     try {
-        const { name, description, price, duration, isAvailable,  } = req.body;
+        const { name, description, price, duration, isAvailable, } = req.body;
 
         // Tạo một sản phẩm mới
         const newService = new Service({
@@ -107,4 +107,5 @@ const updateService = async (req, res) => {
         });
     }
 };
+
 module.exports = { CreateNewService, getAllService, deleteService, updateService };

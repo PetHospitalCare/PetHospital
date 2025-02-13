@@ -165,7 +165,7 @@ export default function Product_Managerment() {
                     </Button>
                 </div>
             ),
-            cell: ({ row }) => <div className="lowercase">{row.getValue("quantity")}</div>,
+            cell: ({ row }) => <div className="lowercase text-center">{row.getValue("quantity")}</div>,
         },
         {
             accessorKey: "price",

@@ -14,10 +14,11 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/Login' element={<Login/>}/>
-        <Route path='/SignUp' element={<SignUp/>}/>
-        <Route path='/Product_Managerment' element={<ProductManagerment/>}/>
-        <Route path='/Service_Managerment' element={<Service_Managerment/>}/>
+        <Route path='/Login' element={<Login />} />
+        <Route path='/SignUp' element={<SignUp />} />
+        <Route path='/Product_Managerment' element={<ProductManagerment />} />
+        <Route path='/Service_Managerment' element={<Service_Managerment />} />
+        <Route path='/Account_Managerment' element={<Service_Managerment />} />
       </Routes>
     </BrowserRouter>
 
