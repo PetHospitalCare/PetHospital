@@ -21,10 +21,10 @@ const accountSchema = new mongoose.Schema(
             required: true,
             unique: [true, "phone is duplicate"],
         },
-        role:  {
-            type: String, 
-            enum: ["customer", "doctor", "admin", "staff"], 
-            required: true 
+        role: {
+            type: [String],
+            enum: ["customer", "doctor", "admin", "staff"],
+            required: true
         }
     },
     { timestamps: true }

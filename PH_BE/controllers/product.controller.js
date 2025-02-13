@@ -20,7 +20,7 @@ const CreateNewProduct = async (req, res) => {
         // }
 
         // Xử lý danh sách ảnh, tạo mảng `images`
-        const images = files.map((file) => ({
+        const images = files?.map((file) => ({
             url: file.path,        // Đường dẫn ảnh (thường từ Multer hoặc dịch vụ upload)
             publicId: file.filename, // ID dùng để quản lý ảnh trên cloud (ví dụ: Cloudinary)
         }));

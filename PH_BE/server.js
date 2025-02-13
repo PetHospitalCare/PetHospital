@@ -31,7 +31,7 @@ app.get("/test", async (req, res) => {
 app.use("/product", ProductRouter);
 app.use("/category", CategoryRouter);
 app.use("/service", ServiceRouter);
-app.use("/api/auth", AccountRouter);
+app.use("/account", AccountRouter);
 server.listen(process.env.PORT || 9999, process.env.HOST_NAME || "localhost", () => {
     console.log(`Server in running at: http://${process.env.HOST_NAME}:${process.env.PORT}`);
     db.connect();

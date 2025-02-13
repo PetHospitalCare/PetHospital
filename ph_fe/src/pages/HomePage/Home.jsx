@@ -19,7 +19,7 @@ export default function Home() {
     return (
         <>
             <div className="relative h-screen">
-                <Stickybutton></Stickybutton>
+
                 <div className="absolute inset-0 -z-10">
                     <img
                         src="https://res.cloudinary.com/debx8syhr/image/upload/v1737554135/a42b4dc7074a1bd77c694dbc815a4ced_omkgkz.png"
@@ -37,6 +37,7 @@ export default function Home() {
                     </h2>
                 </div>
             </div>
+            <Stickybutton></Stickybutton>
             <Carousel />
             <AboutSection></AboutSection>
             <Footer></Footer>
