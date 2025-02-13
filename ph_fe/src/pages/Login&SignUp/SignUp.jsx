@@ -7,7 +7,7 @@ export default function SignUp() {
             <div className="relative h-screen">
                 <div className="absolute inset-0 -z-10">
                     <img
-                        src="https://s3-alpha-sig.figma.com/img/c921/8bcc/a42b4dc7074a1bd77c694dbc815a4ced?Expires=1738540800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Ow2zlB0i08mHcso0jf4kLrBbEOxamaNZyUGYl9dEV1fwqIHHKgMLORSUI8~g1TUV-rknD7YxYpUDXJFcsG-WeLjVNHgaG7M-~oWLUM3owFwUVwJ3GQBIiCqWTOIZhEjuyWajwIVLzAw0Y9j0bMJNvZGo1xao-lNuIcYrLdxq76WFwRTgix35~IX9b8j6KhEfEUJHNOHHAATnVQ24MqsxCJJXiCo9GvvIEh8vECgMJXy81tdHS65uXSSPL0HkwLYxAMnjiDdJD1mcFxNFNHLP~jabex7OYfZsUtJrGbvI4JcDJ8sCU-OhbFEv9S-9yLh8Y20h1Cm-vECEnUKVzEOWxA__"
+                        src="https://res.cloudinary.com/debx8syhr/image/upload/v1737554135/a42b4dc7074a1bd77c694dbc815a4ced_omkgkz.png"
 
                         className="w-full h-full object-cover"
                     />
