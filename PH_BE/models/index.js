@@ -2,12 +2,23 @@ const mongoose = require("mongoose");
 const Product = require("./product.model");
 const Category = require("./category.model");
 const Service = require("./service.model");
+const Account = require("./account.model");
+const Admin = require("./admin.model");
+const Doctor = require("./doctor.model");
+const Staff = require("./staff.model");
+const Customer = require("./customer.model");
+
 mongoose.Promise = global.Promise;
 
 const db = {};
 db.product = Product
 db.service = Service
 db.category = Category
+db.account = Account
+db.admin = Admin
+db.doctor = Doctor
+db.staff = Staff
+db.customer = Customer
 
 const connectDB = async () => {
     await mongoose
