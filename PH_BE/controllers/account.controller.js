@@ -5,12 +5,13 @@ const Account = db.account
 // Signup
 const signup = async (req, res) => {
   try {
-    const { username, password, email, phone, role } = req.body;
+    const { username, password, gender, email, phone, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newAccount = new Account({
       username,
       password: hashedPassword,
+      gender,
       email,
       phone,
       role
@@ -50,4 +51,21 @@ const signin = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-module.exports = { signup, signin };
+const getAllAccount = async (req, res) => {
+    try {
+        const accounts = await Account.find()
+
+        // Trả về danh sách sản phẩm
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy tài khoản thành công',
+            accounts,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+module.exports = { signup, signin, getAllAccount };
