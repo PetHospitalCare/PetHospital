@@ -5,12 +5,13 @@ const Account = db.account
 // Signup
 const signup = async (req, res) => {
   try {
-    const { username, password, email, phone, role } = req.body;
+    const { username, password, gender, email, phone, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newAccount = new Account({
       username,
       password: hashedPassword,
+      gender,
       email,
       phone,
       role

@@ -17,8 +17,9 @@ export default function Login() {
             <div className="grid md:grid-cols-2">
               <div className="p-8">
                 <h1 className="text-2xl font-bold mb-10 text-left">Login</h1>
-
+                {/* Form */}
                 <form className="space-y-4">
+                  {/* Email */}
                   <div>
                     <label className="block text-sm font-medium mb-2 text-left">Email address</label>
                     <input
@@ -27,6 +28,7 @@ export default function Login() {
                     />
                   </div>
 
+                  {/* Password */}
                   <div>
                     <label className="block text-sm font-medium mb-2 text-left">Password</label>
                     <input
@@ -36,15 +38,18 @@ export default function Login() {
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
+                    {/* Remember account */}
                     <label className="flex items-center gap-2">
                       <input type="checkbox" className="ml-4" />
                       <span>Remember account</span>
                     </label>
+                    {/* Forgot password */}
                     <a href="#" className="text-blue-500 underline font-semibold">
                       Forgot password
                     </a>
                   </div>
 
+                  {/* Submit Form */}
                   <button className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors">
                     Sign in
                   </button>

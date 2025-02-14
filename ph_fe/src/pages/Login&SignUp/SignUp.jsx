@@ -1,78 +1,172 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeftIcon } from '@heroicons/react/20/solid'
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from '@heroicons/react/20/solid';
+import { Button } from "@/components/ui/button";
+import StepProgressBar from "@/components/Step-progress-bar";
+import axios from "axios";
+import { Input } from "@/components/ui/input";
+
 export default function SignUp() {
+    const [step, setStep] = useState(1);
+    const [gender, setGender] = useState("male");
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [error, setError] = useState("");
+    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const navigate = useNavigate();
+
+    const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+    const validatePhone = (phone) => /^(0[3|5|7|8|9])+([0-9]{8})$/.test(phone);
+    const validatePassword = (password) => /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(password);
+
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        setError("");
+    
+        if (!validateEmail(email)) {
+            setError("Email must be a valid @gmail.com address");
+            return;
+        }
+        if (!validatePhone(phone)) {
+            setError("Phone number must be a valid number");
+            return;
+        }
+        if (!validatePassword(password)) {
+            setError("Password must be at least 8 characters long, contain at least one uppercase letter and one special character");
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+    
+        try {
+            const response = await axios.get("http://localhost:9999/account/get-all");
+            const accounts = response.data.accounts; 
+    
+            // validate email or phone exist
+            const isEmailExist = accounts.some(acc => acc.email === email);
+            const isPhoneExist = accounts.some(acc => acc.phone === phone);
+    
+            if (isEmailExist) {
+                setError("Email is already registered");
+                return;
+            }
+            if (isPhoneExist) {
+                setError("Phone number is already registered");
+                return;
+            }
+    
+            await axios.post("http://localhost:9999/account/send-otp", { email });
+    
+            // save temporary in localStorage
+            localStorage.setItem("tempSignupData", JSON.stringify({
+                username,
+                password,
+                gender,
+                email,
+                phone,
+                role: ["customer"]
+            }));
+    
+            navigate("/otp", { state: { email } });
+        } catch (err) {
+            setError("Failed to check existing accounts");
+        }
+    };
+    
+
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPassword(e.target.value);
+        if (e.target.value !== password) {
+            setConfirmPasswordError("Passwords do not match");
+        } else {
+            setConfirmPasswordError("");
+        }
+    };
+
     return (
-        <>
-            <div className="relative h-screen">
-                <div className="absolute inset-0 -z-10">
-                    <img
-                        src="https://res.cloudinary.com/debx8syhr/image/upload/v1737554135/a42b4dc7074a1bd77c694dbc815a4ced_omkgkz.png"
+        <div className="relative h-screen">
 
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-                <div className="min-h-screen flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-hidden rounded">
-
-                        <div className="grid md:grid-cols-2">
-                            <div className="p-8">
-                                <Link to="/Login">
-                                    <ArrowLeftIcon className="size-5 text-gray-300" />
-                                </Link>
-                                <h1 className="text-2xl font-bold mb-7 text-left">Input your new account</h1>
-
-                                <form className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2 text-left">Email address</label>
-                                        <input
-                                            type="email"
-                                            className="w-full p-2 bg-gray-100 border rounded"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2 text-left">Password</label>
-                                        <input
-                                            type="password"
-                                            className="w-full p-2 bg-gray-100 border rounded"
-                                        />
-                                    </div>
-
-                                    <div className="flex items-center justify-between text-sm">
-                                        <label className="flex items-center gap-2">
-                                            <input type="checkbox" className="ml-4" />
-                                            <span>Remember account</span>
-                                        </label>
-                                        <a href="#" className="text-blue-500 underline font-semibold">
-                                            Forgot password
-                                        </a>
-                                    </div>
-
-                                    <button className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors">
-                                        Next
-                                    </button>
-                                </form>
-                                <div className="text-left mt-14">
-                                    <Link to="/" className="flex text-gray-400 hover:text-gray-500">
-                                        Home page
-                                    </Link>
-                                </div>
-                            </div>
-
-                            <div className=" p-8 flex items-center justify-center">
-                                <img
-                                    src="https://res.cloudinary.com/dyv5p6rpf/image/upload/v1737568026/cute-mascot_fkjwgv.png"
-                                    alt="Cute mascot"
-                                    className="w-fit h-fit rounded"
-                                />
-                            </div>
+            {/* Background Image */}
+            <div className="absolute inset-0 -z-10">
+                <img
+                    src="https://res.cloudinary.com/debx8syhr/image/upload/v1737554135/a42b4dc7074a1bd77c694dbc815a4ced_omkgkz.png"
+                    className="w-full h-full object-cover"
+                    alt="Background"
+                />
+            </div>
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+                    <Link to="/Login" className="flex items-center text-gray-500 hover:text-gray-700">
+                        <ArrowLeftIcon className="size-4 mr-2" />
+                    </Link>
+                    <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">Create Your Account</h1>
+                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                    {/* Form */}
+                    <form className="space-y-5" onSubmit={handleSignUp}>
+                        {/* UserName */}
+                        <div>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Username<span className="text-red-600">*</span></label>
+                            <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
                         </div>
-                    </div>
+
+                        {/* Email */}
+                        <div>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Email<span className="text-red-600">*</span></label>
+                            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                        </div>
+
+                        {/* Phone Number */}
+                        <div>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Phone Number<span className="text-red-600">*</span></label>
+                            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                        </div>
+
+                        {/* Gender Selection */}
+                        <div className="flex">
+                            <Button
+                                type="button"
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                                onChange={() => setGender("male")}
+                            >
+                                Male
+                            </Button>
+                            <Button
+                                type="button"
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                                onChange={() => setGender("female")}
+                            >
+                                Female
+                            </Button>
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Password<span className="text-red-600">*</span></label>
+                            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        </div>
+
+                        {/* Confirm password */}
+                        <div>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Confirm Password<span className="text-red-600">*</span></label>
+                            <Input type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} required />
+                            {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
+                        </div>
+
+                        {/* Step Progress Bar */}
+                        <StepProgressBar step={1} />
+
+                        {/* Submit form button */}
+                        <div className="text-center">
+                            <Button type="submit" className="w-2/5 bg-blue-400 text-white py-3 rounded font-medium hover:bg-blue-500 transition-colors">Next</Button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-        </>
-
+        </div>
     );
 }
