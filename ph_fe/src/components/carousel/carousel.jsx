@@ -20,6 +20,7 @@ export default function TestimonialCarousel() {
                         .map(service => ({
                             image: service.image,
                             quote: service.description,
+                            url: service.url,
                             author: service.name,
                         }));
                     setServices(filteredServices);
@@ -92,7 +93,7 @@ export default function TestimonialCarousel() {
                 <div className="relative">
                     <Carousel opts={{ loop: true }} setApi={setApi}>
                         <CarouselContent>
-                            {services.map((testimonial, index) => (
+                            {services.map((services, index) => (
                                 <CarouselItem
                                     key={index}
                                     className={`relative h-80 md:basis-1/3 lg:basis-1/3 mx-2 transition-transform duration-300 ${index === centerIndex ? "opacity-100" : "opacity-70"
@@ -114,7 +115,7 @@ export default function TestimonialCarousel() {
                                                 transform: "translate(-50%, -50%)",
                                             }}>
                                             <img
-                                                src={services.image || "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/05/anh-cho-hai-1.jpg"}
+                                                src={services.url || "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/05/anh-cho-hai-1.jpg"}
                                                 alt={`Customer ${index + 1}`}
                                                 className="w-full h-full object-cover"
                                             />
@@ -138,7 +139,7 @@ export default function TestimonialCarousel() {
                 <div className={`flex justify-center gap-6 flex-wrap transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
                     {services.map((services, index) => (
                         <div key={index} className={`overflow-hidden rounded-3xl cursor-pointer transition-all duration-500 ease-in-out ${selectedIndex === index ? "w-72 h-80" : "w-40 h-64 opacity-70"}`} onClick={() => setSelectedIndex(index)}>
-                            <img src={services.image || "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/05/anh-cho-hai-1.jpg"} alt={`Customer ${index + 1}`} className="w-full h-full object-cover" />
+                            <img src={services.url || "https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/05/anh-cho-hai-1.jpg"} alt={`Customer ${index + 1}`} className="w-full h-full object-cover" />
                         </div>
                     ))}
                 </div>

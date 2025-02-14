@@ -50,4 +50,69 @@ const signin = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-module.exports = { signup, signin };
+const getallAccount = async (req, res) => {
+  try {
+    const accounts = await Account.find();
+    res.status(200).json({ success: true, accounts });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+const createNewAccount = async (req, res) => {
+  try {
+    const { username, password, email, phone, role } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newAccount = new Account({
+      username,
+      password: hashedPassword,
+      email,
+      phone,
+      role
+    });
+    const savedAccount = await newAccount.save();
+
+    res.status(201).json({ success: true, savedAccount });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ error: "Email or phone number already exists" });
+    }
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+const deleteAccount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedAccount = await Account.findByIdAndDelete(id);
+
+    if (!deletedAccount) {
+      return res.status(404).json({ error: "Tài khoản không tồn tại" });
+    }
+
+    res.status(200).json({ message: "Xóa tài khoản thành công" });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+const editaccount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username, email, phone, role } = req.body;
+
+    const updatedAccount = await Account.findByIdAndUpdate(
+      id,
+      { username, email, phone, role },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedAccount) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    return res.status(200).json({ message: "Xóa tài khoản thành công", updatedAccount });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount };

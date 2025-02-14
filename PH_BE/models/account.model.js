@@ -6,6 +6,8 @@ const accountSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        url: { type: String },
+        publicId: { type: String },
         password: {
             type: String,
             required: true

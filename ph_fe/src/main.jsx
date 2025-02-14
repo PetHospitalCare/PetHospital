@@ -8,6 +8,7 @@ import Login from './pages/Login&SignUp/Login.jsx'
 import SignUp from './pages/Login&SignUp/SignUp.jsx'
 import ProductManagerment from './pages/ProductManagerment/Product_Managerment.jsx'
 import Service_Managerment from './pages/ServiceManagement/ServiceManagement.jsx'
+import AccountManagement from './pages/AccountManagement/Account_Management.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -18,7 +19,7 @@ createRoot(document.getElementById('root')).render(
         <Route path='/SignUp' element={<SignUp />} />
         <Route path='/Product_Managerment' element={<ProductManagerment />} />
         <Route path='/Service_Managerment' element={<Service_Managerment />} />
-        <Route path='/Account_Managerment' element={<Service_Managerment />} />
+        <Route path='/Account_Managerment' element={<AccountManagement />} />
       </Routes>
     </BrowserRouter>
 

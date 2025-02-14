@@ -193,7 +193,7 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                                     console.log("Selected types:", selected);
                                     setType(selected);
                                 }}
-                                value={["Dog", "Cat"]}
+                                value={type}
                                 placeholder="Chọn loài động vật"
                                 variant="inverted"
                                 animation={2}

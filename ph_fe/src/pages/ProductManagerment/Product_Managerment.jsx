@@ -145,7 +145,7 @@ export default function Product_Managerment() {
         {
             accessorKey: "name",
             header: () => <div className="text-center">Tên sản phẩm</div>,
-            cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("name")}</div>,
         },
         {
             accessorKey: "category",
@@ -246,9 +246,9 @@ export default function Product_Managerment() {
                         </DropdownMenuContent>
                     </DropdownMenu> */}
                     <div className="text-center ml-auto">
-                        <button className="p-2 font-semibold bg-yellow-500  text-white" onClick={() => setOpen(true)}>
+                        <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
                             Thêm sản phẩm
-                        </button>
+                        </Button>
 
                     </div>
                     <Add_Modal open={open} onClose={() => setOpen(false)} />

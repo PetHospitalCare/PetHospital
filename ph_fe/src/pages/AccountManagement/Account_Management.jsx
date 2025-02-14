@@ -1,30 +1,7 @@
-
 import React, { useState, useEffect } from "react";
-import Zoom from "react-medium-image-zoom";
-import "react-medium-image-zoom/dist/styles.css";
-
-import {
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    useReactTable,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Pen, Trash2 } from "lucide-react";
-import { } from '@heroicons/react/20/solid'
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
     Table,
     TableBody,
@@ -34,68 +11,57 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import Page from "@/app/dashboard/page";
-import Add_Modal from "./Add_Service_Modal"
-import Edit_Modal from "./Edit_Service_Modal";
-
 import axios from "axios";
+import { Pen, Trash2 } from "lucide-react";
+import {
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from "@tanstack/react-table";
+import AddProfileDialog from "./Add_Account_Modal";
+import SheetDemo from "./Edit_Management";
 
-export default function Service_Managerment() {
+export default function AccountManagement() {
     const [data, setData] = useState([]);
+    const [search, setSearch] = useState("");
+    const [openEdit, setOpenEdit] = useState(false);
+    const [selectedAccount, setSelectedAccount] = useState(null);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
-    const [open, setOpen] = React.useState(false)
-    const [openEdit, setOpenEdit] = React.useState(false)
-    const [selectedService, setSelectedService] = useState(null);
-
-
-
-    // Gọi API để lấy danh sách sản phẩm
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get("http://localhost:9999/service/get-all"); // Thay bằng URL API của bạn
-                if (response.data.success) {
-                    const formattedData = response.data.services.map((service) => ({
-                        id: service._id,
-                        image: service.url,
-                        name: service.name,
-                        description: service.description,
-                        price: service.price,
-                        duration: service.duration,
-                        isAvailable: service.isAvailable
-
-                    }));
-                    console.log("Formatted Data:", formattedData);
-                    setData(formattedData);
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+    const [open, setOpen] = useState(false);
+    const fetchData = async () => {
+        try {
+            const response = await axios.get("http://localhost:9999/account/get-all");
+            console.log(response.data.accounts)
+            if (response.data.success) {
+                setData(response.data.accounts);
             }
-        };
-
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
+        }
+    };
+    useEffect(() => {
         fetchData();
     }, []);
 
     const handleDelete = async (id) => {
-        console.log(id)
-        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
+        if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
             try {
-                const response = await axios.delete(`http://localhost:9999/service/delete${id}`);
-                if (response.data.success) {
-                    alert("Xóa dịch vụ thành công!");
-                    setData((prevData) => prevData.filter((p) => p.id !== id));
-                } else {
-                    alert(response.data.message || "Không thể xóa sản phẩm.");
-                }
+                const response = await axios.delete(`http://localhost:9999/account/delete${id}`);
+                console.log(response)
+                setData((prevData) => prevData.filter((acc) => acc._id !== id));
+                alert("Xóa tài khoản thành công!");
             } catch (error) {
-                console.error("Lỗi khi xóa sản phẩm:", error);
+                console.error("Lỗi khi xóa tài khoản:", error);
                 alert("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
         }
     };
-
     const columns = [
         {
             id: "select",
@@ -124,10 +90,10 @@ export default function Service_Managerment() {
             enableHiding: false,
         },
         {
-            accessorKey: "image",
+            accessorKey: "url",
             header: () => <div className="text-center">Hình ảnh</div>,
             cell: ({ row }) => {
-                const imageUrl = row.getValue("image") || "/image_unavailable.jpg";
+                const imageUrl = row.getValue("url") || "/profile.png";
                 return (
                     <div className="flex justify-center">
                         <img src={imageUrl} alt="Dịch vụ" className="w-28 h-28 object-cover rounded-md" />
@@ -135,47 +101,20 @@ export default function Service_Managerment() {
                 );
             },
         },
-
         {
-            accessorKey: "name",
-            header: () => <div className="text-center">Tên dịch vụ</div>,
-            cell: ({ row }) => <div className=" text-center capitalize">{row.getValue("name")}</div>,
+            accessorKey: "username",
+            header: () => <div className="text-center">Tên</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("username")}</div>,
         },
         {
-            accessorKey: "price",
-            header: () => <div className="text-right">Giá tiền</div>,
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("price"));
-                return <div className="text-right font-medium">{amount.toLocaleString()}₫</div>;
-            },
+            accessorKey: "email",
+            header: () => <div className="text-center">Email</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("email")}</div>,
         },
         {
-            accessorKey: "duration",
-            header: () => <div className="text-center">Thời gian</div>,
-            cell: ({ row }) => {
-                const duration = row.getValue("duration");
-                const hours = Math.floor(duration / 60);
-                const minutes = duration % 60;
-
-                let displayTime = "";
-                if (hours > 0) {
-                    displayTime += `${hours} tiếng`;
-                }
-                if (minutes > 0) {
-                    displayTime += ` ${minutes} phút`;
-                }
-
-                return <div className="capitalize text-center">{displayTime.trim()}</div>;
-            },
-        },
-        {
-            accessorKey: "isAvailable",
-            header: () => <div className="text-center">Trạng thái</div>,
-            cell: ({ row }) => (
-                <div className="capitalize text-center">
-                    {row.getValue("isAvailable") ? "Hoạt động" : "Vô hiệu"}
-                </div>
-            ),
+            accessorKey: "role",
+            header: () => <div className="text-center">Vai trò</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("role").join(", ")}</div>,
         },
         {
             id: "actions",
@@ -185,12 +124,12 @@ export default function Service_Managerment() {
                     <button>
                         <Pen className="size-6 p-1 mr-1 " onClick={() => {
                             setOpenEdit(true);
-                            setSelectedService(row.original);
+                            setSelectedAccount(row.original);
                         }} />
 
                     </button>
 
-                    <button onClick={() => handleDelete(row.original.id)}>
+                    <button onClick={() => handleDelete(row.original._id)}>
                         <Trash2 className="size-6 p-1 " />
                     </button>
                 </div>
@@ -217,44 +156,27 @@ export default function Service_Managerment() {
         },
     });
 
+
     return (
         <Page>
             <div className="w-full">
+                <SheetDemo open={openEdit} onOpenChange={setOpenEdit} account={selectedAccount} onsuccess={fetchData} />
                 <div className="flex items-center py-4">
                     <Input
                         placeholder="Tìm kiếm sản phẩm..."
-                        value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-                        onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                        value={(table.getColumn("username")?.getFilterValue()) ?? ""}
+                        onChange={(e) => table.getColumn("username")?.setFilterValue(e.target.value)}
                         className="max-w-sm"
                     />
                     <div className="text-center ml-auto">
                         <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
-                            Thêm dịch vụ
+                            Tạo tài khoản mới
                         </Button>
 
-                    </div>
-                    <Add_Modal open={open} onClose={() => setOpen(false)}
-                        onAddService={(newService) => {
-                            console.log(newService)
-                            setData((prevData) => [...prevData, newService]);
-                        }} />
-                    <Edit_Modal
-                        open={openEdit}
-                        onClose={() => {
-                            setOpenEdit(false);
-                            setSelectedService(null);
-                        }}
-                        ServiceData={selectedService}
+                        <AddProfileDialog open={open} onOpenChange={setOpen} onSuccess={fetchData} />
 
-                        onUpdateService={(updatedService) => {
-                            setData((data) =>
-                                data.map((service) =>
-                                    service.id === updatedService.id ? updatedService : service
-                                )
-                            );
-                            console.log(updatedService)
-                        }}
-                    />
+                    </div>
+
                 </div>
                 <div className="rounded-md border  ">
                     <Table >

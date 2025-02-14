@@ -1,5 +1,5 @@
 const express = require("express");
-const { signup, signin } = require("../controllers/account.controller");
+const { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount } = require("../controllers/account.controller");
 const { verifyToken, authorize } = require("../middlewares/auth");
 const accountRouter = express.Router();
 
@@ -11,5 +11,8 @@ accountRouter.get("/profile", verifyToken, (req, res) => {
 accountRouter.get("/admin", verifyToken, authorize("admin"), (req, res) => {
   res.json({ message: "Admin dashboard" });
 });
-
+accountRouter.get("/get-all", getallAccount);
+accountRouter.post("/createnewaccount", createNewAccount);
+accountRouter.delete("/delete:id", deleteAccount);
+accountRouter.put("/edit/:id", editaccount);
 module.exports = accountRouter;

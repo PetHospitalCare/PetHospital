@@ -10,24 +10,35 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
-export default function Edit_Modal({ open, onClose, ServiceData }) {
+export default function Edit_Modal({ open, onClose, ServiceData, onUpdateService }) {
     const [serviceName, setServiceName] = useState("");
     const [serviceDescription, setServiceDescription] = useState("");
     const [price, setPrice] = useState("");
     const [duration, setDuration] = useState("");
-    const [isAvailable, setIsAvailable] = useState(""); // Mặc định là "true" (Còn trống)
-
+    const [isAvailable, setIsAvailable] = useState("");
+    const [image, setImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState("");
 
     useEffect(() => {
         if (ServiceData && open) {
             setServiceName(ServiceData.name || "");
-            setServiceDescription(ServiceData.description || ""); // Fixed from setDescription
+            setServiceDescription(ServiceData.description || "");
             setPrice(ServiceData.price?.toString() || "");
             setDuration(ServiceData.duration?.toString() || "");
             setIsAvailable(ServiceData.isAvailable?.toString() || "true");
+            setPreviewImage(ServiceData.image || "");
         }
     }, [ServiceData, open]);
+
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setImage(file);
+            setPreviewImage(URL.createObjectURL(file));
+        }
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -37,51 +48,68 @@ export default function Edit_Modal({ open, onClose, ServiceData }) {
             return;
         }
 
-        const formData = {
-            name: serviceName,
-            description: serviceDescription,
-            price: parseFloat(price),
-            duration: parseInt(duration, 10),
-            isAvailable: isAvailable === "true",
-        };
+        const formData = new FormData();
+        formData.append("name", serviceName);
+        formData.append("description", serviceDescription);
+        formData.append("price", parseFloat(price));
+        formData.append("duration", parseInt(duration, 10));
+        formData.append("isAvailable", isAvailable === "true");
+        if (image) {
+            formData.append("image", image);
+        }
 
         try {
-            // Make sure ServiceData.id exists
             if (!ServiceData?.id) {
                 throw new Error("Missing service ID");
-            }   
-             console.log(ServiceData.id)
+            }
+
             const response = await axios.put(
-                `http://localhost:9999/service/update/${ServiceData.id}`, 
-                formData
+                `http://localhost:9999/service/update/${ServiceData.id}`,
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } }
             );
-            
+            console.log(response.data)
+
             if (response.data.success) {
                 alert("Cập nhật dịch vụ thành công!");
-                window.location.reload();
+                onUpdateService({
+                    id: response.data.service?._id,
+                    image: response.data.service?.url,
+                    name: response.data.service?.name,
+                    description: response.data.service?.description,
+                    price: response.data.service?.price,
+                    duration: response.data.service?.duration,
+                    isAvailable: response.data.service?.isAvailable
+                });
                 onClose();
+
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật dịch vụ:", error);
-            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            alert("Đã xảy ra lỗi, ơi.");
         }
     };
-
+    <div>
+        <label className="block text-sm font-medium mb-2 text-left">Hình ảnh dịch vụ</label>
+        {previewImage && <img src={previewImage} alt="Preview" className="w-full h-40 object-cover mb-2" />}
+        <Input type="file" accept="image/*" onChange={handleImageChange} />
+    </div>
     if (!open) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-                <h2 className="text-xl font-bold mb-6 text-left">Cập nhật dịch vụ mới</h2>
+                <h2 className="text-xl font-bold mb-6 text-left">Cập nhật dịch vụ</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-2 text-left">Tên dịch vụ</label>
-                        <Input type="text" placeholder="Nhập tên dịch vụ" value={serviceName} onChange={(e) => setServiceName(e.target.value)} required />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-2 text-left">Giá tiền</label>
-                        <Input type="number" placeholder="Nhập giá tiền" value={price} onChange={(e) => setPrice(e.target.value)} required />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-left">Tên dịch vụ</label>
+                            <Input type="text" placeholder="Nhập tên dịch vụ" value={serviceName} onChange={(e) => setServiceName(e.target.value)} required />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-left">Giá tiền</label>
+                            <Input type="number" placeholder="Nhập giá tiền" value={price} onChange={(e) => setPrice(e.target.value)} required />
+                        </div>
                     </div>
 
                     <div>
@@ -89,50 +117,42 @@ export default function Edit_Modal({ open, onClose, ServiceData }) {
                         <Textarea placeholder="Mô tả dịch vụ của bạn" value={serviceDescription} onChange={(e) => setServiceDescription(e.target.value)} required />
                     </div>
 
-                    {/* Thời gian */}
-                    <div>
-                        <label className="block text-sm font-medium mb-2 text-left">Thời gian (phút)</label>
-                        <Select value={duration} onValueChange={setDuration}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Chọn thời gian" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="5">5 phút</SelectItem>
-                                    <SelectItem value="10">10 phút</SelectItem>
-                                    <SelectItem value="15">15 phút</SelectItem>
-                                    <SelectItem value="30">30 phút</SelectItem>
-                                    <SelectItem value="60">1 giờ</SelectItem>
-                                    <SelectItem value="75">1 giờ 15 phút</SelectItem>
-                                    <SelectItem value="90">1 giờ 30 phút</SelectItem>
-                                    <SelectItem value="105">1 giờ 45 phút</SelectItem>
-                                    <SelectItem value="120">2 giờ</SelectItem>
-                                    <SelectItem value="135">2 giờ 15 phút </SelectItem>
-                                    <SelectItem value="150">2 giờ 30 phút</SelectItem>
-                                    <SelectItem value="165">2 giờ 45 phút</SelectItem>
-                                    <SelectItem value="180">3 giờ</SelectItem>
-                                    <SelectItem value="195">3 giờ 15 phút</SelectItem>
-                                    <SelectItem value="210">3 giờ 30 phút</SelectItem>
-                                    <SelectItem value="225">3 giờ 45 phút</SelectItem>
-                                    <SelectItem value="240">4 giờ</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-left">Thời gian (phút)</label>
+                            <Select value={duration} onValueChange={setDuration}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Chọn thời gian" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        {[5, 10, 15, 30, 60, 75, 90, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240].map((time) => (
+                                            <SelectItem key={time} value={time.toString()}>{time} phút</SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-left">Trạng thái</label>
+                            <Select value={isAvailable} onValueChange={setIsAvailable}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Chọn trạng thái" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="true">Hoạt động</SelectItem>
+                                        <SelectItem value="false">Vô hiệu</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
-
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-left">Trạng thái</label>
-                        <Select value={isAvailable} onValueChange={setIsAvailable}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Chọn trạng thái" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="true">Hoạt động</SelectItem>
-                                    <SelectItem value="false">Vô hiệu</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <label className="block text-sm font-medium mb-2 text-left">Hình ảnh dịch vụ</label>
+
+                        <Input type="file" accept="image/*" onChange={handleImageChange} />
+                        {previewImage && <img src={previewImage} alt="Preview" className="w-full h-40 object-cover mb-2" />}
                     </div>
 
                     <div className="flex justify-between items-center mt-4">
