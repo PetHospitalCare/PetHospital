@@ -104,12 +104,12 @@ export default function AccountManagement() {
         {
             accessorKey: "username",
             header: () => <div className="text-center">Tên</div>,
-            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("username")}</div>,
+            cell: ({ row }) => <div className=" text-center">{row.getValue("username")}</div>,
         },
         {
             accessorKey: "email",
             header: () => <div className="text-center">Email</div>,
-            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("email")}</div>,
+            cell: ({ row }) => <div className=" text-center">{row.getValue("email")}</div>,
         },
         {
             accessorKey: "role",

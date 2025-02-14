@@ -19,7 +19,7 @@ app.use(
         credentials: true,
     })
 );
-
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: "64mb" }));

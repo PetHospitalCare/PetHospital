@@ -33,9 +33,9 @@ const signin = async (req, res) => {
     const { email, password } = req.body;
     const account = await Account.findOne({ email });
 
-    // if (!account || !(await comparePassword(password, account.password))) {
-    //   return res.status(401).json({ error: "Invalid credentials" });
-    // }
+    if (!account || !(await comparePassword(password, account.password))) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
 
     const token = generateToken(account._id, account.role);
 
@@ -46,7 +46,7 @@ const signin = async (req, res) => {
       maxAge: 86400000
     });
 
-    res.json({ message: "Login successful", role: account.role, token: token });
+    res.status(200).json({ message: "Login successful", role: account.role, token: token });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
