@@ -29,12 +29,20 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-
+import { UserContext } from "../contexts/UserContext"
+import { useContext } from "react"
+import { useNavigate } from "react-router-dom"
 export function NavUser({
+
   user
 }) {
+  const navigate = useNavigate();
+  const { logoutContext } = useContext(UserContext)
   const { isMobile } = useSidebar()
-
+  const handleLogout = () => {
+    logoutContext()
+    navigate("/Login")
+  }
   return (
     (<SidebarMenu>
       <SidebarMenuItem>
@@ -74,15 +82,8 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
                 <BadgeCheck />
-                Account
+                Hồ hơ
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
@@ -94,7 +95,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

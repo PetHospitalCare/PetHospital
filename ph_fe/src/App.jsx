@@ -2,33 +2,41 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-
+import { BrowserRouter, Route, Router, Routes } from 'react-router-dom'
+import Home from './pages/HomePage/Home'
+import Login from './pages/Login&SignUp/Login.jsx'
+import SignUp from './pages/Login&SignUp/SignUp.jsx'
+import ProductManagerment from './pages/ProductManagerment/Product_Managerment.jsx'
+import Service_Managerment from './pages/ServiceManagement/ServiceManagement.jsx'
+import OTP_Input from './pages/Login&SignUp/OTP_Input.jsx'
+import SignupSuccess from './pages/Login&SignUp/SignupSuccess.jsx'
+import LoadingScreen from './pages/Login&SignUp/LoadingScreen.jsx'
+import AccountManagement from './pages/AccountManagement/Account_Management.jsx'
+import Example from './pages/Unauthorized'
+import ProtectedRoute from './pages/protectedroute'
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <BrowserRouter>
+
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/Login' element={<Login />} />
+        <Route path='/SignUp' element={<SignUp />} />
+        <Route path='/otp' element={<OTP_Input />} />
+        <Route path="/loading" element={<LoadingScreen />} />
+        <Route path='/signup-success' element={<SignupSuccess />} />
+        <Route path='/unauthorized' element={<Example />} />
+
+        {/* Trang dành cho admin */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path='/Product_Managerment' element={<ProductManagerment />} />
+          <Route path='/Service_Managerment' element={<Service_Managerment />} />
+          <Route path='/Account_Managerment' element={<AccountManagement />} />
+        </Route>
+      </Routes>
+
+    </BrowserRouter>
   )
 }
 

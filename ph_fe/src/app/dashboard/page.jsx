@@ -13,7 +13,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-
 export default function Page({ children }) {
   return (
     (<SidebarProvider>
@@ -33,7 +32,7 @@ export default function Page({ children }) {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" /> */}
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Pet Hospital</BreadcrumbPage>
+                  <BreadcrumbPage>PetHospital</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

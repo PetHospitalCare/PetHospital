@@ -12,22 +12,10 @@ import OTP_Input from './pages/Login&SignUp/OTP_Input.jsx'
 import SignupSuccess from './pages/Login&SignUp/SignupSuccess.jsx'
 import LoadingScreen from './pages/Login&SignUp/LoadingScreen.jsx'
 import AccountManagement from './pages/AccountManagement/Account_Management.jsx'
+import { UserProvider } from './contexts/UserContext.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/Login' element={<Login />} />
-        <Route path='/SignUp' element={<SignUp />} />
-        <Route path='/otp' element={<OTP_Input />} />
-        <Route path="/loading" element={<LoadingScreen />} />
-        <Route path='/signup-success' element={<SignupSuccess />} />
-        <Route path='/Product_Managerment' element={<ProductManagerment />} />
-        <Route path='/Service_Managerment' element={<Service_Managerment />} />
-        <Route path='/Account_Managerment' element={<AccountManagement />} />
-      </Routes>
-    </BrowserRouter>
-
-  </StrictMode>
+  <UserProvider>
+    <App />
+  </UserProvider>
 )

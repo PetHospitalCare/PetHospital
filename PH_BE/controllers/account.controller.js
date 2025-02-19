@@ -37,16 +37,16 @@ const signin = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const token = generateToken(account._id, account.role);
+    const token = generateToken(account._id, account.role, account.username, account.email);
 
     res.cookie("access_token", token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "Lax",
       maxAge: 86400000
     });
 
-    res.status(200).json({ message: "Login successful", role: account.role, token: token });
+    res.status(200).json(account);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }

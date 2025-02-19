@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { UserService } from "../../services/UserService";
+import { UserContext } from "../../contexts/UserContext";
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const { loginContext } = useContext(UserContext)
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -15,17 +17,14 @@ export default function Login() {
     setError("");
 
     try {
-      console.log(formData)
-      const response = await axios.post("http://localhost:9999/account/signin",
-        formData, { withCredentials: true }
-      );
-
-
+      const response = await UserService.signInService(formData);
       if (response.status == 200) {
-        console.log(response.data)
+        loginContext(response.data)
         alert("Đăng nhập thành công!");
         navigate("/Product_Managerment");
+
       }
+
     } catch (error) {
       setError(error.message);
     }
