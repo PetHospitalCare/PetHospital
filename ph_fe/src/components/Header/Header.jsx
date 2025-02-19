@@ -2,7 +2,7 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
     Dialog,
     DialogPanel,
@@ -35,14 +35,17 @@ const callsToAction = [
     { name: 'Watch demo', to: '/', icon: PlayCircleIcon },
     { name: 'Contact sales', to: '/', icon: PhoneIcon },
 ]
+import DropdownMenuDemo from "../avatardropdown/avatardropdown"
+import { UserContext } from "../../contexts/UserContext";
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false);
+    const { user } = useContext(UserContext);
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 0);
         };
-
+        console.log(user);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
@@ -59,7 +62,10 @@ export default function Header() {
                         <img
                             alt=""
                             src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png"
-                            className="h-12 w-auto"
+                            className="h-12 w-auto pointer-events-none select-none"
+                            onContextMenu="return false;"
+                            onDrag="retrun false;"
+
                         />
                     </Link>
                 </div>
@@ -132,11 +138,16 @@ export default function Header() {
                         Contact
                     </Link>
                 </PopoverGroup>
-                <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                    <Link to="/Login" className="text-sm/6 font-semibold text-gray-900">
-                        Log in <span aria-hidden="true">&rarr;</span>
-                    </Link>
+                <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-end">
+                    {user ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)
+                        :
+                        (<Link to="/Login" className="text-sm/6 font-semibold text-gray-900">
+                            Log in <span aria-hidden="true">&rarr;</span>
+                        </Link>)}
+
+
                 </div>
+
             </nav>
             <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
                 <div className="fixed inset-0 z-10" />
