@@ -36,6 +36,7 @@ import {
 import Page from "@/app/dashboard/page";
 import Add_Modal from "./Add_Product_Modal";
 
+import { ProductService } from "../../services/ProductService";
 
 import axios from "axios";
 import Edit_Modal from "./Edit_Product_Modal";
@@ -54,7 +55,7 @@ export default function Product_Managerment() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://localhost:9999/product/get-all"); // Thay bằng URL API của bạn
+                const response = await ProductService.getAllProduct()
                 if (response.data.success) {
                     const formattedData = response.data.products.map((product) => ({
                         id: product._id,
@@ -81,7 +82,7 @@ export default function Product_Managerment() {
         console.log(id)
         if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
             try {
-                const response = await axios.delete(`http://localhost:9999/product/delete${id}`);
+                const response = await ProductService.deleteProduct(id)
                 if (response.data.success) {
                     alert("Xóa sản phẩm thành công!");
                     setData((prevData) => prevData.filter((p) => p.id !== id));

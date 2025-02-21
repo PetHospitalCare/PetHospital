@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
+import { UserService } from "@/services/UserService";
 
 export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
         if (!validateForm()) return;
 
         try {
-            const response = await axios.post("http://localhost:9999/account/createnewaccount", {
+            const response = await UserService.createAccount({
                 username: formData.username,
                 password: formData.password,
                 email: formData.email,

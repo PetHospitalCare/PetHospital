@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 import { Button } from "@/components/ui/button";
 import StepProgressBar from "@/components/Step-progress-bar";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
+import { UserService } from "../../services/UserService";
 
 export default function SignUp() {
     const [step, setStep] = useState(1);
@@ -25,7 +26,7 @@ export default function SignUp() {
     const handleSignUp = async (e) => {
         e.preventDefault();
         setError("");
-    
+
         if (!validateEmail(email)) {
             setError("Email must be a valid @gmail.com address");
             return;
@@ -42,15 +43,15 @@ export default function SignUp() {
             setError("Passwords do not match");
             return;
         }
-    
+
         try {
-            const response = await axios.get("http://localhost:9999/account/get-all");
-            const accounts = response.data.accounts; 
-    
+            const response = await UserService.getAllAccount();
+            const accounts = response.data.accounts;
+
             // validate email or phone exist
             const isEmailExist = accounts.some(acc => acc.email === email);
             const isPhoneExist = accounts.some(acc => acc.phone === phone);
-    
+
             if (isEmailExist) {
                 setError("Email is already registered");
                 return;
@@ -59,9 +60,9 @@ export default function SignUp() {
                 setError("Phone number is already registered");
                 return;
             }
-    
-            await axios.post("http://localhost:9999/account/send-otp", { email });
-    
+            
+            await UserService.sendOtp({email: email});
+
             // save temporary in localStorage
             localStorage.setItem("tempSignupData", JSON.stringify({
                 username,
@@ -71,13 +72,24 @@ export default function SignUp() {
                 phone,
                 role: ["customer"]
             }));
-    
+
             navigate("/otp", { state: { email } });
         } catch (err) {
             setError("Failed to check existing accounts");
         }
     };
-    
+
+    // Load temporary data from localStorage when component mounts
+    useEffect(() => {
+        const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
+        if (tempData) {
+            setUsername(tempData.username);
+            setEmail(tempData.email);
+            setPhone(tempData.phone);
+            setPassword(tempData.password);
+            setGender(tempData.gender);
+        }
+    }, []);
 
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
@@ -130,15 +142,17 @@ export default function SignUp() {
                         <div className="flex">
                             <Button
                                 type="button"
+                                value="male"
                                 className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                                onChange={() => setGender("male")}
+                                onChange={(e) => setGender(e.target.value)}
                             >
                                 Male
                             </Button>
                             <Button
                                 type="button"
+                                value="female"
                                 className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                                onChange={() => setGender("female")}
+                                onChange={(e) => setGender(e.target.value)}
                             >
                                 Female
                             </Button>

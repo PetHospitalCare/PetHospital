@@ -1,29 +1,27 @@
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import StepProgressBar from "@/components/Step-progress-bar";
-
+import { UserService } from "../../services/UserService";
+import  axios  from "axios";
 export default function LoadingScreen() {
     const navigate = useNavigate();
-    const { state } = useLocation(); 
+    const { state } = useLocation();
 
     useEffect(() => {
         const verifyOTP = async () => {
             try {
-                const response = await fetch("http://localhost:9999/account/verify-otp", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: state?.email, otp: state?.otp }),
-                });
+                const storedEmail = JSON.parse(localStorage.getItem("tempSignupData"))?.email;
+                const email = state?.email || storedEmail;
 
-                if (!response.ok) throw new Error("Invalid OTP");
+                const response = await UserService.verifyOTP({email:email, otp: state?.otp});
+             
+                if (response.status == 400) throw new Error("Invalid OTP");
 
                 const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
-                await fetch("http://localhost:9999/account/signup", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(tempData),
-                });
 
+                await UserService.signUpService(tempData);
+
+                // Xóa dữ liệu tạm thời và điều hướng
                 localStorage.removeItem("tempSignupData");
                 navigate("/signup-success");
             } catch (err) {
@@ -51,7 +49,7 @@ export default function LoadingScreen() {
                     <div className="flex justify-center">
                         <div className="w-16 h-16 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
                     </div>
-                     <StepProgressBar step={3} />
+                    <StepProgressBar step={3} />
                 </div>
             </div>
         </div>

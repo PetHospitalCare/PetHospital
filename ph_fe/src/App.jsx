@@ -14,6 +14,7 @@ import LoadingScreen from './pages/Login&SignUp/LoadingScreen.jsx'
 import AccountManagement from './pages/AccountManagement/Account_Management.jsx'
 import Example from './pages/Unauthorized'
 import ProtectedRoute from './pages/protectedroute'
+import ChangeEmail from './pages/Login&SignUp/Change_email'
 function App() {
 
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path='/Login' element={<Login />} />
         <Route path='/SignUp' element={<SignUp />} />
         <Route path='/otp' element={<OTP_Input />} />
+        <Route path='/change-email' element={<ChangeEmail />} />
         <Route path="/loading" element={<LoadingScreen />} />
         <Route path='/signup-success' element={<SignupSuccess />} />
         <Route path='/unauthorized' element={<Example />} />

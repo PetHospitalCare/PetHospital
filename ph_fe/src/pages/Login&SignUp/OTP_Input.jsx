@@ -5,13 +5,31 @@ import { Button } from "@/components/ui/button";
 import StepProgressBar from "@/components/Step-progress-bar";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
+import { UserService } from "../../services/UserService";
 
 export default function OTP_Input() {
     const [otp, setOtp] = useState("");
     const [error, setError] = useState("");
+    const [isSending, setIsSending] = useState(false);
+
     const navigate = useNavigate();
     const { state } = useLocation();
 
+    //Handle send again
+    const handleSendAgain = async () => {
+        setIsSending(true);
+        setError("");
+        try {
+            // await axios.post("http://localhost:9999/account/send-otp", { email: state?.email });
+            await UserService.sendOtp({ email: state?.email });
+            setIsSending(false);
+        } catch (err) {
+            setError("Gửi lại OTP thất bại. Vui lòng thử lại.");
+            setIsSending(false);
+        }
+    };
+
+    //handle verify otp to loading screen
     const handleVerifyOTP = (e) => {
         e.preventDefault();
         navigate("/loading", { state: { email: state?.email, otp } });
@@ -53,11 +71,17 @@ export default function OTP_Input() {
 
                         {/* Choice to select change email or Send Again */}
                         <div className="flex justify-between text-sm">
-                            <Link to="/ChangeEmail" className="text-red-500 font-medium underline">
+                            <Link to="/change-email" state={{ email: state?.email }} className="text-red-500 font-medium underline">
                                 Change your email
                             </Link>
-                            <button type="button" className="text-blue-500 font-medium underline">
-                                Send again
+                            <button
+                                type="button"
+                                disabled={isSending}
+                                onClick={handleSendAgain}
+                                className="text-blue-500 font-medium underline"
+                            >
+
+                                {isSending ? "is sending..." : "Send again"}
                             </button>
                         </div>
                         {error && <p className="text-red-500">{error}</p>}

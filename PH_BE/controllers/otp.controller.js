@@ -36,6 +36,8 @@ const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
         const validOTP = await OTP.findOne({ email: email, otp: otp });
+        console.log(otp)
+        console.log(email)
         if (!validOTP) {
             return res.status(400).json({ error: "Invalid OTP" });
         }

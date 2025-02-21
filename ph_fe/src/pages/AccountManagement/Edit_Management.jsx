@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Pen } from "lucide-react";
 import axios from "axios";
+import { UserService } from "@/services/UserService";
 export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
     const roles = ["customer", "staff", "admin", "doctor"];
     const [formData, setFormData] = useState({ username: "", email: "", phone: "", role: [] });
@@ -35,10 +36,7 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
 
     const handleSubmit = async () => {
         try {
-            console.log("Updated Data:", formData);
-            console.log("Updated Data:", account._id);
-            const response = await axios.put(`http://localhost:9999/account/edit/${account._id}`, formData);
-            console.log("Updated Account:", response);
+            const response = await UserService.updateAccount(account._id,formData);
             alert("Cập nhật thành công")
             onsuccess?.();
             onOpenChange(false);
