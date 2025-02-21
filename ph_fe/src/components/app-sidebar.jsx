@@ -60,6 +60,10 @@ export function AppSidebar({
             title: "Tài Khoản",
             url: "/Account_Managerment",
           },
+            {
+                title: "Bản Ghi Thú cưng",
+                url: "/PetRecord_Management",
+            },
         ],
       },
       {

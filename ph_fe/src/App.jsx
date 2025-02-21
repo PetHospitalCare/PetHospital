@@ -16,6 +16,8 @@ import Unauthorized from './pages/Unauthorized'
 import ProtectedRoute from './pages/protectedroute'
 import ChangeEmail from './pages/Login&SignUp/Change_email'
 import Notfound from './pages/PageNotFound'
+import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
+
 function App() {
 
   return (
@@ -36,6 +38,7 @@ function App() {
           <Route path='/Product_Managerment' element={<ProductManagerment />} />
           <Route path='/Service_Managerment' element={<Service_Managerment />} />
           <Route path='/Account_Managerment' element={<AccountManagement />} />
+          <Route path='/PetRecord_Management' element={<PetRecordManagement />}/>
         </Route>
 
         <Route path="*" element={< Notfound />} />
