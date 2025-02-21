@@ -13,6 +13,7 @@ export default function Home() {
             setIsScrolled(window.scrollY > 0);
         };
 
+
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
