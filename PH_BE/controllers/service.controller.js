@@ -39,7 +39,7 @@ const CreateNewService = async (req, res) => {
 };
 const getAllService = async (req, res) => {
     try {
-        const services = await Service.find()
+        const services = await Service.findOne({ name: "Tiêm chủng" })
             .exec();
 
         // Trả về danh sách sản phẩm
