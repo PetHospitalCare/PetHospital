@@ -59,13 +59,10 @@ export default function Service_Managerment() {
                 if (response.data.success) {
                     const formattedData = response.data.services.map((service) => ({
                         id: service._id,
-                        image: service.url,
                         name: service.name,
                         description: service.description,
-                        price: service.price,
-                        duration: service.duration,
-                        isAvailable: service.isAvailable
-
+                        subServices: service.subServices,
+                        status: service.status,
                     }));
                     console.log("Formatted Data:", formattedData);
                     setData(formattedData);
@@ -122,18 +119,6 @@ export default function Service_Managerment() {
             ),
             enableSorting: false,
             enableHiding: false,
-        },
-        {
-            accessorKey: "image",
-            header: () => <div className="text-center">Hình ảnh</div>,
-            cell: ({ row }) => {
-                const imageUrl = row.getValue("image") || "/image_unavailable.jpg";
-                return (
-                    <div className="flex justify-center">
-                        <img src={imageUrl} alt="Dịch vụ" className="w-28 h-28 object-cover rounded-md" />
-                    </div>
-                );
-            },
         },
 
         {

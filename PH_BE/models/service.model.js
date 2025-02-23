@@ -1,15 +1,19 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const serviceSchema = new mongoose.Schema({
+const SubServiceSchema = new mongoose.Schema({
+    name: { type: String, required: false },
+    price: {
+        dog: { type: Number, required: false },
+        cat: { type: Number, required: false }
+    }, // Giá theo từng loại thú cưng
+    status: { type: String, enum: ["active", "inactive"], default: "active" }, // Trạng thái
+});
+
+const ServiceSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String },
-    price: { type: Number, required: true },
-
-    url: { type: String },
-    publicId: { type: String },
-
-    duration: { type: Number, required: true },
-    isAvailable: { type: Boolean, default: true },
+    subServices: [SubServiceSchema], // Danh sách dịch vụ con
 }, { timestamps: true });
 
-module.exports = mongoose.model('Service', serviceSchema);
+const Service = mongoose.model("Service", ServiceSchema);
+module.exports = Service;
