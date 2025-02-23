@@ -12,6 +12,7 @@ import {
 import MultiSelect from "@/components/multi-select";
 import { Dog, Cat } from "lucide-react"
 
+import { ProductService } from "../../services/ProductService";
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
 import { Combobox } from "@/components/Combobox";
@@ -35,7 +36,7 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get("http://localhost:9999/category/get-all");
+                const response = await ProductService.getAllCategory()
                 if (response.data.success) {
                     setCategories(
                         response.data.categories.map((category) => ({

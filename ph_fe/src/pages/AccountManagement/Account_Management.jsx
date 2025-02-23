@@ -23,6 +23,7 @@ import {
 } from "@tanstack/react-table";
 import AddProfileDialog from "./Add_Account_Modal";
 import SheetDemo from "./Edit_Management";
+import { UserService } from "@/services/UserService";
 
 export default function AccountManagement() {
     const [data, setData] = useState([]);
@@ -36,7 +37,7 @@ export default function AccountManagement() {
     const [open, setOpen] = useState(false);
     const fetchData = async () => {
         try {
-            const response = await axios.get("http://localhost:9999/account/get-all");
+            const response = await UserService.getAllAccount()
             console.log(response.data.accounts)
             if (response.data.success) {
                 setData(response.data.accounts);
@@ -52,7 +53,7 @@ export default function AccountManagement() {
     const handleDelete = async (id) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
             try {
-                const response = await axios.delete(`http://localhost:9999/account/delete${id}`);
+                const response = await UserService.deleteAccount(id);
                 console.log(response)
                 setData((prevData) => prevData.filter((acc) => acc._id !== id));
                 alert("Xóa tài khoản thành công!");

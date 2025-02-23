@@ -16,6 +16,7 @@ import { Dog, Cat } from "lucide-react"
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
 import { Combobox } from "@/components/Combobox";
+import { ProductService } from "../../services/ProductService";
 
 const frameworksList = [
     { value: "Dog", label: "Chó", icon: Dog },
@@ -36,7 +37,7 @@ export default function Add_Modal({ open, onClose }) {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get("http://localhost:9999/category/get-all");
+                const response = await ProductService.getAllCategory()
                 if (response.data.success) {
                     setCategories(
                         response.data.categories.map((category) => ({
@@ -98,9 +99,7 @@ export default function Add_Modal({ open, onClose }) {
         // Nếu danh mục được chọn là tạm thời, lưu nó vào DB trước
         if (categories.find((category) => category.value === selectedCategory)?.isTemporary) {
             try {
-                const response = await axios.post("http://localhost:9999/category/create", {
-                    name: categories.find((cat) => cat.value === selectedCategory).label,
-                });
+                const response = await ProductService.createCategory({name: categories.find((cat) => cat.value === selectedCategory).label});
                 if (response.data.success) {
                     // Cập nhật ID danh mục thật vào state và sử dụng ID này
                     finalCategoryId = response.data.category._id;
@@ -130,11 +129,7 @@ export default function Add_Modal({ open, onClose }) {
 
 
         try {
-            const response = await axios.post("http://localhost:9999/product/create", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await ProductService.createProduct(formData);
             if (response.data.message === "Tạo sản phẩm thành công") {
                 alert("Sản phẩm đã được thêm!");
                 window.location.reload();
