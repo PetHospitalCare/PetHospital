@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { UserService } from "../../services/UserService";
+import StepProgressBar from "@/components/Step-progress-bar";
 
 export default function ChangeEmail() {
     const [newEmail, setNewEmail] = useState("");
@@ -75,10 +76,12 @@ export default function ChangeEmail() {
                             <Input 
                                 type="email" 
                                 value={newEmail} 
+                                placeholder="Nhập lại email mới"
                                 onChange={(e) => setNewEmail(e.target.value)} 
                                 required 
                             />
                         </div>
+                        <StepProgressBar step={2} />
                         <div className="text-center">
                             <Button type="submit" className="w-2/5 bg-blue-400 text-white py-3 rounded font-medium hover:bg-blue-500 transition-colors">
                                 Xác nhận
