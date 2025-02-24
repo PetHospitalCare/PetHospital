@@ -34,12 +34,13 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import Page from "@/app/dashboard/page";
-import Add_Modal from "./Add_Service_Modal"
-import Edit_Modal from "./Edit_Service_Modal";
-
+import Add_Modal from "./Add_SubService_Modal"
+import Edit_Modal from "./Edit_SubService_Modal"
 import axios from "axios";
-
+import { useParams } from "react-router-dom";
+import { Services } from "../../services/Services";
 export default function Service_Managerment() {
+    const { id } = useParams();
     const [data, setData] = useState([]);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
@@ -49,40 +50,32 @@ export default function Service_Managerment() {
     const [openEdit, setOpenEdit] = React.useState(false)
     const [selectedService, setSelectedService] = useState(null);
 
+    const fetchData = async () => {
+        try {
+            const response = await Services.getAllServiceById(id) // Thay bằng URL API của bạn
+            if (response.data.success) {
 
+                console.log("Formatted Data:", response.data.services);
+                setData(response.data.services);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+        }
+    };
 
     // Gọi API để lấy danh sách sản phẩm
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get("http://localhost:9999/service/get-all"); // Thay bằng URL API của bạn
-                if (response.data.success) {
-                    const formattedData = response.data.services.map((service) => ({
-                        id: service._id,
-                        name: service.name,
-                        description: service.description,
-                        subServices: service.subServices,
-                        status: service.status,
-                    }));
-                    console.log("Formatted Data:", formattedData);
-                    setData(formattedData);
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
-            }
-        };
-
         fetchData();
-    }, []);
+    }, [id]);
 
-    const handleDelete = async (id) => {
-        console.log(id)
+    const handleDelete = async (sid) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
             try {
-                const response = await axios.delete(`http://localhost:9999/service/delete${id}`);
+
+                const response = await Services.DeleteSubService(id, sid)
                 if (response.data.success) {
                     alert("Xóa dịch vụ thành công!");
-                    setData((prevData) => prevData.filter((p) => p.id !== id));
+                    fetchData();
                 } else {
                     alert(response.data.message || "Không thể xóa sản phẩm.");
                 }
@@ -124,41 +117,34 @@ export default function Service_Managerment() {
         {
             accessorKey: "name",
             header: () => <div className="text-center">Tên dịch vụ</div>,
-            cell: ({ row }) => <div className=" text-center capitalize">{row.getValue("name")}</div>,
-        },
-        {
-            accessorKey: "price",
-            header: () => <div className="text-right">Giá tiền</div>,
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("price"));
-                return <div className="text-right font-medium">{amount.toLocaleString()}₫</div>;
-            },
+            cell: ({ row }) => <div className="text-center capitalize">{row.getValue("name")}</div>,
         },
         {
             accessorKey: "duration",
-            header: () => <div className="text-center">Thời gian</div>,
+            header: () => <div className="text-center">thời gian</div>,
+            cell: ({ row }) => <div className="text-center capitalize">{row.getValue("duration")}</div>,
+        },
+        {
+            accessorKey: "price",
+            header: () => <div className="text-center">Giá tiền</div>,
             cell: ({ row }) => {
-                const duration = row.getValue("duration");
-                const hours = Math.floor(duration / 60);
-                const minutes = duration % 60;
+                const price = row.original.price;
+                const dogPrice = price?.dog ? `${price.dog.toLocaleString()}₫ (Chó)` : "";
+                const catPrice = price?.cat ? `${price.cat.toLocaleString()}₫ (Mèo)` : "";
 
-                let displayTime = "";
-                if (hours > 0) {
-                    displayTime += `${hours} tiếng`;
-                }
-                if (minutes > 0) {
-                    displayTime += ` ${minutes} phút`;
-                }
-
-                return <div className="capitalize text-center">{displayTime.trim()}</div>;
+                return (
+                    <div className="text-center font-medium">
+                        {dogPrice}<br></br> {catPrice}
+                    </div>
+                );
             },
         },
         {
-            accessorKey: "isAvailable",
+            accessorKey: "status",
             header: () => <div className="text-center">Trạng thái</div>,
             cell: ({ row }) => (
                 <div className="capitalize text-center">
-                    {row.getValue("isAvailable") ? "Hoạt động" : "Vô hiệu"}
+                    {row.original.status === "active" ? "Hoạt động" : "Vô hiệu"}
                 </div>
             ),
         },
@@ -168,20 +154,23 @@ export default function Service_Managerment() {
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
                     <button>
-                        <Pen className="size-6 p-1 mr-1 " onClick={() => {
-                            setOpenEdit(true);
-                            setSelectedService(row.original);
-                        }} />
-
+                        <Pen
+                            className="size-6 p-1 mr-1"
+                            onClick={() => {
+                                setOpenEdit(true);
+                                setSelectedService(row.original);
+                            }}
+                        />
                     </button>
 
-                    <button onClick={() => handleDelete(row.original.id)}>
-                        <Trash2 className="size-6 p-1 " />
+                    <button onClick={() => handleDelete(row.original._id)}>
+                        <Trash2 className="size-6 p-1" />
                     </button>
                 </div>
             ),
         },
     ];
+
 
     const table = useReactTable({
         data,
@@ -219,10 +208,7 @@ export default function Service_Managerment() {
 
                     </div>
                     <Add_Modal open={open} onClose={() => setOpen(false)}
-                        onAddService={(newService) => {
-                            console.log(newService)
-                            setData((prevData) => [...prevData, newService]);
-                        }} />
+                        onAddService={fetchData} />
                     <Edit_Modal
                         open={openEdit}
                         onClose={() => {
@@ -231,14 +217,7 @@ export default function Service_Managerment() {
                         }}
                         ServiceData={selectedService}
 
-                        onUpdateService={(updatedService) => {
-                            setData((data) =>
-                                data.map((service) =>
-                                    service.id === updatedService.id ? updatedService : service
-                                )
-                            );
-                            console.log(updatedService)
-                        }}
+                        onUpdateService={fetchData}
                     />
                 </div>
                 <div className="rounded-md border  ">
