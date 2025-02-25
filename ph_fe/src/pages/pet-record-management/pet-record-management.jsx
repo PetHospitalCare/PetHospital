@@ -43,32 +43,34 @@ export default function PetRecordManagement() {
 
     // Gọi API để lấy danh sách bản ghi thú cưng
     useEffect(() => {
-        // const fetchData = async () => {
-        //     try {
-        //         const response = await PetRecordService.getAllPets();
-        //
-        //         if (response.data.success) {
-        //             const formattedData = response.data.pets.map((pet) => ({
-        //                 id: pet._id,
-        //                 name: pet.name,
-        //                 imageUrl: pet.images,
-        //                 description: pet.description,
-        //                 type: pet.type
-        //             }));
-        //             setData(formattedData);
-        //         }
-        //     } catch (error) {
-        //         console.error("Lỗi khi lấy dữ liệu thú cưng:", error);
-        //     }
-        // };
-        //
-        // fetchData();
+        const fetchData = async () => {
+            try {
+                const response = await PetRecordService.getAllPetRecords();
 
-        setData([
-            {id: 'petR1', name: 'Customer111', phoneNumber: '0123456781', imageUrl: ['https://res.cloudinary.com/debx8syhr/image/upload/v1737735769/SDN301m/fr5ec6kmr2txll0ravnk.png'], service: 'Khám Bệnh', time: '2025-02-22 14:00 - 15:00'},
-            {id: 'petR2', name: 'Customer222', phoneNumber: '0123456782', imageUrl: ['https://res.cloudinary.com/debx8syhr/image/upload/v1737735769/SDN301m/fr5ec6kmr2txll0ravnk.png'], service: 'Cắt Giống', time: '2025-02-22 15:00 - 16:00'},
-            {id: 'petR3', name: 'Customer333', phoneNumber: '0123456783', imageUrl: ['https://res.cloudinary.com/debx8syhr/image/upload/v1737735769/SDN301m/fr5ec6kmr2txll0ravnk.png'], service: 'Hộ Sinh', time: '2025-02-22 16:00 - 17:00'},
-        ]);
+                if (response.data.success) {
+                    const formattedData = response.data.petRecords.map((petRecord) => ({
+                        customer_id: petRecord.customer_id,
+                        customer_name: petRecord.customer_name,
+                        phoneNumber: petRecord.phoneNumber,
+                        pet_name: petRecord.pet_name,
+                        service: 'Khám Bệnh',
+                        time: '2025-02-22 14:00 - 15:00'
+                    }));
+
+                    setData(formattedData);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu thú cưng:", error);
+            }
+        };
+
+        fetchData();
+
+        // setData([
+        //     {customer_id: '123', customer_name: 'Customer111', phoneNumber: '0123456781', pet_name: 'Mực', service: 'Khám Bệnh', time: '2025-02-22 14:00 - 15:00'},
+        //     {id: 'petR2', name: 'Customer222', phoneNumber: '0123456782', petName: 'Milo', service: 'Cắt Giống', time: '2025-02-22 15:00 - 16:00'},
+        //     {id: 'petR3', name: 'Customer333', phoneNumber: '0123456783', petName: 'Bún', service: 'Hộ Sinh', time: '2025-02-22 16:00 - 17:00'},
+        // ]);
     }, []);
 
     const handleDelete = async (id) => {
@@ -93,7 +95,7 @@ export default function PetRecordManagement() {
         {
             id: "select",
             header: ({ table }) => (
-                <div className="text-center">
+                <div className="text-left">
                     <Checkbox
                         checked={
                             table.getIsAllPageRowsSelected() ||
@@ -115,40 +117,55 @@ export default function PetRecordManagement() {
             enableHiding: false,
         },
         {
-            accessorKey: "name",
-            header: () => <div className="text-center">Tên thú cưng</div>,
-            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("name")}</div>,
+            accessorKey: "customer_name",
+            header: () => <div className="text-center">Tên</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("customer_name")}</div>,
         },
         {
             accessorKey: "phoneNumber",
             header: () => <div className="text-center">Số điện thoại</div>,
             cell: ({ row }) => <div className="capitalize text-center">{row.getValue("phoneNumber")}</div>,
         },
+        // {
+        //     accessorKey: "imageUrl",
+        //     header: () => <div className="text-center">Thú cưng</div>,
+        //     cell: ({ row }) => {
+        //         const images = row.original.imageUrl; // Lấy danh sách ảnh từ API
+        //         return (
+        //             <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
+        //                 {images.map((image, index) => (
+        //                     <Zoom>
+        //                         <img
+        //                             src={image}
+        //                             alt={`Pet ${index}`}
+        //                             className="h-28 w-28 object-cover rounded-md"
+        //                         />
+        //                     </Zoom>
+        //                 ))}
+        //             </div>
+        //         );
+        //     },
+        //     enableSorting: false,
+        //     enableHiding: false,
+        // },
         {
-            accessorKey: "imageUrl",
-            header: () => <div className="text-center">Ảnh</div>,
-            cell: ({ row }) => {
-                const images = row.original.imageUrl; // Lấy danh sách ảnh từ API
-                return (
-                    <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
-                        {images.map((image, index) => (
-                            <Zoom>
-                                <img
-                                    src={image}
-                                    alt={`Pet ${index}`}
-                                    className="h-28 w-28 object-cover rounded-md"
-                                />
-                            </Zoom>
-                        ))}
-                    </div>
-                );
-            },
-            enableSorting: false,
-            enableHiding: false,
+            accessorKey: "pet_name",
+            header: () => <div className="text-center">Thú cưng</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("pet_name")}</div>,
+        },
+        {
+            accessorKey: "service",
+            header: () => <div className="text-center">Dịch vụ</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("service")}</div>,
+        },
+        {
+            accessorKey: "time",
+            header: () => <div className="text-center">Thời gian</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("time")}</div>,
         },
         {
             id: "actions",
-            header: () => <div className="text-center font-semibold">...</div>,
+            header: () => <div className="text-center font-semibold">Hành động</div>,
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
                     <button>
@@ -191,14 +208,14 @@ export default function PetRecordManagement() {
             <div className="w-full">
                 <div className="flex items-center py-4">
                     <Input
-                        placeholder="Tìm kiếm thú cưng..."
-                        value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-                        onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                        placeholder="Tìm kiếm..."
+                        value={(table.getColumn("customer_name")?.getFilterValue()) ?? ""}
+                        onChange={(e) => table.getColumn("customer_name")?.setFilterValue(e.target.value)}
                         className="max-w-sm"
                     />
                     <div className="text-center ml-auto">
                         <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
-                            Thêm thú cng
+                            Thêm bản ghi thú cưng
                         </Button>
 
                     </div>
