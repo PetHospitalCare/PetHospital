@@ -7,7 +7,9 @@ const Admin = require("./admin.model");
 const Doctor = require("./doctor.model");
 const Staff = require("./staff.model");
 const Customer = require("./customer.model");
-const OTP = require("./otp.model")
+const OTP = require("./otp.model");
+const Pet = require("./pet.model");
+
 mongoose.Promise = global.Promise;
 
 const db = {};
@@ -20,6 +22,7 @@ db.doctor = Doctor
 db.staff = Staff
 db.customer = Customer
 db.otp = OTP
+db.pet = Pet
 const connectDB = async () => {
     await mongoose
         .connect(process.env.MONGO_URI, {

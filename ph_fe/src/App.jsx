@@ -36,7 +36,7 @@ function App() {
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path='/Product_Managerment' element={<ProductManagerment />} />
-          <Route path='/Service_Managerment' element={<Service_Managerment />} />
+          <Route path='/Service_Managerment/:id' element={<Service_Managerment />} />
           <Route path='/Account_Managerment' element={<AccountManagement />} />
           <Route path='/PetRecord_Management' element={<PetRecordManagement />}/>
         </Route>

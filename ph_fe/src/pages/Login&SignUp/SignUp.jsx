@@ -123,19 +123,34 @@ export default function SignUp() {
                         {/* UserName */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Username<span className="text-red-600">*</span></label>
-                            <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                            <Input
+                                type="text"
+                                value={username}
+                                placeholder="Nhập username"
+                                onChange={(e) => setUsername(e.target.value)}
+                                required />
                         </div>
 
                         {/* Email */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Email<span className="text-red-600">*</span></label>
-                            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                            <Input 
+                                type="email" 
+                                value={email} 
+                                placeholder="Nhập email"
+                                onChange={(e) => setEmail(e.target.value)} 
+                                required />
                         </div>
 
                         {/* Phone Number */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Phone Number<span className="text-red-600">*</span></label>
-                            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                            <Input 
+                                type="tel" 
+                                value={phone} 
+                                placeholder="Nhập số điện thoại" 
+                                onChange={(e) => setPhone(e.target.value)} 
+                                required />
                         </div>
 
                         {/* Gender Selection */}
@@ -143,16 +158,16 @@ export default function SignUp() {
                             <Button
                                 type="button"
                                 value="male"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                                onChange={(e) => setGender(e.target.value)}
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick ={(e) => setGender(e.target.value)}
                             >
                                 Male
                             </Button>
                             <Button
                                 type="button"
                                 value="female"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                                onChange={(e) => setGender(e.target.value)}
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick ={(e) => setGender(e.target.value)}
                             >
                                 Female
                             </Button>
@@ -161,13 +176,23 @@ export default function SignUp() {
                         {/* Password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Password<span className="text-red-600">*</span></label>
-                            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                            <Input 
+                                type="password" 
+                                value={password} 
+                                placeholder="Nhập mật khẩu" 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required />
                         </div>
 
                         {/* Confirm password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Confirm Password<span className="text-red-600">*</span></label>
-                            <Input type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} required />
+                            <Input 
+                                type="password" 
+                                value={confirmPassword} 
+                                placeholder="Nhập lại mật khẩu" 
+                                onChange={handleConfirmPasswordChange} 
+                                required />
                             {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
                         </div>
 

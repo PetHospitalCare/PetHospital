@@ -38,7 +38,7 @@ import Add_Modal from "./Add_Product_Modal";
 
 import { ProductService } from "../../services/ProductService";
 
-import axios from "axios";
+
 import Edit_Modal from "./Edit_Product_Modal";
 
 export default function Product_Managerment() {

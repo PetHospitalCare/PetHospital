@@ -26,13 +26,33 @@ import {
 } from "@/components/ui/sidebar"
 import { UserContext } from "../contexts/UserContext"
 import { useContext } from "react"
-
+import { useState } from "react"
+import { useEffect } from "react"
+import { Services } from "../../src/services/Services";
 
 
 export function AppSidebar({
   ...props
 }) {
   const { user } = useContext(UserContext)
+  const [service, setService] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await Services.getAllService("http://localhost:9999/service/get-all"); // Thay bằng URL API của bạn
+        if (response.data.success) {
+
+          console.log("Formatted Data:", response.data.services);
+          setService(response.data.services);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const data = {
     user: {
       name: user.username,
@@ -71,54 +91,10 @@ export function AppSidebar({
         url: "#",
         icon: HeartPulse,
         isActive: true,
-        items: [
-          {
-            title: "Siêu âm, Chụp X quang",
-            url: "",
-          },
-          {
-            title: "Khám sức khỏe và điều trị bệnh",
-            url: "",
-          },
-          {
-            title: "Xét nghiệm máu",
-            url: "",
-          },
-          {
-            title: "Khám điều trị tại nhà",
-            url: "",
-          },
-          {
-            title: "Phẫu thuật mổ để",
-            url: "",
-          },
-          {
-            title: "Phẫu thuật phức tạp",
-            url: "",
-          },
-          {
-            title: "Phẫu thuật xương",
-            url: "",
-          },
-          {
-            title: "Lưu chuồng điều trị",
-            url: "",
-          },
-          {
-            title: "Spa & Grooming",
-            url: "",
-          },
-          {
-            title: "Tiêm vaccine chó & mèo",
-            url: "",
-          },
-          {
-            title: "Triệt sản chó & mèo",
-            url: "",
-          },
-
-
-        ],
+        items: service.map((item) => ({
+          title: item.name,
+          url: `/Service_Managerment/${item._id}`,
+        })),
       },
     ],
     projects: [
@@ -142,7 +118,6 @@ export function AppSidebar({
   return (
     (<Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
