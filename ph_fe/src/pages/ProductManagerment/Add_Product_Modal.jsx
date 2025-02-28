@@ -99,7 +99,7 @@ export default function Add_Modal({ open, onClose }) {
         // Nếu danh mục được chọn là tạm thời, lưu nó vào DB trước
         if (categories.find((category) => category.value === selectedCategory)?.isTemporary) {
             try {
-                const response = await ProductService.createCategory({name: categories.find((cat) => cat.value === selectedCategory).label});
+                const response = await ProductService.createCategory({ name: categories.find((cat) => cat.value === selectedCategory).label });
                 if (response.data.success) {
                     // Cập nhật ID danh mục thật vào state và sử dụng ID này
                     finalCategoryId = response.data.category._id;

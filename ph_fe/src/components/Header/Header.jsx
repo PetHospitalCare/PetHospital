@@ -45,7 +45,6 @@ export default function Header() {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 0);
         };
-        console.log(user);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
@@ -63,8 +62,8 @@ export default function Header() {
                             alt=""
                             src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png"
                             className="h-12 w-auto pointer-events-none select-none"
-                            onContextMenu="return false;"
-                            onDrag="retrun false;"
+                        // onContextMenu="return false;"
+                        // onDrag="retrun false;"
 
                         />
                     </Link>
