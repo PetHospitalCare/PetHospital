@@ -18,7 +18,23 @@ const customerSchema = new mongoose.Schema(
             {
                 pet_name: String
             }
-        ]
+        ],
+        customer_id: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        phone_number: {
+            type: String,
+            required: true
+        },
+        pet_id: {
+            type: String,
+            required: true
+        },
     },
     { timestamps: true }
 );
