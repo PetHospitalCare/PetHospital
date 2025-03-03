@@ -37,7 +37,7 @@ const CreateNewService = async (req, res) => {
 };
 const getAllService = async (req, res) => {
     try {
-        const services = await Service.find().select("-subServices");
+        const services = await Service.find();
         // Trả về danh sách sản phẩm
         return res.status(200).json({
             success: true,
