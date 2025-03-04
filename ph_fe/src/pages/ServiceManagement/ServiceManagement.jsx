@@ -55,7 +55,7 @@ export default function Service_Managerment() {
             const response = await Services.getAllServiceById(id) // Thay bằng URL API của bạn
             if (response.data.success) {
 
-                console.log("Formatted Data:", response.data.services);
+
                 setData(response.data.services);
             }
         } catch (error) {

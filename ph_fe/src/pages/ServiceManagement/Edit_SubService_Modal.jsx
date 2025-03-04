@@ -26,7 +26,7 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
             setDuration(ServiceData.duration?.toString() || "");
             setStatus(ServiceData.status?.toString() || "");
         }
-        console.log(ServiceData);
+
     }, [ServiceData, open]);
 
     const handleSubmit = async (event) => {

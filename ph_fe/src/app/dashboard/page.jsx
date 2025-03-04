@@ -18,16 +18,25 @@ import { useLocation } from "react-router-dom";
 export default function Page({ children }) {
   const [navTitle, setNavTitle] = useState([]);
   const [navItems, setNavItems] = useState([]);
+  const [project, setProject] = useState([]);
   const location = useLocation();
 
   // Find breadcrumb that matchs with url
   const currentBreadcrumb = navItems.find((item) => item.url === location.pathname);
-  const parentTitle = navTitle.find((title) =>
-    navItems.some((item) => item.url === location.pathname && item.title === currentBreadcrumb?.title)
-  );
+  const findSectionTitleByItemTitle = (data, itemTitle) => {
+    for (const section of data) {
+      if (section.items.some(item => item.title === itemTitle)) {
+        return section.title;
+      }
+    }
+    return null; // Trả về null nếu không tìm thấy
+  };
+  const parentTitle = findSectionTitleByItemTitle(navTitle, currentBreadcrumb?.title)
+  const projecttilte = project.find((item) => item.url === location.pathname)
+
   return (
     (<SidebarProvider>
-      <AppSidebar setNavItems={setNavItems} setNavTitle={setNavTitle}/>
+      <AppSidebar setNavItems={setNavItems} setNavTitle={setNavTitle} setProject={setProject} />
       <SidebarInset>
         <header
           className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -38,7 +47,12 @@ export default function Page({ children }) {
               <BreadcrumbList>
                 {parentTitle && (
                   <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink>{parentTitle}</BreadcrumbLink>
+                    <BreadcrumbLink>{parentTitle} </BreadcrumbLink>
+                  </BreadcrumbItem>
+                )}
+                {projecttilte && (
+                  <BreadcrumbItem >
+                    <BreadcrumbPage>{projecttilte.name} </BreadcrumbPage>
                   </BreadcrumbItem>
                 )}
                 {parentTitle && <BreadcrumbSeparator className="hidden md:block" />}
