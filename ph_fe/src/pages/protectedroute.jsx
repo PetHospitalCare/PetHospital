@@ -52,7 +52,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
         setCheckingAuth(false);
 
         // Trả về một hàm cleanup hợp lệ (hoặc không return gì)
-        return () => { };
+        // return () => { };
     }, [location.pathname, setUser]);
 
     if (checkingAuth) return <div>Loading...</div>;
