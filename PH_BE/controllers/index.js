@@ -14,7 +14,7 @@ module.exports = {
     OTPController,
 
     PetRecordController,
-    BookingController
+    BookingController,
 
     MedicineController,
 
