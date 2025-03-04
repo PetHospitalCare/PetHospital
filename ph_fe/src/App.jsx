@@ -20,6 +20,7 @@ import Notfound from './pages/PageNotFound'
 import Calendar from './pages/BookingSchedule/CalendarPage'
 
 import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
+import ProductPage from "@/pages/product-page/product-page.jsx";
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
         <Route path="/loading" element={<LoadingScreen />} />
         <Route path='/signup-success' element={<SignupSuccess />} />
         <Route path='/unauthorized' element={<Unauthorized />} />
+        <Route path='/product' element={<ProductPage />} />
 
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

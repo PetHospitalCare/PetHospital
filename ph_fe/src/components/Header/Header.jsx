@@ -35,19 +35,46 @@ const callsToAction = [
     { name: 'Watch demo', to: '/', icon: PlayCircleIcon },
     { name: 'Contact sales', to: '/', icon: PhoneIcon },
 ]
+const tempCategories = [
+    { name: 'Thực phẩm', description: 'Thức ăn dành cho chó và mèo', to: '/product/1' },
+    { name: 'Thực phẩm bổ sung', description: 'Các sản phẩm bổ sung dinh dưỡng và các chất cho chó mèo', to: '/product/2'},
+    { name: 'Phụ kiện', description: 'Các phụ kiện dành cho chó mèo: lược, sữa tắm, dầu thơm, dây, chuồng, cát', to: '/product/3' },
+    { name: 'Thuốc', description: 'Các sản phẩm trị bệnh cho chó mèo', to: '/product/4' },
+    { name: 'Pate', description: 'Pate dành cho chó mèo', to: '/product/5' },
+]
 import DropdownMenuDemo from "../avatardropdown/avatardropdown"
 import { UserContext } from "../../contexts/UserContext";
+import {ProductService} from "@/services/ProductService.js";
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false);
     const { user } = useContext(UserContext);
+    const [categories, setCategories] = useState(tempCategories);
+
     useEffect(() => {
+        fetchCategories();
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 0);
         };
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await ProductService.getAllCategory()
+            if (response.data.success) {
+                setCategories(
+                    response.data.categories.map((category) => ({
+                        name: category.name,
+                        description: category.description,
+                    }))
+                );
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh mục:", error);
+        }
+    };
 
     return (
         <header
@@ -81,7 +108,7 @@ export default function Header() {
                 <PopoverGroup className="hidden lg:flex lg:gap-x-12">
                     <Popover className="relative">
                         <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
-                            Product
+                            Menu
                             <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
                         </PopoverButton>
 
@@ -129,9 +156,39 @@ export default function Header() {
                     <Link to="/" className="text-sm/6 font-semibold text-gray-900">
                         Our Services
                     </Link>
-                    <Link to="/" className="text-sm/6 font-semibold text-gray-900">
-                        Comunity
-                    </Link>
+                    {/*<Link to="/product" className="text-sm/6 font-semibold text-gray-900">*/}
+                    {/*    Product*/}
+                    {/*</Link>*/}
+
+                    <Popover className="relative">
+                        <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
+                            Product
+                            <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
+                        </PopoverButton>
+
+                        <PopoverPanel
+                            transition
+                            className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition data-[closed]:translate-y-1 data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-150 data-[enter]:ease-out data-[leave]:ease-in"
+                        >
+                            {categories?.length > 0 && <div className="p-4">
+                                {categories.map((item) => (
+                                    <div
+                                        key={item.name}
+                                        className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm/6 hover:bg-gray-50"
+                                    >
+                                        <div className="flex-auto">
+                                            <Link to={item.to} className="block font-semibold text-gray-900">
+                                                {item.name}
+                                                <span className="absolute inset-0" />
+                                            </Link>
+                                            <p className="mt-1 text-gray-600">{item.description}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            }
+                        </PopoverPanel>
+                    </Popover>
 
                     <Link to="/test" className="text-sm/6 font-semibold text-gray-900">
                         Contact
