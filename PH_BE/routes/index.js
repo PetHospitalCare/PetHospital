@@ -9,7 +9,7 @@ module.exports = {
     ServiceRouter,
     CategoryRouter,
     AccountRouter,
-    MedicineRouter
+    MedicineRouter,
     PetRecordRouter
 };
 
