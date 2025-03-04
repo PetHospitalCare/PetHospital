@@ -46,7 +46,7 @@ function App() {
           <Route path='/Schedule' element={<Calendar />}></Route>
 
           <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
-          {/* <Route path='/Booking_Management' element={<ManageBooking />} /> */}
+          <Route path='/Booking_Management' element={<ManageBooking />} />
         </Route>
         <Route path="*" element={< Notfound />} />
       </Routes>

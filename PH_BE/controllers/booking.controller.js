@@ -8,6 +8,7 @@ const CreateNewBooking = async (req, res) => {
             scheduleDate,
             scheduleTime,
             scheduleType,
+            subServiceId,
             type,
             note,
             name,
@@ -24,6 +25,7 @@ const CreateNewBooking = async (req, res) => {
             type,
             status: "pending",
             note,
+            sub_service_id: subServiceId,
             guest_name: name,
             guest_phone: phone,
             guest_email: email,
@@ -38,4 +40,12 @@ const CreateNewBooking = async (req, res) => {
         res.status(500).json({ message: "Lỗi server!" });
     }
 }
-module.exports = { CreateNewBooking };
+const GetAllBooking = async (req, res) => {
+    try {
+        const bookings = await Booking.find();
+        return res.status(200).json(bookings);
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+    }
+}
+module.exports = { CreateNewBooking, GetAllBooking };

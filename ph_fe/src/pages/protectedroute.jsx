@@ -39,7 +39,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
             try {
                 const decoded = jwtDecode(jwtToken);
                 setUser({
-                    id: decoded.id,
+                    _id: decoded.id,
                     role: decoded.role,
                     email: decoded.email,
                     username: decoded.username,
@@ -57,7 +57,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
     if (checkingAuth) return <div>Loading...</div>;
 
-    if (!user || !user.id) {
+    if (!user || !user._id) {
         return <Navigate to="/Login" />;
     }
 

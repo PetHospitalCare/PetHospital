@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
     Table,
@@ -21,101 +20,118 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import AddProfileDialog from "../AccountManagement/Add_Account_Modal";
-import SheetDemo from "../AccountManagement/Edit_Management";
-
+import { BookingServices } from "@/services/BookingService";
+import { Services } from "@/services/Services";
 
 export default function ManageBooking() {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
-    const [openEdit, setOpenEdit] = useState(false);
-    const [selectedAccount, setSelectedAccount] = useState(null);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
-    const [open, setOpen] = useState(false);
-    const fetchData = async () => {
+    const [services, setServices] = useState([]);
+
+    const fetchBookings = async () => {
         try {
-            const response = await UserService.getAllAccount()
-            console.log(response.data.accounts)
-            if (response.data.success) {
-                setData(response.data.accounts);
-            }
+            const response = await BookingServices.GetAllBooking();
+            setData(response.data);
+            console.log(response.data)
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
+            console.error("Lỗi khi lấy dữ liệu booking:", error);
         }
     };
+    const getAllService = async () => {
+        try {
+            const res = await Services.getAllService();
+            setServices(res.data.services);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu services:", error);
+        }
+    }
+
     useEffect(() => {
-        fetchData();
+        fetchBookings();
+        getAllService();
     }, []);
 
     const handleDelete = async (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
+        if (window.confirm("Bạn có chắc chắn muốn xóa booking này?")) {
             try {
-                const response = await UserService.deleteAccount(id);
-                console.log(response)
-                setData((prevData) => prevData.filter((acc) => acc._id !== id));
-                alert("Xóa tài khoản thành công!");
+                await axios.delete(`http://localhost:5000/bookings/${id}`);
+                setData((prevData) => prevData.filter((booking) => booking._id !== id));
+                alert("Xóa booking thành công!");
             } catch (error) {
-                console.error("Lỗi khi xóa tài khoản:", error);
+                console.error("Lỗi khi xóa booking:", error);
                 alert("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
         }
     };
+    const getSubServiceName = (serviceId, subServiceId) => {
+        const service = services.find(s => s._id === serviceId);
+        if (!service) return "Không tìm thấy";
+
+        const subService = service.subServices.find(sub => sub._id === subServiceId);
+        return subService ? subService.name : "Không tìm thấy";
+    };
+
     const columns = [
         {
-            accessorKey: "url",
-            header: () => <div className="text-center">Date & Time</div>,
+            accessorKey: "date",
+            header: "Ngày đặt",
+            cell: ({ row }) => <div className="">{row.getValue("date").split("T")[0].split("-").reverse().join("/")}</div>,
+        },
+        {
+            accessorKey: "hour",
+            header: "Giờ",
+            cell: ({ row }) => <div className="">{row.getValue("hour")}</div>,
+        },
+        {
+            accessorKey: "guest_name",
+            header: "Khách hàng",
+            cell: ({ row }) => <div className="">{row.getValue("guest_name")}</div>,
+        },
+        {
+            accessorKey: "guest_phone",
+            header: "SĐT",
+            cell: ({ row }) => <div className="">{row.getValue("guest_phone")}</div>,
+        },
+        {
+            accessorKey: "type",
+            header: "Loại thú cưng",
+            cell: ({ row }) => <div className="">{row.getValue("type")}</div>,
+        },
+        {
+            accessorKey: "status",
+            header: "Trạng thái",
+            cell: ({ row }) => <div className="">{row.getValue("status")}</div>,
+        },
+        {
+            accessorKey: "sub_service_id",
+            header: "Dịch vụ",
             cell: ({ row }) => {
-                const imageUrl = row.getValue("url") || "/profile.png";
+                const serviceId = row.original.service_id;
+                const subServiceId = row.original.sub_service_id;
                 return (
-                    <div className="flex justify-center">
-                        <img src={imageUrl} alt="Dịch vụ" className="w-28 h-28 object-cover rounded-md" />
+                    <div className="">
+                        {getSubServiceName(serviceId, subServiceId)}
+
                     </div>
                 );
             },
         },
         {
-            accessorKey: "username",
-            header: () => <div className="text-center">Pet/Khách</div>,
-            cell: ({ row }) => <div className=" text-center">{row.getValue("username")}</div>,
-        },
-        {
-            accessorKey: "email",
-            header: () => <div className="text-center">Dịch vụ</div>,
-            cell: ({ row }) => <div className=" text-center">{row.getValue("email")}</div>,
-        },
-        {
-            accessorKey: "role",
-            header: () => <div className="text-center">Loại</div>,
-            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("role").join(", ")}</div>,
-        },
-        {
-            accessorKey: "role",
-            header: () => <div className="text-center">Status</div>,
-            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("role").join(", ")}</div>,
-        },
-        {
-            accessorKey: "role",
-            header: () => <div className="text-center">Ngày đặt</div>,
-            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("role").join(", ")}</div>,
-        },
-        {
             id: "actions",
-            header: () => <div className="text-center font-semibold">...</div>,
+            header: "Hành động",
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
                     <button>
                         <Pen className="size-6 p-1 mr-1 " onClick={() => {
-                            setOpenEdit(true);
-                            setSelectedAccount(row.original);
                         }} />
 
                     </button>
-
                     <button onClick={() => handleDelete(row.original._id)}>
-                        <Trash2 className="size-6 p-1 " />
+                        <Trash2 className="size-6 p-1 text-red-500" />
                     </button>
                 </div>
             ),
@@ -141,30 +157,19 @@ export default function ManageBooking() {
         },
     });
 
-
     return (
         <Page>
             <div className="w-full">
-                <SheetDemo open={openEdit} onOpenChange={setOpenEdit} account={selectedAccount} onsuccess={fetchData} />
                 <div className="flex items-center py-4">
                     <Input
-                        placeholder="Tìm kiếm sản phẩm..."
-                        value={(table.getColumn("username")?.getFilterValue()) ?? ""}
-                        onChange={(e) => table.getColumn("username")?.setFilterValue(e.target.value)}
+                        placeholder="Tìm kiếm khách hàng..."
+                        value={(table.getColumn("guest_name")?.getFilterValue()) ?? ""}
+                        onChange={(e) => table.getColumn("guest_name")?.setFilterValue(e.target.value)}
                         className="max-w-sm"
                     />
-                    <div className="text-center ml-auto">
-                        <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
-                            Tạo tài khoản mới
-                        </Button>
-
-                        <AddProfileDialog open={open} onOpenChange={setOpen} onSuccess={fetchData} />
-
-                    </div>
-
                 </div>
-                <div className="rounded-md border  ">
-                    <Table >
+                <div className="rounded-md border">
+                    <Table>
                         <TableHeader>
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
@@ -179,18 +184,17 @@ export default function ManageBooking() {
                         <TableBody>
                             {table.getRowModel().rows.length ? (
                                 table.getRowModel().rows.map((row) => (
-                                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                    <TableRow key={row.id}>
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-
                                             </TableCell>
                                         ))}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={columns.length} className="text-center">
+                                    <TableCell colSpan={columns.length} className="">
                                         Không có kết quả.
                                     </TableCell>
                                 </TableRow>
