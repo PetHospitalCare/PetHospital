@@ -16,11 +16,16 @@ import Unauthorized from './pages/Unauthorized'
 import ProtectedRoute from './pages/protectedroute'
 import ChangeEmail from './pages/Login&SignUp/Change_email'
 import Notfound from './pages/PageNotFound'
+import MedicineManagerment from './pages/MedicineManagement/Medicine_Managerment'
 
 import Calendar from './pages/BookingSchedule/CalendarPage'
 
 import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
+
 import ManageBooking from './pages/BookingSchedule/ManageBooking'
+
+import ProductPage from "@/pages/product-page/product-page.jsx";
+
 
 
 function App() {
@@ -36,10 +41,12 @@ function App() {
         <Route path="/loading" element={<LoadingScreen />} />
         <Route path='/signup-success' element={<SignupSuccess />} />
         <Route path='/unauthorized' element={<Unauthorized />} />
+        <Route path='/product' element={<ProductPage />} />
 
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path='/Product_Managerment' element={<ProductManagerment />} />
+          <Route path='/Medicine_Managerment/' element={<MedicineManagerment />} />
           <Route path='/Service_Managerment/:id' element={<Service_Managerment />} />
           <Route path='/Account_Managerment' element={<AccountManagement />} />
 

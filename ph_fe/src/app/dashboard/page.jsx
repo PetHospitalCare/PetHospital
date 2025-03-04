@@ -13,10 +13,21 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 export default function Page({ children }) {
+  const [navTitle, setNavTitle] = useState([]);
+  const [navItems, setNavItems] = useState([]);
+  const location = useLocation();
+
+  // Find breadcrumb that matchs with url
+  const currentBreadcrumb = navItems.find((item) => item.url === location.pathname);
+  const parentTitle = navTitle.find((title) =>
+    navItems.some((item) => item.url === location.pathname && item.title === currentBreadcrumb?.title)
+  );
   return (
     (<SidebarProvider>
-      <AppSidebar />
+      <AppSidebar setNavItems={setNavItems} setNavTitle={setNavTitle}/>
       <SidebarInset>
         <header
           className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -25,15 +36,17 @@ export default function Page({ children }) {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                {/* <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" /> */}
-                <BreadcrumbItem>
-                  <BreadcrumbPage>PetHospital</BreadcrumbPage>
-                </BreadcrumbItem>
+                {parentTitle && (
+                  <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbLink>{parentTitle}</BreadcrumbLink>
+                  </BreadcrumbItem>
+                )}
+                {parentTitle && <BreadcrumbSeparator className="hidden md:block" />}
+                {currentBreadcrumb && (
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{currentBreadcrumb.title}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                )}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
