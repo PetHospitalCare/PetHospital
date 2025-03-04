@@ -81,10 +81,10 @@ export function AppSidebar({
             title: "Tài Khoản",
             url: "/Account_Managerment",
           },
-            {
-                title: "Bản Ghi Thú cưng",
-                url: "/PetRecord_Management",
-            },
+          {
+            title: "Bản Ghi Thú cưng",
+            url: "/PetRecord_Management",
+          },
         ],
       },
       {
@@ -105,8 +105,8 @@ export function AppSidebar({
         icon: CalendarCheck,
       },
       {
-        name: "Sales & Marketing",
-        url: "#",
+        name: "Quản lí lịch hẹn",
+        url: "/Booking_Management",
         icon: PieChart,
       },
       {

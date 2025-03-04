@@ -21,7 +21,11 @@ import MedicineManagerment from './pages/MedicineManagement/Medicine_Managerment
 import Calendar from './pages/BookingSchedule/CalendarPage'
 
 import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
+
+import ManageBooking from './pages/BookingSchedule/ManageBooking'
+
 import ProductPage from "@/pages/product-page/product-page.jsx";
+
 
 
 function App() {
@@ -48,8 +52,8 @@ function App() {
 
           <Route path='/Schedule' element={<Calendar />}></Route>
 
-          <Route path='/PetRecord_Management' element={<PetRecordManagement />}/>
-
+          <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
+          <Route path='/Booking_Management' element={<ManageBooking />} />
         </Route>
         <Route path="*" element={< Notfound />} />
       </Routes>

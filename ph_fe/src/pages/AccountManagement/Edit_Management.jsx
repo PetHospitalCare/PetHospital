@@ -36,7 +36,7 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
 
     const handleSubmit = async () => {
         try {
-            const response = await UserService.updateAccount(account._id,formData);
+            const response = await UserService.updateAccount(account._id, formData);
             alert("Cập nhật thành công")
             onsuccess?.();
             onOpenChange(false);
@@ -79,6 +79,7 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
                             value={formData.email}
                             onChange={handleInputChange}
                             className="col-span-3"
+                            disabled
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
