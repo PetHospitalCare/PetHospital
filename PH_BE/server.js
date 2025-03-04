@@ -7,7 +7,10 @@ const db = require("./models");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const http = require("http");
-const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter } = require("./routes");
+
+const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter } = require("./routes");
+
+
 //khoi tao web server
 
 const app = express();
@@ -32,6 +35,9 @@ app.use("/product", ProductRouter);
 app.use("/category", CategoryRouter);
 app.use("/service", ServiceRouter);
 app.use("/account", AccountRouter);
+app.use("/medicine", MedicineRouter);
+app.use("/pet-record", PetRecordRouter);
+app.use("/booking", BookingRouter);
 server.listen(process.env.PORT || 9999, process.env.HOST_NAME || "localhost", () => {
     console.log(`Server in running at: http://${process.env.HOST_NAME}:${process.env.PORT}`);
     db.connect();

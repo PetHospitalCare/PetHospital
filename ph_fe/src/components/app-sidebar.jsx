@@ -10,7 +10,8 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-  HeartPulse
+  HeartPulse,
+  CalendarCheck
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -26,13 +27,33 @@ import {
 } from "@/components/ui/sidebar"
 import { UserContext } from "../contexts/UserContext"
 import { useContext } from "react"
-
+import { useState } from "react"
+import { useEffect } from "react"
+import { Services } from "../../src/services/Services";
 
 
 export function AppSidebar({
-  ...props
+  setNavItems, setNavTitle,...props
 }) {
   const { user } = useContext(UserContext)
+  const [service, setService] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await Services.getAllService("http://localhost:9999/service/get-all");
+        if (response.data.success) {
+
+          console.log("Formatted Data:", response.data.services);
+          setService(response.data.services);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const data = {
     user: {
       name: user.username,
@@ -53,12 +74,16 @@ export function AppSidebar({
 
           },
           {
-            title: "Dịch vụ",
-            url: "/Service_Managerment",
+            title: "Thuốc",
+            url: "/Medicine_Managerment",
           },
           {
             title: "Tài Khoản",
             url: "/Account_Managerment",
+          },
+          {
+            title: "Bản Ghi Thú cưng",
+            url: "/PetRecord_Management",
           },
         ],
       },
@@ -67,65 +92,21 @@ export function AppSidebar({
         url: "#",
         icon: HeartPulse,
         isActive: true,
-        items: [
-          {
-            title: "Siêu âm, Chụp X quang",
-            url: "",
-          },
-          {
-            title: "Khám sức khỏe và điều trị bệnh",
-            url: "",
-          },
-          {
-            title: "Xét nghiệm máu",
-            url: "",
-          },
-          {
-            title: "Khám điều trị tại nhà",
-            url: "",
-          },
-          {
-            title: "Phẫu thuật mổ để",
-            url: "",
-          },
-          {
-            title: "Phẫu thuật phức tạp",
-            url: "",
-          },
-          {
-            title: "Phẫu thuật xương",
-            url: "",
-          },
-          {
-            title: "Lưu chuồng điều trị",
-            url: "",
-          },
-          {
-            title: "Spa & Grooming",
-            url: "",
-          },
-          {
-            title: "Tiêm vaccine chó & mèo",
-            url: "",
-          },
-          {
-            title: "Triệt sản chó & mèo",
-            url: "",
-          },
-
-
-        ],
+        items: service.map((item) => ({
+          title: item.name,
+          url: `/Service_Managerment/${item._id}`,
+        })),
       },
     ],
     projects: [
       {
-        name: "Design Engineering",
-        url: "#",
-        icon: Frame,
+        name: "Lịch khám",
+        url: "/Schedule",
+        icon: CalendarCheck,
       },
       {
-        name: "Sales & Marketing",
-        url: "#",
+        name: "Quản lí lịch hẹn",
+        url: "/Booking_Management",
         icon: PieChart,
       },
       {
@@ -135,10 +116,19 @@ export function AppSidebar({
       },
     ],
   }
+
+  // send data navMain to Page.jsx
+  useEffect(() => {
+    if (setNavItems) {
+      const allTitle = data.navMain.flatMap((nav) => nav.title)
+      const allItems = data.navMain.flatMap((nav) => nav.items);
+      setNavTitle(allTitle)
+      setNavItems(allItems);
+    }
+  }, [service]);
   return (
     (<Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

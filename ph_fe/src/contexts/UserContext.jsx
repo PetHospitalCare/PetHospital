@@ -19,18 +19,16 @@ const UserProvider = ({ children }) => {
     };
 
     const logoutContext = () => {
-        setUser({});
+        setUser(null);
         Cookies.remove("access_token");
     };
     useEffect(() => {
         const jwtToken = Cookies.get("access_token");
-        console.log("Token từ cookies:", jwtToken);
         if (jwtToken) {
             try {
                 const decoded = jwtDecode(jwtToken);
-                console.log("Decoded token:", decoded);
                 setUser({
-                    id: decoded.id,
+                    _id: decoded.id,
                     role: decoded.role,
                     email: decoded.email,
                     username: decoded.username,

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 import { Button } from "@/components/ui/button";
 import StepProgressBar from "@/components/Step-progress-bar";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
+import { UserService } from "../../services/UserService";
 
 export default function SignUp() {
     const [step, setStep] = useState(1);
@@ -25,7 +26,7 @@ export default function SignUp() {
     const handleSignUp = async (e) => {
         e.preventDefault();
         setError("");
-    
+
         if (!validateEmail(email)) {
             setError("Email must be a valid @gmail.com address");
             return;
@@ -42,15 +43,15 @@ export default function SignUp() {
             setError("Passwords do not match");
             return;
         }
-    
+
         try {
-            const response = await axios.get("http://localhost:9999/account/get-all");
-            const accounts = response.data.accounts; 
-    
+            const response = await UserService.getAllAccount();
+            const accounts = response.data.accounts;
+
             // validate email or phone exist
             const isEmailExist = accounts.some(acc => acc.email === email);
             const isPhoneExist = accounts.some(acc => acc.phone === phone);
-    
+
             if (isEmailExist) {
                 setError("Email is already registered");
                 return;
@@ -59,9 +60,9 @@ export default function SignUp() {
                 setError("Phone number is already registered");
                 return;
             }
-    
-            await axios.post("http://localhost:9999/account/send-otp", { email });
-    
+            
+            await UserService.sendOtp({email: email});
+
             // save temporary in localStorage
             localStorage.setItem("tempSignupData", JSON.stringify({
                 username,
@@ -71,13 +72,24 @@ export default function SignUp() {
                 phone,
                 role: ["customer"]
             }));
-    
+
             navigate("/otp", { state: { email } });
         } catch (err) {
             setError("Failed to check existing accounts");
         }
     };
-    
+
+    // Load temporary data from localStorage when component mounts
+    useEffect(() => {
+        const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
+        if (tempData) {
+            setUsername(tempData.username);
+            setEmail(tempData.email);
+            setPhone(tempData.phone);
+            setPassword(tempData.password);
+            setGender(tempData.gender);
+        }
+    }, []);
 
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
@@ -111,34 +123,51 @@ export default function SignUp() {
                         {/* UserName */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Username<span className="text-red-600">*</span></label>
-                            <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                            <Input
+                                type="text"
+                                value={username}
+                                placeholder="Nhập username"
+                                onChange={(e) => setUsername(e.target.value)}
+                                required />
                         </div>
 
                         {/* Email */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Email<span className="text-red-600">*</span></label>
-                            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                            <Input 
+                                type="email" 
+                                value={email} 
+                                placeholder="Nhập email"
+                                onChange={(e) => setEmail(e.target.value)} 
+                                required />
                         </div>
 
                         {/* Phone Number */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Phone Number<span className="text-red-600">*</span></label>
-                            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                            <Input 
+                                type="tel" 
+                                value={phone} 
+                                placeholder="Nhập số điện thoại" 
+                                onChange={(e) => setPhone(e.target.value)} 
+                                required />
                         </div>
 
                         {/* Gender Selection */}
                         <div className="flex">
                             <Button
                                 type="button"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                                onChange={() => setGender("male")}
+                                value="male"
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick ={(e) => setGender(e.target.value)}
                             >
                                 Male
                             </Button>
                             <Button
                                 type="button"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
-                                onChange={() => setGender("female")}
+                                value="female"
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick ={(e) => setGender(e.target.value)}
                             >
                                 Female
                             </Button>
@@ -147,13 +176,23 @@ export default function SignUp() {
                         {/* Password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Password<span className="text-red-600">*</span></label>
-                            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                            <Input 
+                                type="password" 
+                                value={password} 
+                                placeholder="Nhập mật khẩu" 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required />
                         </div>
 
                         {/* Confirm password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Confirm Password<span className="text-red-600">*</span></label>
-                            <Input type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} required />
+                            <Input 
+                                type="password" 
+                                value={confirmPassword} 
+                                placeholder="Nhập lại mật khẩu" 
+                                onChange={handleConfirmPasswordChange} 
+                                required />
                             {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
                         </div>
 

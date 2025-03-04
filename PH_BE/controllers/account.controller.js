@@ -43,7 +43,8 @@ const signin = async (req, res) => {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
-      maxAge: 86400000
+      maxAge: 86400000 //1 ngày 
+      // maxAge: 60000 // 1 phút
     });
 
     res.status(200).json(account);

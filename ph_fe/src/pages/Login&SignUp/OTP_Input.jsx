@@ -1,20 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/ui/button";
 import StepProgressBar from "@/components/Step-progress-bar";
-import axios from "axios";
 import { Input } from "@/components/ui/input";
+import { UserService } from "../../services/UserService";
 
 export default function OTP_Input() {
     const [otp, setOtp] = useState("");
     const [error, setError] = useState("");
+    const [isSending, setIsSending] = useState(false);
+    const [countdown, setCountdown] = useState(0);
+
     const navigate = useNavigate();
     const { state } = useLocation();
 
-    const handleVerifyOTP = (e) => {
+    // Bắt đầu đếm ngược 60s khi nhấn "Send Again"
+    const handleSendAgain = async () => {
+        if (isSending || countdown > 0) return; // Nếu đang gửi hoặc chưa hết thời gian thì không làm gì
+
+        setIsSending(true);
+        setError("");
+
+        try {
+            await UserService.sendOtp({ email: state?.email });
+            setCountdown(60); // Bắt đầu đếm ngược 60s
+        } catch (err) {
+            setError("Gửi lại OTP thất bại. Vui lòng thử lại.");
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    // useEffect để đếm ngược
+    useEffect(() => {
+        if (countdown > 0) {
+            const timer = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+            }, 1000);
+
+            return () => clearInterval(timer); // Xóa bộ đếm khi component unmount
+        }
+    }, [countdown]);
+
+    // Handle verify OTP
+    const handleVerifyOTP = async (e) => {
         e.preventDefault();
-        navigate("/loading", { state: { email: state?.email, otp } });
+        setError("");
+
+        try {
+            const storedEmail = JSON.parse(localStorage.getItem("tempSignupData"))?.email;
+            const email = state?.email || storedEmail;
+            const response = await UserService.verifyOTP({ email: email, otp });
+
+            if (response.status === 200) {
+                navigate("/loading");
+            } else {
+                throw new Error("Invalid OTP or expired");
+            }
+        } catch (err) {
+            setError("OTP không hợp lệ hoặc đã hết hạn.");
+        }
     };
 
     return (
@@ -37,6 +83,7 @@ export default function OTP_Input() {
                         The OTP code has been sent to your email <br />
                         <span className="font-bold text-black">{state?.email}</span>
                     </p>
+
                     {/* Form input OTP */}
                     <form className="space-y-5" onSubmit={handleVerifyOTP}>
                         <div>
@@ -51,16 +98,23 @@ export default function OTP_Input() {
                             />
                         </div>
 
-                        {/* Choice to select change email or Send Again */}
+                        {/* Change email / Send Again */}
                         <div className="flex justify-between text-sm">
-                            <Link to="/ChangeEmail" className="text-red-500 font-medium underline">
+                            <Link to="/change-email" state={{ email: state?.email }} className="text-red-500 font-medium underline">
                                 Change your email
                             </Link>
-                            <button type="button" className="text-blue-500 font-medium underline">
-                                Send again
+                            <button
+                                type="button"
+                                disabled={isSending || countdown > 0} // Chặn khi đang gửi hoặc đang đếm ngược
+                                onClick={handleSendAgain}
+                                className="text-blue-500 font-medium underline"
+                            >
+                                {countdown > 0 ? `Resend in ${countdown}s` : "Send again"}
                             </button>
                         </div>
+
                         {error && <p className="text-red-500">{error}</p>}
+
                         {/* Step Progress Bar */}
                         <StepProgressBar step={2} />
 

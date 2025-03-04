@@ -1,12 +1,19 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserService } from "../../services/UserService";
 import { UserContext } from "../../contexts/UserContext";
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const { loginContext } = useContext(UserContext)
+  const { loginContext, user } = useContext(UserContext)
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Nếu đã đăng nhập, chuyển hướng về trang chủ
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,8 +28,9 @@ export default function Login() {
       if (response.status == 200) {
         loginContext(response.data)
         alert("Đăng nhập thành công!");
-        navigate("/Product_Managerment");
-
+        navigate("/");
+      } else {
+        setError("Vui Lòng kiểm tra lại tài khoản và mật khẩu!!!");
       }
 
     } catch (error) {

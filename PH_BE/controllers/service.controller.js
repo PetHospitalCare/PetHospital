@@ -10,26 +10,24 @@ cloudinary.config({
 });
 const CreateNewService = async (req, res) => {
     try {
-        const { name, description, price, duration, isAvailable } = req.body;
-        const file = req.file; //
-        // Tạo một sản phẩm mới
-        const newService = new Service({
+        const { id } = req.params;
+        const { name, price, status, duration } = req.body;
+        const service = await Service.findById(id);
+        if (!service) {
+            return res.status(404).json({ message: "Service not found" });
+        }
+
+        // Tạo subservice mới
+        const newSubService = {
             name,
-            description,
             price,
-            duration,
-            url: file.path,
-            publicId: file.filename,
-            isAvailable
-        });
+            status: status || "active", // Mặc định là "active" nếu không có
+            duration
+        };
+        service.subServices.push(newSubService);
 
-        // Lưu sản phẩm vào database
-        const savedService = await newService.save();
-
-        return res.status(201).json({
-            message: "Tạo dịch vụ thành công",
-            Service: savedService,
-        });
+        await service.save();
+        return res.status(201).json({ message: "Subservice added successfully", service: service.subServices, });
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -39,9 +37,7 @@ const CreateNewService = async (req, res) => {
 };
 const getAllService = async (req, res) => {
     try {
-        const services = await Service.find()
-            .exec();
-
+        const services = await Service.find();
         // Trả về danh sách sản phẩm
         return res.status(200).json({
             success: true,
@@ -145,5 +141,88 @@ const updateService = async (req, res) => {
         });
     }
 };
+const getAllServiceById = async (req, res) => {
+    try {
+        const services = await Service.findById(req.params.id);
+        if (!services) {
+            return res.status(404).json({ success: false, message: "Dịch vụ không tồn tại" });
+        }
+        // Trả về danh sách sản phẩm
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy danh sách sản phẩm thành công',
+            services: services.subServices,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+const UpdateSubService = async (req, res) => {
+    try {
+        const { id, sid } = req.params;
+        const { name, duration, price, status } = req.body;
 
-module.exports = { CreateNewService, getAllService, deleteService, updateService };
+        // Tìm dịch vụ chứa subService
+        const service = await Service.findById(id);
+        if (!service) {
+            return res.status(404).json({ success: false, message: "Dịch vụ không tồn tại" });
+        }
+
+        // Tìm subService trong danh sách subServices
+        const subService = service.subServices.id(sid);
+        if (!subService) {
+            return res.status(404).json({ success: false, message: "Dịch vụ con không tồn tại" });
+        }
+
+        // Cập nhật thông tin subService
+        if (name !== undefined) subService.name = name;
+        if (duration !== undefined) subService.duration = duration;
+        if (price !== undefined) subService.price = price;
+        if (status !== undefined) subService.status = status;
+
+        // Lưu cập nhật
+        await service.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Cập nhật dịch vụ con thành công",
+        });
+    } catch (error) {
+        console.error("Lỗi cập nhật dịch vụ con:", error);
+        return res.status(500).json({ success: false, message: "Lỗi hệ thống Back-end" });
+    }
+};
+const DeleteSubService = async (req, res) => {
+    try {
+        const { serviceId, subServiceId } = req.params;
+
+        // Tìm dịch vụ chứa subService
+        const service = await Service.findById(serviceId);
+        if (!service) {
+            return res.status(404).json({ success: false, message: "Dịch vụ không tồn tại" });
+        }
+
+        // Lọc ra danh sách subServices mới sau khi loại bỏ subService cần xóa
+        const updatedSubServices = service.subServices.filter(sub => sub._id.toString() !== subServiceId);
+        if (updatedSubServices.length === service.subServices.length) {
+            return res.status(404).json({ success: false, message: "Dịch vụ con không tồn tại" });
+        }
+
+        // Cập nhật danh sách subServices
+        service.subServices = updatedSubServices;
+        await service.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Xóa dịch vụ con thành công",
+        });
+    } catch (error) {
+        console.error("Lỗi khi xóa dịch vụ con:", error);
+        return res.status(500).json({ success: false, message: "Lỗi hệ thống Back-end" });
+    }
+};
+
+module.exports = { CreateNewService, getAllService, deleteService, updateService, getAllServiceById, UpdateSubService, DeleteSubService };
