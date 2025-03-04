@@ -1,7 +1,7 @@
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
+import {Link, useLocation, useNavigate} from "react-router-dom"
 import { useEffect, useState, useContext } from "react";
 import {
     Dialog,
@@ -46,6 +46,8 @@ import DropdownMenuDemo from "../avatardropdown/avatardropdown"
 import { UserContext } from "../../contexts/UserContext";
 import {ProductService} from "@/services/ProductService.js";
 export default function Header() {
+    const navigate = useNavigate();
+    const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false);
     const { user } = useContext(UserContext);
@@ -65,16 +67,24 @@ export default function Header() {
             const response = await ProductService.getAllCategory()
             if (response.data.success) {
                 setCategories(
-                    response.data.categories.map((category) => ({
-                        name: category.name,
-                        description: category.description,
-                    }))
+                    response.data.categories.sort((a, b) => a.sort_number - b.sort_number)
+                        .map((category) => ({
+                            name: category.name,
+                            description: category.description,
+                            to: '/product?category_id=' + category.category_id,
+                        }))
                 );
             }
         } catch (error) {
             console.error("Lỗi khi lấy danh mục:", error);
         }
     };
+
+    const handleLinkToProductPage = () => {
+        if (location.pathname !== '/product') {
+            navigate('/product');
+        }
+    }
 
     return (
         <header
@@ -161,7 +171,7 @@ export default function Header() {
                     {/*</Link>*/}
 
                     <Popover className="relative">
-                        <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
+                        <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900" onClick={handleLinkToProductPage}>
                             Product
                             <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
                         </PopoverButton>
