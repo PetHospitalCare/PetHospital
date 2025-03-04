@@ -33,7 +33,7 @@ import { Services } from "../../src/services/Services";
 
 
 export function AppSidebar({
-  ...props
+  setNavItems, setNavTitle,...props
 }) {
   const { user } = useContext(UserContext)
   const [service, setService] = useState([]);
@@ -74,8 +74,8 @@ export function AppSidebar({
 
           },
           {
-            title: "Dịch vụ",
-            url: "/Service_Managerment",
+            title: "Thuốc",
+            url: "/Medicine_Managerment",
           },
           {
             title: "Tài Khoản",
@@ -116,6 +116,16 @@ export function AppSidebar({
       },
     ],
   }
+
+  // send data navMain to Page.jsx
+  useEffect(() => {
+    if (setNavItems) {
+      const allTitle = data.navMain.flatMap((nav) => nav.title)
+      const allItems = data.navMain.flatMap((nav) => nav.items);
+      setNavTitle(allTitle)
+      setNavItems(allItems);
+    }
+  }, [service]);
   return (
     (<Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
