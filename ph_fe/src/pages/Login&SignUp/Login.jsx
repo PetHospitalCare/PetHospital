@@ -29,7 +29,8 @@ export default function Login() {
         loginContext(response.data)
         alert("Đăng nhập thành công!");
         navigate("/");
-
+      } else {
+        setError("Vui Lòng kiểm tra lại tài khoản và mật khẩu!!!");
       }
 
     } catch (error) {

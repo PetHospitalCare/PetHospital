@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
@@ -11,20 +10,11 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Pen, Trash2 } from "lucide-react";
+import { Pen, Trash2 } from "lucide-react";
 import { } from '@heroicons/react/20/solid'
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
     Table,
     TableBody,
@@ -34,14 +24,14 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import Page from "@/app/dashboard/page";
-import Add_Modal from "./Add_Product_Modal";
+// import AddPetRecordModal from "./add-pet-record-modal.jsx";
 
-import { ProductService } from "../../services/ProductService";
+import { PetRecordService } from "@/services/PetRecordService.js";
 
+import axios from "axios";
+// import EditPetModal from "./edit-pet-record-modal.jsx";
 
-import Edit_Modal from "./Edit_Product_Modal";
-
-export default function Product_Managerment() {
+export default function PetRecordManagement() {
     const [data, setData] = useState([]);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
@@ -49,49 +39,53 @@ export default function Product_Managerment() {
     const [rowSelection, setRowSelection] = useState({});
     const [open, setOpen] = React.useState(false)
     const [openEdit, setOpenEdit] = React.useState(false)
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedPetRecord, setSelectedPetRecord] = useState(null);
 
-
-    // Gọi API để lấy danh sách sản phẩm
+    // Gọi API để lấy danh sách bản ghi thú cưng
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await ProductService.getAllProduct()
+                const response = await PetRecordService.getAllPetRecords();
+
                 if (response.data.success) {
-                    const formattedData = response.data.products.map((product) => ({
-                        id: product._id,
-                        name: product.name,
-                        imageUrl: product.images,
-                        description: product.description,
-                        price: product.price,
-                        quantity: product.quantity,
-                        type: product.type,
-                        category:
-                            product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
+                    const formattedData = response.data.petRecords.map((petRecord) => ({
+                        customer_id: petRecord.customer_id,
+                        customer_name: petRecord.customer_name,
+                        phoneNumber: petRecord.phoneNumber,
+                        pet_name: petRecord.pet_name,
+                        service: 'Khám Bệnh',
+                        time: '2025-02-22 14:00 - 15:00'
                     }));
+
                     setData(formattedData);
                 }
             } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+                console.error("Lỗi khi lấy dữ liệu thú cưng:", error);
             }
         };
 
         fetchData();
+
+        // setData([
+        //     {customer_id: '123', customer_name: 'Customer111', phoneNumber: '0123456781', pet_name: 'Mực', service: 'Khám Bệnh', time: '2025-02-22 14:00 - 15:00'},
+        //     {id: 'petR2', name: 'Customer222', phoneNumber: '0123456782', petName: 'Milo', service: 'Cắt Giống', time: '2025-02-22 15:00 - 16:00'},
+        //     {id: 'petR3', name: 'Customer333', phoneNumber: '0123456783', petName: 'Bún', service: 'Hộ Sinh', time: '2025-02-22 16:00 - 17:00'},
+        // ]);
     }, []);
 
     const handleDelete = async (id) => {
-        console.log(id)
-        if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
+        if (window.confirm("Bạn có chắc chắn muốn xóa bản ghi này?")) {
             try {
-                const response = await ProductService.deleteProduct(id)
+                const response = await PetRecordService.deletePet(id)
+
                 if (response.data.success) {
-                    alert("Xóa sản phẩm thành công!");
+                    alert("Xóa bản ghi thành công!");
                     setData((prevData) => prevData.filter((p) => p.id !== id));
                 } else {
-                    alert(response.data.message || "Không thể xóa sản phẩm.");
+                    alert(response.data.message || "Không thể xóa bản ghi.");
                 }
             } catch (error) {
-                console.error("Lỗi khi xóa sản phẩm:", error);
+                console.error("Lỗi khi xóa bản ghi:", error);
                 alert("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
         }
@@ -101,7 +95,7 @@ export default function Product_Managerment() {
         {
             id: "select",
             header: ({ table }) => (
-                <div className="text-center">
+                <div className="text-left">
                     <Checkbox
                         checked={
                             table.getIsAllPageRowsSelected() ||
@@ -123,63 +117,55 @@ export default function Product_Managerment() {
             enableHiding: false,
         },
         {
-            accessorKey: "imageUrl",
-            header: () => <div className="text-center">Ảnh</div>,
-            cell: ({ row }) => {
-                const images = row.original.imageUrl; // Lấy danh sách ảnh từ API
-                return (
-                    <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
-                        {images.map((image, index) => (
-                            <Zoom>
-                                <img
-                                    src={image.url}
-                                    alt={`Product ${index}`}
-                                    className="h-28 w-28 object-cover rounded-md"
-                                />
-                            </Zoom>
-                        ))}
-                    </div>
-                );
-            },
-            enableSorting: false,
-            enableHiding: false,
+            accessorKey: "customer_name",
+            header: () => <div className="text-center">Tên</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("customer_name")}</div>,
         },
         {
-            accessorKey: "name",
-            header: () => <div className="text-center">Tên sản phẩm</div>,
-            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("name")}</div>,
+            accessorKey: "phoneNumber",
+            header: () => <div className="text-center">Số điện thoại</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("phoneNumber")}</div>,
+        },
+        // {
+        //     accessorKey: "imageUrl",
+        //     header: () => <div className="text-center">Thú cưng</div>,
+        //     cell: ({ row }) => {
+        //         const images = row.original.imageUrl; // Lấy danh sách ảnh từ API
+        //         return (
+        //             <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
+        //                 {images.map((image, index) => (
+        //                     <Zoom>
+        //                         <img
+        //                             src={image}
+        //                             alt={`Pet ${index}`}
+        //                             className="h-28 w-28 object-cover rounded-md"
+        //                         />
+        //                     </Zoom>
+        //                 ))}
+        //             </div>
+        //         );
+        //     },
+        //     enableSorting: false,
+        //     enableHiding: false,
+        // },
+        {
+            accessorKey: "pet_name",
+            header: () => <div className="text-center">Thú cưng</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("pet_name")}</div>,
         },
         {
-            accessorKey: "category",
-            header: () => <div className="text-center">Danh mục</div>,
-            cell: ({ row }) => <div className="capitalize">{row.getValue("category")}</div>,
+            accessorKey: "service",
+            header: () => <div className="text-center">Dịch vụ</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("service")}</div>,
         },
         {
-            accessorKey: "quantity",
-            header: ({ column }) => (
-                <div className="text-center">
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Số lượng
-                        <ArrowUpDown />
-                    </Button>
-                </div>
-            ),
-            cell: ({ row }) => <div className="lowercase text-center">{row.getValue("quantity")}</div>,
-        },
-        {
-            accessorKey: "price",
-            header: () => <div className="text-right">Giá tiền</div>,
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("price"));
-                return <div className="text-right font-medium">{amount.toLocaleString()}₫</div>;
-            },
+            accessorKey: "time",
+            header: () => <div className="text-center">Thời gian</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("time")}</div>,
         },
         {
             id: "actions",
-            header: () => <div className="text-center font-semibold">...</div>,
+            header: () => <div className="text-center font-semibold">Hành động</div>,
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
                     <button>
@@ -222,43 +208,23 @@ export default function Product_Managerment() {
             <div className="w-full">
                 <div className="flex items-center py-4">
                     <Input
-                        placeholder="Tìm kiếm sản phẩm..."
-                        value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-                        onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                        placeholder="Tìm kiếm..."
+                        value={(table.getColumn("customer_name")?.getFilterValue()) ?? ""}
+                        onChange={(e) => table.getColumn("customer_name")?.setFilterValue(e.target.value)}
                         className="max-w-sm"
                     />
-                    {/* <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="ml-auto">
-                                Columns <ChevronDown />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {table.getAllColumns()
-                                .filter((col) => col.getCanHide())
-                                .map((col) => (
-                                    <DropdownMenuCheckboxItem
-                                        key={col.id}
-                                        checked={col.getIsVisible()}
-                                        onCheckedChange={(value) => col.toggleVisibility(!!value)}
-                                    >
-                                        {col.id}
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu> */}
                     <div className="text-center ml-auto">
                         <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
-                            Thêm sản phẩm
+                            Thêm bản ghi thú cưng
                         </Button>
 
                     </div>
-                    <Add_Modal open={open} onClose={() => setOpen(false)} />
-                    <Edit_Modal
-                        open={openEdit}
-                        onClose={() => setOpenEdit(false)}
-                        ProductData={selectedProduct}
-                    />
+                    {/*<AddPetRecordModal open={open} onClose={() => setOpen(false)} />*/}
+                    {/*<EditPetModal*/}
+                    {/*    open={openEdit}*/}
+                    {/*    onClose={() => setOpenEdit(false)}*/}
+                    {/*    PetData={selectedPet}*/}
+                    {/*/>*/}
                 </div>
                 <div className="rounded-md border">
                     <Table>

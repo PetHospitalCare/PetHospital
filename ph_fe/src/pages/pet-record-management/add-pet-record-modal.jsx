@@ -16,22 +16,22 @@ import { Dog, Cat } from "lucide-react"
 import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
 import { Combobox } from "@/components/Combobox";
-import { ProductService } from "../../services/ProductService";
+import { PetRecordService } from "@/services/PetRecordService.js";
 
 const frameworksList = [
     { value: "Dog", label: "Chó", icon: Dog },
     { value: "Cat", label: "Mèo", icon: Cat },
 ];
 
-export default function Add_Modal({ open, onClose }) {
-    const [images, setImages] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [productName, setProductName] = useState("");
-    const [productDescription, setProductDescription] = useState("");
+export default function AddPetRecordModal({ open, onClose }) {
+    // const [images, setImages] = useState([]);
+    // const [categories, setCategories] = useState([]);
+    // const [selectedCategory, setSelectedCategory] = useState("");
+    const [petName, setPetName] = useState("");
+    const [petDescription, setPetDescription] = useState("");
     const [price, setPrice] = useState("");
     const [quantity, setQuantity] = useState("");
-    const [type, setType] = useState([]);
+    // const [type, setType] = useState([]);
 
     // Lấy dữ liệu danh mục từ backend
     useEffect(() => {
@@ -99,7 +99,7 @@ export default function Add_Modal({ open, onClose }) {
         // Nếu danh mục được chọn là tạm thời, lưu nó vào DB trước
         if (categories.find((category) => category.value === selectedCategory)?.isTemporary) {
             try {
-                const response = await ProductService.createCategory({ name: categories.find((cat) => cat.value === selectedCategory).label });
+                const response = await ProductService.createCategory({name: categories.find((cat) => cat.value === selectedCategory).label});
                 if (response.data.success) {
                     // Cập nhật ID danh mục thật vào state và sử dụng ID này
                     finalCategoryId = response.data.category._id;

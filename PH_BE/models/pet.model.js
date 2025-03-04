@@ -20,6 +20,9 @@ const petSchema = new mongoose.Schema(
         },
         profile_id: { 
             type: String 
+        },
+        pet_id: {
+            type: String
         }
     },
     { timestamps: true }

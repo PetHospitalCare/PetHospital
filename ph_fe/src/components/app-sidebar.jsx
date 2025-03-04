@@ -10,7 +10,8 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-  HeartPulse
+  HeartPulse,
+  CalendarCheck
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -40,7 +41,7 @@ export function AppSidebar({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await Services.getAllService("http://localhost:9999/service/get-all"); // Thay bằng URL API của bạn
+        const response = await Services.getAllService("http://localhost:9999/service/get-all");
         if (response.data.success) {
 
           console.log("Formatted Data:", response.data.services);
@@ -80,6 +81,10 @@ export function AppSidebar({
             title: "Tài Khoản",
             url: "/Account_Managerment",
           },
+            {
+                title: "Bản Ghi Thú cưng",
+                url: "/PetRecord_Management",
+            },
         ],
       },
       {
@@ -95,9 +100,9 @@ export function AppSidebar({
     ],
     projects: [
       {
-        name: "Design Engineering",
-        url: "#",
-        icon: Frame,
+        name: "Lịch khám",
+        url: "/Schedule",
+        icon: CalendarCheck,
       },
       {
         name: "Sales & Marketing",
