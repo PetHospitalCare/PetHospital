@@ -68,7 +68,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
             ...prev,
             images: prev.images.filter((_, i) => i !== index),
         }));
-    
+
         setImageFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
@@ -76,7 +76,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
     const validateForm = () => {
         let newErrors = {};
         const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
-    
+
         if (!formData.name) newErrors.name = "Vui lòng nhập tên thuốc";
         if (!formData.price) newErrors.price = "Vui lòng nhập giá thuốc";
         if (!formData.quantity) newErrors.quantity = "Vui lòng nhập số lượng";
@@ -86,7 +86,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
         } else if (formData.expiry_date < today) {
             newErrors.expiry_date = "Ngày hết hạn không thể là ngày trong quá khứ";
         }
-    
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -178,7 +178,9 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                                         checked={formData.pet_type.includes(type)}
                                         onCheckedChange={() => handlePetTypeChange(type)}
                                     />
-                                    <Label htmlFor={type}>{type}</Label>
+                                    <Label htmlFor={type}>
+                                        {type === "Dog" ? "Chó" : type === "Cat" ? "Mèo" : type}
+                                    </Label>
                                 </div>
                             ))}
                         </div>

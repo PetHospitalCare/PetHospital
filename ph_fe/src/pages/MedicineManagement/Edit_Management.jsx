@@ -36,9 +36,9 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                 unit: medicine.unit || "",
                 price: medicine.price || "",
                 quantity: medicine.quantity || "",
-                expiry_date: medicine.expiry_date 
-                ? new Date(medicine.expiry_date).toISOString().split("T")[0] 
-                : ""
+                expiry_date: medicine.expiry_date
+                    ? new Date(medicine.expiry_date).toISOString().split("T")[0]
+                    : ""
             });
         }
     }, [medicine]);
@@ -82,11 +82,11 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
             formDataToSend.append("price", formData.price);
             formDataToSend.append("quantity", formData.quantity);
             formDataToSend.append("expiry_date", formData.expiry_date);
-    
+
             formData.pet_type.forEach((type) => {
                 formDataToSend.append("pet_type[]", type);
             });
-    
+
             // Gửi danh sách ảnh cũ lên để BE biết ảnh nào cần giữ
             formData.images.forEach((image, index) => {
                 if (image.file) {
@@ -96,7 +96,7 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                     formDataToSend.append(`existingImages[${index}][publicId]`, image.publicId || "");
                 }
             });
-    
+
             const response = await MedicineService.updateMedicine(medicine._id, formDataToSend);
             alert("Cập nhật thành công");
             onsuccess?.();
@@ -142,7 +142,9 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                             {petTypes.map((type) => (
                                 <div key={type} className="flex items-center gap-2">
                                     <Checkbox id={type} checked={formData.pet_type.includes(type)} onCheckedChange={() => handlePetTypeChange(type)} />
-                                    <Label htmlFor={type}>{type}</Label>
+                                    <Label htmlFor={type}>
+                                        {type === "Dog" ? "Chó" : type === "Cat" ? "Mèo" : type}
+                                    </Label>
                                 </div>
                             ))}
                         </div>

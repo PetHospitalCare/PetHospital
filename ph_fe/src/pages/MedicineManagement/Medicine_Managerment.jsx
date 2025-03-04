@@ -122,7 +122,20 @@ export default function MedicineManagerment() {
         {
             accessorKey: "pet_type",
             header: () => <div className="text-center">Dành cho</div>,
-            cell: ({ row }) => <div className=" text-center">{row.getValue("pet_type")}</div>,
+            cell: ({ row }) => {
+                const petType = row.getValue("pet_type");
+
+                // Kiểm tra nếu petType là mảng, thì chuyển sang tiếng Việt
+                const translatedPetType = Array.isArray(petType)
+                    ? petType.map((type) => (type === "Dog" ? "Chó" : type === "Cat" ? "Mèo" : type)).join(", ")
+                    : petType === "Dog"
+                        ? "Chó"
+                        : petType === "Cat"
+                            ? "Mèo"
+                            : petType;
+
+                return <div className="text-center">{translatedPetType}</div>;
+            }
         },
         {
             accessorKey: "quantity",
@@ -155,7 +168,7 @@ export default function MedicineManagerment() {
                 if (!rawDate) return <div className="text-center">Không có ngày</div>;
 
 
-                
+
                 const date = new Date(rawDate);
                 const formattedDate = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
 
