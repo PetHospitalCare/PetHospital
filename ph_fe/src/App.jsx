@@ -22,6 +22,11 @@ import Calendar from './pages/BookingSchedule/CalendarPage'
 
 import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
 
+import ManageBooking from './pages/BookingSchedule/ManageBooking'
+
+import ProductPage from "@/pages/product-page/product-page.jsx";
+
+
 
 function App() {
   return (
@@ -36,6 +41,7 @@ function App() {
         <Route path="/loading" element={<LoadingScreen />} />
         <Route path='/signup-success' element={<SignupSuccess />} />
         <Route path='/unauthorized' element={<Unauthorized />} />
+        <Route path='/product' element={<ProductPage />} />
 
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
@@ -46,8 +52,8 @@ function App() {
 
           <Route path='/Schedule' element={<Calendar />}></Route>
 
-          <Route path='/PetRecord_Management' element={<PetRecordManagement />}/>
-
+          <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
+          <Route path='/Booking_Management' element={<ManageBooking />} />
         </Route>
         <Route path="*" element={< Notfound />} />
       </Routes>

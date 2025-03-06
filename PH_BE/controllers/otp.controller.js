@@ -26,7 +26,7 @@ const sendOTP = async (req, res) => {
 
         res.status(200).json({ message: "OTP sent" });
     } catch (err) {
-        console.error("Error in sendOTP:", err); 
+        console.error("Error in sendOTP:", err);
         res.status(500).json({ error: "Failed to send OTP", details: err.message });
     }
 };
@@ -39,10 +39,10 @@ const verifyOTP = async (req, res) => {
         console.log(otp)
         console.log(email)
         if (!validOTP) {
-            return res.status(400).json({status: 400, error: "Invalid OTP" });
+            return res.status(400).json({ status: 400, error: "Invalid OTP" });
         }
 
-        return res.status(200).json({status: 200, message: "OTP verified" });
+        return res.status(200).json({ status: 200, message: "OTP verified" });
     } catch (err) {
         return res.status(500).json({ error: "Verification failed" });
     }

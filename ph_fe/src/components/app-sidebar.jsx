@@ -33,7 +33,7 @@ import { Services } from "../../src/services/Services";
 
 
 export function AppSidebar({
-  setNavItems, setNavTitle,...props
+  setNavItems, setNavTitle, setProject, ...props
 }) {
   const { user } = useContext(UserContext)
   const [service, setService] = useState([]);
@@ -44,7 +44,7 @@ export function AppSidebar({
         const response = await Services.getAllService("http://localhost:9999/service/get-all");
         if (response.data.success) {
 
-          console.log("Formatted Data:", response.data.services);
+
           setService(response.data.services);
         }
       } catch (error) {
@@ -81,10 +81,10 @@ export function AppSidebar({
             title: "Tài Khoản",
             url: "/Account_Managerment",
           },
-            {
-                title: "Bản Ghi Thú cưng",
-                url: "/PetRecord_Management",
-            },
+          {
+            title: "Bản Ghi Thú cưng",
+            url: "/PetRecord_Management",
+          },
         ],
       },
       {
@@ -105,8 +105,8 @@ export function AppSidebar({
         icon: CalendarCheck,
       },
       {
-        name: "Sales & Marketing",
-        url: "#",
+        name: "Quản lí lịch hẹn",
+        url: "/Booking_Management",
         icon: PieChart,
       },
       {
@@ -120,10 +120,14 @@ export function AppSidebar({
   // send data navMain to Page.jsx
   useEffect(() => {
     if (setNavItems) {
-      const allTitle = data.navMain.flatMap((nav) => nav.title)
+      const allTitle = data.navMain
+      const project = data.projects
       const allItems = data.navMain.flatMap((nav) => nav.items);
       setNavTitle(allTitle)
       setNavItems(allItems);
+      setProject(data.projects)
+
+
     }
   }, [service]);
   return (

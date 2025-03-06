@@ -43,7 +43,7 @@ const createNewMedicine = async (req, res) => {
             quantity,
             expiry_date: expiry_date ? new Date(expiry_date) : null
         });
-        console.log(newMedicine);
+
         // Lưu sản phẩm vào database
         const savedMedicine = await newMedicine.save();
 
@@ -118,7 +118,7 @@ const updateMedicine = async (req, res) => {
         medicine.name = name || medicine.name;
         medicine.description = description || medicine.description;
         medicine.type = type || medicine.type;
-        medicine.pet_type = parsedPetType ||  medicine.pet_type;
+        medicine.pet_type = parsedPetType || medicine.pet_type;
         medicine.dosage = dosage || medicine.dosage;
         medicine.manufacturer = manufacturer || medicine.manufacturer;
         medicine.unit = unit || medicine.unit;

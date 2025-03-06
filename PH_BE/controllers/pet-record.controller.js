@@ -40,5 +40,27 @@ const getAllPetRecords = async (req, res) => {
         });
     }
 };
+const getAllPetByAccount = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "ID không hợp lệ",
+            });
+        }
+        const petRecords = await db.pet.find({ account_id: id });
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy danh sách bản ghi thú cưng thành công',
+            petRecords,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
 
-module.exports = { getAllPetRecords };
+module.exports = { getAllPetRecords, getAllPetByAccount };

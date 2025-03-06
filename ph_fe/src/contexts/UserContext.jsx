@@ -28,7 +28,7 @@ const UserProvider = ({ children }) => {
             try {
                 const decoded = jwtDecode(jwtToken);
                 setUser({
-                    id: decoded.id,
+                    _id: decoded.id,
                     role: decoded.role,
                     email: decoded.email,
                     username: decoded.username,
