@@ -18,12 +18,12 @@ const petSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        profile_id: {
-            type: String
-        },
         account_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Account",
+        },
+        weight: {
+            type: Number
         },
         url: { type: String },
         publicId: { type: String },

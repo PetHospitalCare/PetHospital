@@ -15,24 +15,20 @@ const accountSchema = new mongoose.Schema(
         gender: {
             type: String,
             enum: ["male", "female"],
-
         },
         email: {
             type: String,
             required: true,
-            unique: [true, "Account email is duplicate"],
-            match: [/^[a-zA-Z0-9._%+-]+@gmail\.com$/, "Email must be a valid Gmail address"]
         },
         phone: {
             type: String,
             required: true,
-            unique: [true, "phone is duplicate"],
         },
         role: {
             type: [String],
             enum: ["customer", "doctor", "admin", "staff"],
             required: true
-        }
+        },
     },
     { timestamps: true }
 );
