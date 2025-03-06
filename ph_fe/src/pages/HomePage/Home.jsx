@@ -28,7 +28,7 @@ export default function Home() {
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <Header />
+
                 <div className="absolute inset-0 flex flex-col items-center justify-start text-center text-gray-900 mt-32">
                     <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
                         Veterinary Hospital
@@ -38,10 +38,8 @@ export default function Home() {
                     </h2>
                 </div>
             </div>
-            <Stickybutton></Stickybutton>
             <Carousel />
             <AboutSection></AboutSection>
-            <Footer></Footer>
         </>
     );
 }

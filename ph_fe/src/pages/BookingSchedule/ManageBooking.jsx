@@ -22,6 +22,7 @@ import {
 } from "@tanstack/react-table";
 import { BookingServices } from "@/services/BookingService";
 import { Services } from "@/services/Services";
+import { Badge } from "@/components/ui/badge";
 
 export default function ManageBooking() {
     const [data, setData] = useState([]);
@@ -49,6 +50,7 @@ export default function ManageBooking() {
             console.error("Lỗi khi lấy dữ liệu services:", error);
         }
     }
+
 
     useEffect(() => {
         fetchBookings();
@@ -78,33 +80,28 @@ export default function ManageBooking() {
     const columns = [
         {
             accessorKey: "date",
-            header: "Ngày đặt",
-            cell: ({ row }) => <div className="">{row.getValue("date").split("T")[0].split("-").reverse().join("/")}</div>,
+            header: "Ngày và giờ đặt",
+            cell: ({ row }) => {
+                const time = row.original.hour;
+                return (<>
+                    <div className="font-medium">{row.getValue("date").split("T")[0].split("-").reverse().join("/")}</div>
+                    <div className="text-sm text-muted-foreground">{time}</div></>
+                )
+            }
         },
-        {
-            accessorKey: "hour",
-            header: "Giờ",
-            cell: ({ row }) => <div className="">{row.getValue("hour")}</div>,
-        },
+
         {
             accessorKey: "guest_name",
             header: "Khách hàng",
-            cell: ({ row }) => <div className="">{row.getValue("guest_name")}</div>,
-        },
-        {
-            accessorKey: "guest_phone",
-            header: "SĐT",
-            cell: ({ row }) => <div className="">{row.getValue("guest_phone")}</div>,
-        },
-        {
-            accessorKey: "type",
-            header: "Loại thú cưng",
-            cell: ({ row }) => <div className="">{row.getValue("type")}</div>,
-        },
-        {
-            accessorKey: "status",
-            header: "Trạng thái",
-            cell: ({ row }) => <div className="">{row.getValue("status")}</div>,
+            cell: ({ row }) => {
+                const pet = row.original.pet_id;
+                const sdt = row.original.guest_phone;
+                const email = row.original.guest_email;
+                return (<>
+                    <div className="font-medium">{row.getValue("guest_name")}</div>
+                    <div className="text-sm text-muted-foreground">{sdt} - {email}</div></>
+                )
+            }
         },
         {
             accessorKey: "sub_service_id",
@@ -120,6 +117,17 @@ export default function ManageBooking() {
                 );
             },
         },
+        {
+            accessorKey: "type",
+            header: "Loại thú cưng",
+            cell: ({ row }) => <Badge variant="outline" className="capitalize">{row.getValue("type")}</Badge>
+        },
+        {
+            accessorKey: "status",
+            header: "Trạng thái",
+            cell: ({ row }) => <div className="">{row.getValue("status")}</div>,
+        },
+
         {
             id: "actions",
             header: "Hành động",

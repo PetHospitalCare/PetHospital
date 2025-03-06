@@ -25,23 +25,25 @@ import PetRecordManagement from "@/pages/pet-record-management/pet-record-manage
 import ManageBooking from './pages/BookingSchedule/ManageBooking'
 
 import ProductPage from "@/pages/product-page/product-page.jsx";
+import PublicLayout from './layout/PublicRoutes'
 
 
 
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/Login' element={<Login />} />
-        <Route path='/SignUp' element={<SignUp />} />
-        <Route path='/otp' element={<OTP_Input />} />
-        <Route path='/change-email' element={<ChangeEmail />} />
-        <Route path="/loading" element={<LoadingScreen />} />
-        <Route path='/signup-success' element={<SignupSuccess />} />
-        <Route path='/unauthorized' element={<Unauthorized />} />
-        <Route path='/product' element={<ProductPage />} />
+        <Route element={<PublicLayout />} >
+          <Route path='/' element={<Home />} />
+          <Route path='/Login' element={<Login />} />
+          <Route path='/SignUp' element={<SignUp />} />
+          <Route path='/otp' element={<OTP_Input />} />
+          <Route path='/change-email' element={<ChangeEmail />} />
+          <Route path="/loading" element={<LoadingScreen />} />
+          <Route path='/signup-success' element={<SignupSuccess />} />
+          <Route path='/unauthorized' element={<Unauthorized />} />
+          <Route path='/product' element={<ProductPage />} />
+        </Route>
 
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

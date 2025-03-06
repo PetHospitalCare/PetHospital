@@ -116,5 +116,17 @@ const editaccount = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+const getAllDoctor = async (req, res) => {
+  try {
+    const doctor = await Account.find({ role: "doctor" }).select("-password -role");
+    if (!doctor) {
+      return res.status(404).json({ message: "Không có bác sĩ nào " })
+    }
 
-module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount };
+    return res.status(200).json({ message: "Lấy danh sách bác sĩ thành công", doctor });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor };

@@ -9,11 +9,12 @@ const bookingSchema = new mongoose.Schema(
         service_id: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
         sub_service_id: { type: mongoose.Schema.Types.ObjectId, ref: "SubService" },
         type: { enum: ["dog", "cat"], type: String },
-        status: { enum: ["pending", "done", "cancel"], type: String },
+        status: { enum: ["pending", "confirm", "cancel", "complete"], type: String },
         note: { type: String },
         guest_name: { type: String, default: null },
         guest_phone: { type: String, default: null },
         guest_email: { type: String, default: null },
+        doctor_id: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
     },
     { timestamps: true }
 );

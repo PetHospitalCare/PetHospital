@@ -13,7 +13,7 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headless
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { CheckIcon } from '@heroicons/react/20/solid'
 import { BookingServices } from "@/services/BookingService";
-
+import { toast } from "sonner"
 export default function BookingDialog({ open, onClose }) {
     const { user } = useContext(UserContext);
 
@@ -101,8 +101,15 @@ export default function BookingDialog({ open, onClose }) {
         try {
             const response = await BookingServices.CreateNewBooking(formData);
             if (response.status === 201) {
-                alert("Đặt lịch khám thành công!");
-                console.log(formData)
+                toast.success(`Đặt lịch khám thành công!`,
+                    {
+                        description: `ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
+                        action: {
+                            label: 'Xem chi tiết',
+                            onClick: () => console.log('Undo')
+                        }
+                    }
+                );
                 handleClose();
             }
         } catch (error) {
@@ -132,7 +139,7 @@ export default function BookingDialog({ open, onClose }) {
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <Label className="font-medium text-gray-700">Họ và tên <span className="text-red-500">*</span></Label>
-                        <Input id="name" name="name" value={formData.name} onChange={handleChange} required className="bg-white border-gray-300 rounded-lg" />
+                        <Input id="name" name="name" value={formData.name} onChange={handleChange} required className="bg-white border-gray-300 rounded-lg" disabled={!!user} />
                     </div>
                     <div>
                         <Label className="font-medium text-gray-700">Số điện thoại <span className="text-red-500">*</span></Label>
@@ -140,7 +147,7 @@ export default function BookingDialog({ open, onClose }) {
                     </div>
                     <div>
                         <Label className="font-medium text-gray-700">Email</Label>
-                        <Input id="email" name="email" value={formData.email} onChange={handleChange} className="bg-white border-gray-300 rounded-lg" />
+                        <Input id="email" name="email" value={formData.email} onChange={handleChange} className="bg-white border-gray-300 rounded-lg" disabled={!!user} />
                     </div>
                     <div className="flex gap-6">
                         <div className="w-1/2">
