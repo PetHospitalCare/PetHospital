@@ -26,6 +26,9 @@ const updateAccount = (id, data) => {
 const deleteAccount = (id) => {
   return axios.delete(`/account/delete${id}`);
 }
+const getAllDoctor = (id) => {
+  return axios.get(`/account/get-all-doctor`);
+}
 export const UserService = {
   signInService,
   signUpService,
@@ -34,5 +37,6 @@ export const UserService = {
   getAllAccount,
   createAccount,
   updateAccount,
-  deleteAccount
+  deleteAccount,
+  getAllDoctor
 };

@@ -3,7 +3,7 @@ import Header from "../../components/Header/Header"
 import { useEffect, useState } from "react";
 import Footer from "@/components/footer/footer";
 import Stickybutton from "@/components/stickybutton";
-import {ProductService} from "@/services/ProductService.js";
+import { ProductService } from "@/services/ProductService.js";
 
 export default function ProductPage() {
     // const [isScrolled, setIsScrolled] = useState(false);
@@ -46,43 +46,33 @@ export default function ProductPage() {
 
     return (
         <>
-            <div className="relative h-screen">
 
-                <div className="absolute inset-0 -z-10">
-                    <img
-                        src="https://res.cloudinary.com/debx8syhr/image/upload/v1737554135/a42b4dc7074a1bd77c694dbc815a4ced_omkgkz.png"
 
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-                <Header/>
-
-                <div className="container mx-auto pt-24">
-                    <div className="grid grid-cols-4 gap-6 pt-12">
-                        {products.map((product) => (
+            <div className="container mx-auto pt-24">
+                <div className="grid grid-cols-4 gap-6 pt-12">
+                    {products.map((product) => (
+                        <div
+                            key={product.id}
+                            className=" bg-white p-4 border border-black rounded-2xl shadow-md w-[295px] h-[336px]  left-[1113px] top-[257px]"
+                        >
                             <div
-                                key={product.id}
-                                className=" bg-white p-4 border border-black rounded-2xl shadow-md w-[295px] h-[336px]  left-[1113px] top-[257px]"
+                                className=" rounded-sm bg-cover bg-darken"
                             >
-                                <div
-                                    className=" rounded-sm bg-cover bg-darken"
-                                >
-                                    <img src={product.imageUrl[0].url}></img>
-                                </div>
-                                <h3 className="text-lg font-normal text-gray-800  font-inter">
-                                    {product.name}
-                                </h3>
-                                <p className=" font-semibold text-sm">
-                                    {product.price}
-                                </p>
+                                <img src={product.imageUrl[0].url}></img>
                             </div>
-                        ))}
-                    </div>
+                            <h3 className="text-lg font-normal text-gray-800  font-inter">
+                                {product.name}
+                            </h3>
+                            <p className=" font-semibold text-sm">
+                                {product.price}
+                            </p>
+                        </div>
+                    ))}
                 </div>
-
             </div>
-            <Stickybutton></Stickybutton>
-            <Footer></Footer>
+
+
+
         </>
     );
 }
