@@ -95,7 +95,7 @@ export default function BookingDialog({ open, onClose }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!formData.name || !formData.phone || !formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId) {
-            alert("Vui lòng nhập đầy đủ thông tin!");
+            toast.error("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
         try {

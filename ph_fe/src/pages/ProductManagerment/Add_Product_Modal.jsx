@@ -17,13 +17,14 @@ import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
 import { Combobox } from "@/components/Combobox";
 import { ProductService } from "../../services/ProductService";
-
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 const frameworksList = [
     { value: "Dog", label: "Chó", icon: Dog },
     { value: "Cat", label: "Mèo", icon: Cat },
 ];
-
-export default function Add_Modal({ open, onClose }) {
+import { toast } from "sonner";
+export default function Add_Modal({ open, onClose, onSuccess }) {
     const [images, setImages] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -32,7 +33,7 @@ export default function Add_Modal({ open, onClose }) {
     const [price, setPrice] = useState("");
     const [quantity, setQuantity] = useState("");
     const [type, setType] = useState([]);
-
+    const [loading, setLoading] = useState(false);
     // Lấy dữ liệu danh mục từ backend
     useEffect(() => {
         const fetchCategories = async () => {
@@ -88,20 +89,21 @@ export default function Add_Modal({ open, onClose }) {
     //function xác nhận tạo sản phẩm
     const handleSubmit = async (event) => {
         event.preventDefault();
-
         if (!productName || !selectedCategory || !productDescription || !type.length || !images.length) {
-            alert("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
+            toast.error("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
+            //alert("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
             return;
         }
 
+        setLoading(true); // Bật trạng thái loading
+
         let finalCategoryId = selectedCategory;
 
-        // Nếu danh mục được chọn là tạm thời, lưu nó vào DB trước
+        // Nếu danh mục là tạm thời, lưu vào DB trước
         if (categories.find((category) => category.value === selectedCategory)?.isTemporary) {
             try {
                 const response = await ProductService.createCategory({ name: categories.find((cat) => cat.value === selectedCategory).label });
                 if (response.data.success) {
-                    // Cập nhật ID danh mục thật vào state và sử dụng ID này
                     finalCategoryId = response.data.category._id;
                     setCategories((prevCategories) =>
                         prevCategories.map((cat) =>
@@ -112,8 +114,9 @@ export default function Add_Modal({ open, onClose }) {
                     );
                 }
             } catch (error) {
-                console.error("Lỗi khi lưu danh mục tạm thời:", error);
-                alert("Đã xảy ra lỗi khi tạo danh mục, vui lòng thử lại.");
+                toast.error("Đã xảy ra lỗi khi tạo danh mục, vui lòng thử lại.");
+
+                setLoading(false);
                 return;
             }
         }
@@ -124,22 +127,26 @@ export default function Add_Modal({ open, onClose }) {
         formData.append("description", productDescription);
         formData.append("price", price);
         formData.append("quantity", quantity);
-        formData.append("categoryId", finalCategoryId); // Sử dụng ID danh mục cuối cùng (thật hoặc tạm đã được cập nhật)
+        formData.append("categoryId", finalCategoryId);
         formData.append("type", JSON.stringify(type));
-
 
         try {
             const response = await ProductService.createProduct(formData);
             if (response.data.message === "Tạo sản phẩm thành công") {
-                alert("Sản phẩm đã được thêm!");
-                window.location.reload();
+                toast.success("Sản phẩm đã được thêm!");
+
+                onSuccess();
                 onClose();
             }
         } catch (error) {
             console.error("Lỗi khi thêm sản phẩm:", error);
-            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            toast.error("Đã xảy ra lỗi, vui lòng thử lại.");
+
+        } finally {
+            setLoading(false); // Tắt trạng thái loading sau khi API hoàn tất
         }
     };
+
 
     if (!open) return null;
 
@@ -210,7 +217,16 @@ export default function Add_Modal({ open, onClose }) {
 
                     <div className="flex justify-between items-center">
                         <button type="button" onClick={onClose} className="text-red-500 underline">Hủy bỏ</button>
-                        <button type="submit" className="bg-blue-500 text-white px-6 py-3 rounded">Thêm sản phẩm</button>
+                        <Button type="submit" className="bg-blue-500 text-white px-6 py-3 rounded flex items-center justify-center" disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="animate-spin mr-2" />
+                                    Đang xử lý...
+                                </>
+                            ) : (
+                                "Thêm sản phẩm"
+                            )}
+                        </Button>
                     </div>
                 </form>
             </div>

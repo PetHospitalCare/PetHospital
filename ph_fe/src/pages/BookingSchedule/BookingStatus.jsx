@@ -23,7 +23,9 @@ import { BookingServices } from "@/services/BookingService";
 import { Services } from "@/services/Services";
 import { Badge } from "@/components/ui/badge";
 import { socket } from "../../App"
-
+import { Check } from 'lucide-react';
+import AssignDoctor from "./AssignDoctor";
+import { UserService } from "@/services/UserService";
 export default function BookingStatus({ status, setCount }) {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
@@ -32,10 +34,19 @@ export default function BookingStatus({ status, setCount }) {
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
     const [services, setServices] = useState([]);
+    const [openAssignDoctor, setOpenAssignDoctor] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const [doctor, setDoctor] = useState([]);
+    const statusMapping = {
+        pending: { label: "Chờ xác nhận", color: "bg-yellow-500 text-white" },
+        confirm: { label: "Chờ khám", color: "bg-blue-500 text-white" },
+        complete: { label: "Đã khám", color: "bg-green-500 text-white" },
+        cancel: { label: "Đã hủy", color: "bg-red-500 text-white" },
+    };
     const fetchBookings = async () => {
         try {
             const response = await BookingServices.GetAllBooking();
-            const pending = response.data.filter(booking => booking.status === status)
+            const pending = response?.data?.filter(booking => booking.status === status)
             setData(pending);
             if (status === "pending") {
                 setCount(pending.length);
@@ -54,9 +65,18 @@ export default function BookingStatus({ status, setCount }) {
             console.error("Lỗi khi lấy dữ liệu services:", error);
         }
     }
+    const getAllDoctor = async () => {
+        try {
+            const respon = await UserService.getAllDoctor();
+            setDoctor(respon.data.doctor);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu bác sĩ:", error);
+        }
+    };
     useEffect(() => {
         fetchBookings();
         getAllService();
+        getAllDoctor();
     }, [status]);
     useEffect(() => {
         socket.on("newBooking", (newBooking) => {
@@ -64,12 +84,12 @@ export default function BookingStatus({ status, setCount }) {
                 setData((prevData) => [newBooking, ...prevData]);
             }
             setCount((prevCount) => prevCount + 1);
-            console.log("New booking:", newBooking);
+
         });
         return () => {
             socket.off("newBooking");
         };
-    }, [socket]);
+    }, []);
 
     const handleDelete = async (id) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa booking này?")) {
@@ -103,7 +123,6 @@ export default function BookingStatus({ status, setCount }) {
                 )
             }
         },
-
         {
             accessorKey: "guest_name",
             header: "Khách hàng",
@@ -126,7 +145,6 @@ export default function BookingStatus({ status, setCount }) {
                 return (
                     <div className="">
                         {getSubServiceName(serviceId, subServiceId)}
-
                     </div>
                 );
             },
@@ -139,14 +157,34 @@ export default function BookingStatus({ status, setCount }) {
         {
             accessorKey: "status",
             header: "Trạng thái",
-            cell: ({ row }) => <div className="">{row.getValue("status")}</div>,
+            cell: ({ row }) => <Badge className={`px-2 py-1 rounded ${statusMapping[row.getValue("status")]?.color || "bg-gray-500 text-white"}`}>
+                {statusMapping[row.getValue("status")]?.label || "Không xác định"}
+            </Badge>
         },
+        {
+            accessorKey: "doctor_id",
+            header: "Bác sĩ phụ trách",
+            cell: ({ row }) =>
 
+                <div className="font-medium">
+                    {row.getValue("doctor_id")?.username || "Chưa chỉ định"}
+
+                </div>
+
+        },
         {
             id: "actions",
             header: "Hành động",
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
+                    {status === "pending" &&
+                        <button>
+                            <Check className="size-6 p-1 mr-1 " onClick={() => {
+                                setOpenAssignDoctor(true);
+                                setSelectedBooking(row.original._id);
+                            }} />
+                        </button>
+                    }
                     <button>
                         <Pen className="size-6 p-1 mr-1 " onClick={() => {
                         }} />
@@ -182,6 +220,7 @@ export default function BookingStatus({ status, setCount }) {
     return (
 
         <div className="w-full">
+            <AssignDoctor open={openAssignDoctor} onOpenChange={setOpenAssignDoctor} booking={selectedBooking} onUpdate={fetchBookings} />
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Tìm kiếm khách hàng..."

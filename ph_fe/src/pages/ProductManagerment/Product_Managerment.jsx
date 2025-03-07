@@ -37,7 +37,7 @@ import Page from "@/app/dashboard/page";
 import Add_Modal from "./Add_Product_Modal";
 
 import { ProductService } from "../../services/ProductService";
-
+import { toast } from "sonner"
 
 import Edit_Modal from "./Edit_Product_Modal";
 
@@ -50,31 +50,31 @@ export default function Product_Managerment() {
     const [open, setOpen] = React.useState(false)
     const [openEdit, setOpenEdit] = React.useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null);
-
+    const fetchData = async () => {
+        try {
+            const response = await ProductService.getAllProduct()
+            if (response.data.success) {
+                const formattedData = response.data.products.map((product) => ({
+                    id: product._id,
+                    name: product.name,
+                    imageUrl: product.images,
+                    description: product.description,
+                    price: product.price,
+                    quantity: product.quantity,
+                    type: product.type,
+                    category:
+                        product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
+                }));
+                setData(formattedData);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+        }
+    };
 
     // Gọi API để lấy danh sách sản phẩm
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await ProductService.getAllProduct()
-                if (response.data.success) {
-                    const formattedData = response.data.products.map((product) => ({
-                        id: product._id,
-                        name: product.name,
-                        imageUrl: product.images,
-                        description: product.description,
-                        price: product.price,
-                        quantity: product.quantity,
-                        type: product.type,
-                        category:
-                            product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
-                    }));
-                    setData(formattedData);
-                }
-            } catch (error) {
-                console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
-            }
-        };
+
 
         fetchData();
     }, []);
@@ -85,10 +85,12 @@ export default function Product_Managerment() {
             try {
                 const response = await ProductService.deleteProduct(id)
                 if (response.data.success) {
-                    alert("Xóa sản phẩm thành công!");
+                    toast.success("Xóa sản phẩm thành công!")
+
                     setData((prevData) => prevData.filter((p) => p.id !== id));
                 } else {
-                    alert(response.data.message || "Không thể xóa sản phẩm.");
+                    toast.error(response.data.message || "Không thể xóa sản phẩm.")
+
                 }
             } catch (error) {
                 console.error("Lỗi khi xóa sản phẩm:", error);
@@ -253,7 +255,7 @@ export default function Product_Managerment() {
                     </Button>
 
                 </div>
-                <Add_Modal open={open} onClose={() => setOpen(false)} />
+                <Add_Modal open={open} onClose={() => setOpen(false)} onSuccess={fetchData} />
                 <Edit_Modal
                     open={openEdit}
                     onClose={() => setOpenEdit(false)}
