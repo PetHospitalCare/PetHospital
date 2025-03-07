@@ -38,7 +38,6 @@ export default function AccountManagement() {
     const fetchData = async () => {
         try {
             const response = await UserService.getAllAccount()
-            console.log(response.data.accounts)
             if (response.data.success) {
                 setData(response.data.accounts);
             }
@@ -54,7 +53,6 @@ export default function AccountManagement() {
         if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
             try {
                 const response = await UserService.deleteAccount(id);
-                console.log(response)
                 setData((prevData) => prevData.filter((acc) => acc._id !== id));
                 alert("Xóa tài khoản thành công!");
             } catch (error) {
