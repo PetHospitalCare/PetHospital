@@ -218,16 +218,16 @@ export default function Product_Managerment() {
     });
 
     return (
-        <Page>
-            <div className="w-full">
-                <div className="flex items-center py-4">
-                    <Input
-                        placeholder="Tìm kiếm sản phẩm..."
-                        value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-                        onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-                        className="max-w-sm"
-                    />
-                    {/* <DropdownMenu>
+
+        <div className="w-full">
+            <div className="flex items-center py-4">
+                <Input
+                    placeholder="Tìm kiếm sản phẩm..."
+                    value={(table.getColumn("name")?.getFilterValue()) ?? ""}
+                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                    className="max-w-sm"
+                />
+                {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="ml-auto">
                                 Columns <ChevronDown />
@@ -247,73 +247,73 @@ export default function Product_Managerment() {
                                 ))}
                         </DropdownMenuContent>
                     </DropdownMenu> */}
-                    <div className="text-center ml-auto">
-                        <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
-                            Thêm sản phẩm
-                        </Button>
+                <div className="text-center ml-auto">
+                    <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
+                        Thêm sản phẩm
+                    </Button>
 
-                    </div>
-                    <Add_Modal open={open} onClose={() => setOpen(false)} />
-                    <Edit_Modal
-                        open={openEdit}
-                        onClose={() => setOpenEdit(false)}
-                        ProductData={selectedProduct}
-                    />
                 </div>
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead key={header.id}>
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHead>
+                <Add_Modal open={open} onClose={() => setOpen(false)} />
+                <Edit_Modal
+                    open={openEdit}
+                    onClose={() => setOpenEdit(false)}
+                    ProductData={selectedProduct}
+                />
+            </div>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+
+                                        </TableCell>
                                     ))}
                                 </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length} className="text-center">
-                                        Không có kết quả.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-                <div className="flex items-center justify-end py-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Next
-                    </Button>
-                </div>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="text-center">
+                                    Không có kết quả.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
-        </Page>
+            <div className="flex items-center justify-end py-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    Previous
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                >
+                    Next
+                </Button>
+            </div>
+        </div>
+
     );
 }
