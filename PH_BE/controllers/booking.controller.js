@@ -1,5 +1,6 @@
 const db = require("../models");
 const Booking = db.booking
+const server = require("../server");
 const CreateNewBooking = async (req, res) => {
     try {
         const {
@@ -33,7 +34,7 @@ const CreateNewBooking = async (req, res) => {
 
 
         await newBooking.save();
-
+        server.io.emit("newBooking", newBooking);
         res.status(201).json({ message: "Đặt lịch thành công!", booking: newBooking });
     } catch (error) {
         console.error("Lỗi API create booking:", error);

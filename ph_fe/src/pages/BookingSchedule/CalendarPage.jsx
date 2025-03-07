@@ -47,124 +47,124 @@ export default function Calendar() {
     const weekStart = getWeekStart(currentDate);
 
     return (
-        <Page>
-            <div className="container mx-auto p-4">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => navigateWeek(-1)}>
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => navigateWeek(1)}>
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
 
-                        <h2 className="text-xl font-semibold">{getDateRangeText()}</h2>
-                        <Button variant="outline" onClick={() => setCurrentDate(getWeekStart(new Date()))}>
-                            Today
-                        </Button>
-                    </div>
-                </div>
+        <div className="container mx-auto p-4">
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => navigateWeek(-1)}>
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => navigateWeek(1)}>
+                        <ChevronRight className="h-4 w-4" />
+                    </Button>
 
-                <div className="border rounded-lg">
-                    <div className="grid grid-cols-8 border-b">
-                        <div className="p-4 border-r"></div>
-                        {DAYS.map((day, index) => {
-                            const dayDate = new Date(weekStart);
-                            dayDate.setDate(weekStart.getDate() + index);
-                            const isToday = dayDate.toDateString() === today.toDateString();
-
-                            return (
-                                <div key={day} className="p-4 text-center border-r last:border-r-0">
-                                    <div className={cn("font-medium", isToday && "text-red-500 font-bold")}>
-                                        {day} {dayDate.getDate()}/{dayDate.getMonth() + 1}
-                                        {isToday && <span className="ml-1"></span>}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-
-                    <div className="relative">
-                        {HOURS.map((hour, rowIndex) => (
-                            <div key={hour} className="grid grid-cols-8">
-                                <div className="p-4 border-r border-t text-sm text-muted-foreground">
-                                    {hour}
-                                </div>
-                                {DAYS.map((_, index) => {
-                                    const filteredAppointments = appointments.filter(event => {
-                                        const eventDate = new Date(event.date);
-                                        const getMinutes = (time) => {
-                                            const [hour, minute] = time.split(":").map(Number);
-                                            return hour * 60 + minute;
-                                        };
-
-                                        const eventStartMinutes = getMinutes(event.startHour);
-                                        const startIdx = HOURS.reduce((prevIdx, h, idx) => {
-                                            return getMinutes(h) <= eventStartMinutes ? idx : prevIdx;
-                                        }, 0);
-
-
-                                        const endIdx = startIdx + event.duration / 30;
-
-                                        return (
-                                            eventDate >= weekStart &&
-                                            eventDate < new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000) &&
-                                            eventDate.getDay() === (index + 1) % 7 &&
-                                            rowIndex >= startIdx &&
-                                            rowIndex < endIdx
-                                        );
-                                    });
-
-                                    return (
-                                        <div
-                                            key={index}
-                                            className={cn(
-                                                "relative border-r last:border-r-0 border-t p-2 min-h-[50px] flex flex-wrap gap-1",
-                                                BREAK_HOURS.includes(hour) && "bg-gray-200 opacity-50 pointer-events-none relative"
-                                            )}
-                                        >
-                                            {BREAK_HOURS.includes(hour) && <span className="absolute inset-0 flex items-center justify-center text-gray-500">Nghỉ trưa</span>}
-                                            {filteredAppointments.map((event) => {
-                                                const getMinutes = (time) => {
-                                                    const [hour, minute] = time.split(":").map(Number);
-                                                    return hour * 60 + minute;
-                                                };
-
-                                                const eventStartMinutes = getMinutes(event.startHour);
-                                                const eventEndMinutes = eventStartMinutes + event.duration;
-
-                                                // Tìm index gần nhất của giờ kết thúc
-                                                const endHourIndex = HOURS.reduce((prevIdx, h, idx) => {
-                                                    return getMinutes(h) <= eventEndMinutes ? idx : prevIdx;
-                                                }, 0);
-
-                                                const endHour = HOURS[endHourIndex] || "Unknown";
-
-                                                return (
-                                                    <div
-                                                        key={event.id}
-                                                        className={cn("rounded-md p-2 text-sm", event.color)}
-                                                        style={{
-                                                            flex: `1 1 ${100 / filteredAppointments.length}%`,
-                                                            minWidth: "48px",
-                                                            gridRow: `span ${event.duration / 30}`,
-                                                        }}
-                                                    >
-                                                        <div className="font-semibold">{event.title}</div>
-                                                        <div className="text-xs">{event.startHour} - {endHour}</div>
-                                                    </div>
-                                                );
-                                            })}
-
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </div>
+                    <h2 className="text-xl font-semibold">{getDateRangeText()}</h2>
+                    <Button variant="outline" onClick={() => setCurrentDate(getWeekStart(new Date()))}>
+                        Today
+                    </Button>
                 </div>
             </div>
-        </Page>
+
+            <div className="border rounded-lg">
+                <div className="grid grid-cols-8 border-b">
+                    <div className="p-4 border-r"></div>
+                    {DAYS.map((day, index) => {
+                        const dayDate = new Date(weekStart);
+                        dayDate.setDate(weekStart.getDate() + index);
+                        const isToday = dayDate.toDateString() === today.toDateString();
+
+                        return (
+                            <div key={day} className="p-4 text-center border-r last:border-r-0">
+                                <div className={cn("font-medium", isToday && "text-red-500 font-bold")}>
+                                    {day} {dayDate.getDate()}/{dayDate.getMonth() + 1}
+                                    {isToday && <span className="ml-1"></span>}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+
+                <div className="relative">
+                    {HOURS.map((hour, rowIndex) => (
+                        <div key={hour} className="grid grid-cols-8">
+                            <div className="p-4 border-r border-t text-sm text-muted-foreground">
+                                {hour}
+                            </div>
+                            {DAYS.map((_, index) => {
+                                const filteredAppointments = appointments.filter(event => {
+                                    const eventDate = new Date(event.date);
+                                    const getMinutes = (time) => {
+                                        const [hour, minute] = time.split(":").map(Number);
+                                        return hour * 60 + minute;
+                                    };
+
+                                    const eventStartMinutes = getMinutes(event.startHour);
+                                    const startIdx = HOURS.reduce((prevIdx, h, idx) => {
+                                        return getMinutes(h) <= eventStartMinutes ? idx : prevIdx;
+                                    }, 0);
+
+
+                                    const endIdx = startIdx + event.duration / 30;
+
+                                    return (
+                                        eventDate >= weekStart &&
+                                        eventDate < new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000) &&
+                                        eventDate.getDay() === (index + 1) % 7 &&
+                                        rowIndex >= startIdx &&
+                                        rowIndex < endIdx
+                                    );
+                                });
+
+                                return (
+                                    <div
+                                        key={index}
+                                        className={cn(
+                                            "relative border-r last:border-r-0 border-t p-2 min-h-[50px] flex flex-wrap gap-1",
+                                            BREAK_HOURS.includes(hour) && "bg-gray-200 opacity-50 pointer-events-none relative"
+                                        )}
+                                    >
+                                        {BREAK_HOURS.includes(hour) && <span className="absolute inset-0 flex items-center justify-center text-gray-500">Nghỉ trưa</span>}
+                                        {filteredAppointments.map((event) => {
+                                            const getMinutes = (time) => {
+                                                const [hour, minute] = time.split(":").map(Number);
+                                                return hour * 60 + minute;
+                                            };
+
+                                            const eventStartMinutes = getMinutes(event.startHour);
+                                            const eventEndMinutes = eventStartMinutes + event.duration;
+
+                                            // Tìm index gần nhất của giờ kết thúc
+                                            const endHourIndex = HOURS.reduce((prevIdx, h, idx) => {
+                                                return getMinutes(h) <= eventEndMinutes ? idx : prevIdx;
+                                            }, 0);
+
+                                            const endHour = HOURS[endHourIndex] || "Unknown";
+
+                                            return (
+                                                <div
+                                                    key={event.id}
+                                                    className={cn("rounded-md p-2 text-sm", event.color)}
+                                                    style={{
+                                                        flex: `1 1 ${100 / filteredAppointments.length}%`,
+                                                        minWidth: "48px",
+                                                        gridRow: `span ${event.duration / 30}`,
+                                                    }}
+                                                >
+                                                    <div className="font-semibold">{event.title}</div>
+                                                    <div className="text-xs">{event.startHour} - {endHour}</div>
+                                                </div>
+                                            );
+                                        })}
+
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
     );
 }
