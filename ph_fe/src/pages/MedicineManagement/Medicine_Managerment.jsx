@@ -217,80 +217,80 @@ export default function MedicineManagerment() {
 
 
     return (
-        <Page>
-            <div className="w-full">
-                <SheetDemo open={openEdit} onOpenChange={setOpenEdit} medicine={selectedMedicine} onsuccess={fetchData} />
-                <div className="flex items-center py-4">
-                    <Input
-                        placeholder="Tìm kiếm sản phẩm..."
-                        value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-                        onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-                        className="max-w-sm"
-                    />
-                    <div className="text-center ml-auto">
-                        <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
-                            Tạo thuốc mới
-                        </Button>
 
-                        <AddMedicineDialog open={open} onOpenChange={setOpen} onSuccess={fetchData} />
+        <div className="w-full">
+            <SheetDemo open={openEdit} onOpenChange={setOpenEdit} medicine={selectedMedicine} onsuccess={fetchData} />
+            <div className="flex items-center py-4">
+                <Input
+                    placeholder="Tìm kiếm sản phẩm..."
+                    value={(table.getColumn("name")?.getFilterValue()) ?? ""}
+                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                    className="max-w-sm"
+                />
+                <div className="text-center ml-auto">
+                    <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
+                        Tạo thuốc mới
+                    </Button>
 
-                    </div>
+                    <AddMedicineDialog open={open} onOpenChange={setOpen} onSuccess={fetchData} />
 
                 </div>
-                <div className="rounded-md border  ">
-                    <Table >
-                        <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead key={header.id}>
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHead>
+
+            </div>
+            <div className="rounded-md border  ">
+                <Table >
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+
+                                        </TableCell>
                                     ))}
                                 </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length} className="text-center">
-                                        Không có kết quả.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-                <div className="flex items-center justify-end py-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Next
-                    </Button>
-                </div>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="text-center">
+                                    Không có kết quả.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
-        </Page>
+            <div className="flex items-center justify-end py-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    Previous
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                >
+                    Next
+                </Button>
+            </div>
+        </div>
+
     );
 }

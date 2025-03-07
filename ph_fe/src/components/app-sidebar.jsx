@@ -126,8 +126,6 @@ export function AppSidebar({
       setNavTitle(allTitle)
       setNavItems(allItems);
       setProject(data.projects)
-
-
     }
   }, [service]);
   return (

@@ -21,13 +21,14 @@ import MedicineManagerment from './pages/MedicineManagement/Medicine_Managerment
 import Calendar from './pages/BookingSchedule/CalendarPage'
 
 import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
-
+import AdminLayout from './layout/AdminRoutes'
 import ManageBooking from './pages/BookingSchedule/ManageBooking'
 
 import ProductPage from "@/pages/product-page/product-page.jsx";
 import PublicLayout from './layout/PublicRoutes'
 
-
+import { io } from "socket.io-client";
+export const socket = io.connect("http://localhost:9999",);
 
 function App() {
   return (
@@ -47,15 +48,15 @@ function App() {
 
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-          <Route path='/Product_Managerment' element={<ProductManagerment />} />
-          <Route path='/Medicine_Managerment/' element={<MedicineManagerment />} />
-          <Route path='/Service_Managerment/:id' element={<Service_Managerment />} />
-          <Route path='/Account_Managerment' element={<AccountManagement />} />
-
-          <Route path='/Schedule' element={<Calendar />}></Route>
-
-          <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
-          <Route path='/Booking_Management' element={<ManageBooking />} />
+          <Route element={<AdminLayout />}> {/* Bọc toàn bộ route admin */}
+            <Route path='/Product_Managerment' element={<ProductManagerment />} />
+            <Route path='/Medicine_Managerment' element={<MedicineManagerment />} />
+            <Route path='/Service_Managerment/:id' element={<Service_Managerment />} />
+            <Route path='/Account_Managerment' element={<AccountManagement />} />
+            <Route path='/Schedule' element={<Calendar />} />
+            <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
+            <Route path='/Booking_Management' element={<ManageBooking />} />
+          </Route>
         </Route>
         <Route path="*" element={< Notfound />} />
       </Routes>
