@@ -71,7 +71,7 @@ export default function Header() {
                         .map((category) => ({
                             name: category.name,
                             description: category.description,
-                            to: '/product?category_id=' + category.category_id,
+                            to: '/product?category_id=' + category._id,
                         }))
                 );
             }

@@ -24,7 +24,8 @@ import PetRecordManagement from "@/pages/pet-record-management/pet-record-manage
 import AdminLayout from './layout/AdminRoutes'
 import ManageBooking from './pages/BookingSchedule/ManageBooking'
 
-import ProductPage from "@/pages/product-page/product-page.jsx";
+import ProductPage from "@/pages/product/product-page.jsx";
+import ProductDetail from "@/pages/product/product-detail.jsx";
 import PublicLayout from './layout/PublicRoutes'
 
 import { io } from "socket.io-client";
@@ -44,6 +45,7 @@ function App() {
           <Route path='/signup-success' element={<SignupSuccess />} />
           <Route path='/unauthorized' element={<Unauthorized />} />
           <Route path='/product' element={<ProductPage />} />
+          <Route path='/product-detail' element={<ProductDetail />} />
         </Route>
 
         {/* Trang dành cho admin */}
