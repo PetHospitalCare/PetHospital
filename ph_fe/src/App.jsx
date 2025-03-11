@@ -29,6 +29,7 @@ import ProductDetail from "@/pages/product/product-detail.jsx";
 import PublicLayout from './layout/PublicRoutes'
 
 import { io } from "socket.io-client";
+import UserProfile from './pages/UserProfile/UserProfile'
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <Route path='/signup-success' element={<SignupSuccess />} />
           <Route path='/unauthorized' element={<Unauthorized />} />
           <Route path='/product' element={<ProductPage />} />
+          <Route path='/profile' element={<UserProfile />} />
           <Route path='/product-detail' element={<ProductDetail />} />
         </Route>
 

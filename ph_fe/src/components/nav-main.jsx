@@ -34,7 +34,7 @@ export function NavMain({
   const { isMobile } = useSidebar()
   return (
     (<SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
