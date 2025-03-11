@@ -14,36 +14,48 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { socket } from "../../App"
+import { socket } from "../../App";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+
 export default function Page({ children }) {
   const [navTitle, setNavTitle] = useState([]);
   const [navItems, setNavItems] = useState([]);
   const [project, setProject] = useState([]);
   const location = useLocation();
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0); // Số thông báo chưa đọc
+  const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [hasUnread, setHasUnread] = useState(true); // Trạng thái có thông báo chưa đọc
-
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const handleOpen = () => {
-    setIsOpen((prev) => {
-      if (!prev) setUnreadCount(0); // Khi mở, đánh dấu là đã đọc
-      return !prev;
-    });
+
+  const handleOpen = useCallback(() => {
+    setIsOpen((prev) => !prev); // Đảo ngược giá trị của isOpen
+    if (!isOpen) {
+      setUnreadCount(0); // Reset số lượng thông báo chưa đọc khi mở dropdown
+    }
+  }, [isOpen]);
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "Không có thời gian";
+    return format(new Date(timestamp), "HH:mm - dd/MM/yyyy", { locale: vi });
   };
 
   useEffect(() => {
+
+
     socket.on("newBooking", (newBooking) => {
+      if (!newBooking || !newBooking.guest_name) {
+        return;
+      }
+      console.log("newBooking", newBooking);
       setNotifications((prevNotifications) => [
         {
           message: `${newBooking.guest_name} có đặt lịch hẹn mới!`,
-          time: newBooking.createdAt, // Lấy thời gian từ server
+          time: newBooking.createdAt,
         },
         ...prevNotifications,
       ]);
@@ -54,10 +66,20 @@ export default function Page({ children }) {
       socket.off("newBooking");
     };
   }, []);
-  const formatTime = (timestamp) => {
-    return format(new Date(timestamp), "HH:mm - dd/MM/yyyy", { locale: vi });
-  };
-  // Find breadcrumb that matches with url
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const currentBreadcrumb = navItems.find((item) => item.url === location.pathname);
   const findSectionTitleByItemTitle = (data, itemTitle) => {
     for (const section of data) {
@@ -65,7 +87,7 @@ export default function Page({ children }) {
         return section.title;
       }
     }
-    return null; // Trả về null nếu không tìm thấy
+    return null;
   };
   const parentTitle = findSectionTitleByItemTitle(navTitle, currentBreadcrumb?.title);
   const projecttilte = project.find((item) => item.url === location.pathname);
@@ -101,7 +123,7 @@ export default function Page({ children }) {
           </div>
 
           {/* Chuông thông báo */}
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <div className="cursor-pointer relative" onClick={handleOpen}>
               <Bell className="w-6 h-6 text-gray-700" />
               {unreadCount > 0 && (

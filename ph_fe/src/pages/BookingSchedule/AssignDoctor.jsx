@@ -41,10 +41,10 @@ const AssignDoctor = ({ open, onOpenChange, booking, onUpdate }) => {
 
         setLoading(true);
         try {
-            const res = await BookingServices.AssignDoctor(booking, selectedDoctor);
+            const res = await BookingServices.AssignDoctor(booking?._id, selectedDoctor);
             if (res.status === 200) {
                 toast.success("Cập nhật thành công!");
-                onUpdate(); // Cập nhật lại danh sách
+                onUpdate();
                 onOpenChange(false); // Đóng modal
             }
         } catch (error) {
@@ -55,7 +55,7 @@ const AssignDoctor = ({ open, onOpenChange, booking, onUpdate }) => {
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={onOpenChange} >
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Chọn bác sĩ</DialogTitle>
