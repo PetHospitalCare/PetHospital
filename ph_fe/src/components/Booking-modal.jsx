@@ -9,30 +9,31 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Services } from "@/services/Services";
 import { Link } from "react-router-dom";
 import { PetRecordService } from "@/services/PetRecordService";
-import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
-import { CheckIcon } from '@heroicons/react/20/solid'
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { ChevronUpDownIcon } from '@heroicons/react/16/solid';
+import { CheckIcon } from '@heroicons/react/20/solid';
 import { BookingServices } from "@/services/BookingService";
-import { toast } from "sonner"
-export default function BookingDialog({ open, onClose }) {
+import { toast } from "sonner";
+
+export default function BookingDialog({ open, onClose, fetchBookings }) {
     const { user } = useContext(UserContext);
 
     const [service, setService] = useState([]);
-    const [pet, SetPet] = useState([]);
+    const [pet, setPet] = useState([]);
     const [formData, setFormData] = useState({
-        name: user?.username || "",
-        phone: user?.phone || "",
-        email: user?.email || "",
+        name: "",
+        phone: "",
+        email: "",
         type: "dog",
         scheduleType: "",
         subServiceId: "",
         scheduleDate: "",
         scheduleTime: "",
         pet_id: "",
-        account_id: user?._id || "",
+        account_id: "",
         note: ""
     });
-    const [selected, setSelected] = useState();
+    const [selected, setSelected] = useState(null);
 
     const fetchService = async () => {
         try {
@@ -41,39 +42,43 @@ export default function BookingDialog({ open, onClose }) {
                 setService(response.data.services);
             }
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+            console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
         }
     };
+
     const fetchPet = async () => {
         try {
-            if (!user?._id) return
+            if (!user?._id) return;
             const response = await PetRecordService.GetAllPetByAccount(user?._id);
-            console.log(response.data.petRecords)
             if (response.data.success) {
-                SetPet(response.data.petRecords);
+                setPet(response.data.petRecords);
             }
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+            console.error("Lỗi khi lấy dữ liệu thú cưng:", error);
         }
     };
 
     useEffect(() => {
         fetchService();
         fetchPet();
-        setFormData((prev) => ({
-            ...prev,
-            name: user?.username || "",
-            phone: user?.phone || "",
-            email: user?.email || "",
-            account_id: user?._id || "",
-            pet_id: pet[0]?._id || "",
-        }));
-
     }, [user]);
+
+    useEffect(() => {
+        if (user?.role?.includes("customer")) {
+            setFormData((prev) => ({
+                ...prev,
+                name: user?.username || "",
+                phone: user?.phone || "",
+                email: user?.email || "",
+                account_id: user?._id || "",
+            }));
+        }
+    }, [user]);
+
     useEffect(() => {
         if (pet.length > 0) {
             setSelected(pet[0]);
-            setFormData(prev => ({ ...prev, pet_id: pet[0]._id }));
+            setFormData((prev) => ({ ...prev, pet_id: pet[0]._id }));
         }
     }, [pet]);
 
@@ -81,6 +86,7 @@ export default function BookingDialog({ open, onClose }) {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
     const handleServiceChange = (serviceId) => {
         const selectedService = service.find((s) => s._id === serviceId);
         setFormData({
@@ -90,43 +96,47 @@ export default function BookingDialog({ open, onClose }) {
         });
     };
 
-
     const selectedService = service.find((service) => service._id === formData.scheduleType);
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!formData.name || !formData.phone || !formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId) {
+        if (!formData.name || !formData.phone || !formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId || !formData.pet_id) {
             toast.error("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
         try {
             const response = await BookingServices.CreateNewBooking(formData);
             if (response.status === 201) {
-                toast.success(`Đặt lịch khám thành công!`,
-                    {
-                        description: `ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
-                        action: {
-                            label: 'Xem chi tiết',
-                            onClick: () => console.log('Undo')
-                        }
+                toast.success(`Đặt lịch khám thành công!`, {
+                    description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
+                    action: {
+                        label: 'Xem chi tiết',
+                        onClick: () => console.log('Undo')
                     }
-                );
+                });
+                fetchBookings();
                 handleClose();
             }
         } catch (error) {
             console.error("Lỗi khi tạo lịch khám:", error);
         }
-    }
+    };
+
     const handleClose = () => {
-        setFormData((prev) => ({
-            ...prev,
-            phone: user?.phone || "",
-            scheduleDate: "",
-            scheduleTime: "",
+        setFormData({
+            name: user?.role?.includes("customer") ? user?.username || "" : "",
+            phone: user?.role?.includes("customer") ? user?.phone || "" : "",
+            email: user?.role?.includes("customer") ? user?.email || "" : "",
+            type: "dog",
             scheduleType: "",
             subServiceId: "",
+            scheduleDate: "",
+            scheduleTime: "",
             pet_id: pet[0]?._id || "",
-            note: "",
-        }));
+            account_id: user?._id || "",
+            note: ""
+        });
+        setSelected(pet[0] || null);
         onClose();
     };
 
@@ -139,22 +149,50 @@ export default function BookingDialog({ open, onClose }) {
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <Label className="font-medium text-gray-700">Họ và tên <span className="text-red-500">*</span></Label>
-                        <Input id="name" name="name" value={formData.name} onChange={handleChange} required className="bg-white border-gray-300 rounded-lg" disabled={!!user} />
+                        <Input
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            className="bg-white border-gray-300 rounded-lg"
+                            disabled={!!user && user?.role?.includes("customer")}
+                        />
                     </div>
                     <div>
                         <Label className="font-medium text-gray-700">Số điện thoại <span className="text-red-500">*</span></Label>
-                        <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} required className="bg-white border-gray-300 rounded-lg" />
+                        <Input
+                            id="phone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
+                            className="bg-white border-gray-300 rounded-lg"
+                        />
                     </div>
                     <div>
                         <Label className="font-medium text-gray-700">Email</Label>
-                        <Input id="email" name="email" value={formData.email} onChange={handleChange} className="bg-white border-gray-300 rounded-lg" disabled={!!user} />
+                        <Input
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="bg-white border-gray-300 rounded-lg"
+                            disabled={!!user && user?.role?.includes("customer")}
+                        />
                     </div>
                     <div className="flex gap-6">
                         <div className="w-1/2">
                             <Label className="font-medium text-gray-700">Chọn ngày hẹn <span className="text-red-500">*</span></Label>
                             <div className="relative">
-                                <Input type="date" name="scheduleDate" value={formData.scheduleDate} onChange={handleChange} required className="bg-white border-gray-300 rounded-lg pl-3 pr-10 w-full" />
-                                {/* <Calendar className="absolute right-3 top-3 text-gray-500" size={20} /> */}
+                                <Input
+                                    type="date"
+                                    name="scheduleDate"
+                                    value={formData.scheduleDate}
+                                    onChange={handleChange}
+                                    required
+                                    className="bg-white border-gray-300 rounded-lg pl-3 pr-10 w-full"
+                                />
                             </div>
                         </div>
                         <div className="w-1/2">
@@ -174,7 +212,7 @@ export default function BookingDialog({ open, onClose }) {
 
                     <div>
                         <Label className="font-medium text-gray-700">Chọn thú cưng</Label>
-                        {user ? (
+                        {user && user?.role?.includes("customer") ? (
                             pet.length > 0 ? (
                                 <Listbox value={selected} onChange={(value) => {
                                     setSelected(value);
@@ -183,7 +221,7 @@ export default function BookingDialog({ open, onClose }) {
                                     <div className="relative mt-2">
                                         <ListboxButton className="grid w-full cursor-default grid-cols-1 rounded-md bg-white py-1.5 pr-2 pl-3 text-left text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                             <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6">
-                                                <img alt="" src={selected?.url || "/dog.png"} className="size-5 shrink-0 rounded-full" />
+                                                <img alt="" src={selected?.url || `/${selected?.type}.png`} className="size-5 shrink-0 rounded-full" />
                                                 <span className="block truncate">{selected?.name}</span>
                                             </span>
                                             <ChevronUpDownIcon
@@ -192,15 +230,12 @@ export default function BookingDialog({ open, onClose }) {
                                             />
                                         </ListboxButton>
 
-                                        <ListboxOptions
-                                            transition
-                                            className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 shadow-lg ring-black/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
-                                        >
+                                        <ListboxOptions className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
                                             {pet.map((pet) => (
                                                 <ListboxOption
                                                     key={pet._id}
                                                     value={pet}
-                                                    className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
+                                                    className="group relative cursor-default py-2 pr-9 pl-3 text-gray-900 select-none"
                                                 >
                                                     <div className="flex items-center">
                                                         <img alt="" src={pet?.url || "/dog.png"} className="size-5 shrink-0 rounded-full" />
@@ -214,7 +249,7 @@ export default function BookingDialog({ open, onClose }) {
                                     </div>
                                 </Listbox>
                             ) : (
-                                <div className="mt-2 py-3 px-4  text-sm">
+                                <div className="mt-2 py-3 px-4 text-sm">
                                     Chưa có hồ sơ thú cưng
                                 </div>
                             )
@@ -265,26 +300,15 @@ export default function BookingDialog({ open, onClose }) {
                             </div>
                         )}
                     </div>
-                    {/* {selectedService && selectedService.subServices.length > 0 && (
-                        <div>
-                            <Label>Chọn dịch vụ con <span className="text-red-500">*</span></Label>
-                            <Select onValueChange={(value) => setFormData({ ...formData, subServiceId: value })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Chọn dịch vụ con..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {selectedService.subServices.map((sub) => (
-                                        <SelectItem key={sub._id} value={sub._id}>
-                                            {sub.name} ({sub.price[formData.type] ? `${sub.price[formData.type]} VND` : "Giá không có sẵn"})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )} */}
                     <div className="col-span-2">
                         <Label className="font-medium text-gray-700">Ghi chú</Label>
-                        <Textarea name="note" value={formData.note} onChange={handleChange} placeholder="Nhập thông tin bổ sung..." className="bg-white border-gray-300 rounded-lg" />
+                        <Textarea
+                            name="note"
+                            value={formData.note}
+                            onChange={handleChange}
+                            placeholder="Nhập thông tin bổ sung..."
+                            className="bg-white border-gray-300 rounded-lg"
+                        />
                     </div>
                 </div>
                 <DialogFooter className="mt-6">
@@ -292,6 +316,5 @@ export default function BookingDialog({ open, onClose }) {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-
     );
 }
