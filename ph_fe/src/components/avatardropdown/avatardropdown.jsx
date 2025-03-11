@@ -30,7 +30,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/UserContext";
 export default function DropdownMenuDemo(user) {
@@ -58,11 +58,13 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={handletest}>
-                        <User />
-                        <span>Profile</span>
+                    <Link to="/profile">
+                        <DropdownMenuItem onClick={handletest}>
+                            <User />
+                            <span>Profile</span>
+                        </DropdownMenuItem>
+                    </Link>
 
-                    </DropdownMenuItem>
                     <DropdownMenuItem>
                         <CreditCard />
                         <span>Billing</span>

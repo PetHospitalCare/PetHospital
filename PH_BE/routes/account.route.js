@@ -12,4 +12,5 @@ accountRouter.post("/createnewaccount", AccountController.createNewAccount);
 accountRouter.delete("/delete:id", AccountController.deleteAccount);
 accountRouter.put("/edit/:id", AccountController.editaccount);
 accountRouter.get("/get-all-doctor", AccountController.getAllDoctor);
+accountRouter.get("/current-user",verifyToken, AccountController.getCurrentUser);
 module.exports = accountRouter;
