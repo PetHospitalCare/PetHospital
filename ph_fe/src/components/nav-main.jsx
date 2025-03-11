@@ -51,7 +51,7 @@ export function NavMain({
                     className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuAction showOnHover>
                     <MoreHorizontal />
@@ -76,7 +76,7 @@ export function NavMain({
                     <span>Delete Project</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
               <CollapsibleContent>
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (

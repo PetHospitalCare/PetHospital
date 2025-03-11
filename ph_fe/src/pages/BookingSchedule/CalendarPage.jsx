@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Page from "@/app/dashboard/page";
+import { Services } from "@/services/Services";
+import { BookingServices } from "@/services/BookingService";
 const HOURS = [
     "8:00", "8:30", "9:00", "9:30", "10:00", "10:30", "11:00", "13:00",
     "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
@@ -22,7 +24,52 @@ export default function Calendar() {
         const today = new Date();
         return new Date(today.setDate(today.getDate() - ((today.getDay() + 6) % 7)));
     });
+    const [appointments, setAppointments] = useState([]);
+    const [services, setServices] = useState([]);
+    const [booking, setBooking] = useState([]);
+    const getAllService = async () => {
+        try {
+            const res = await Services.getAllService();
+            setServices(res.data.services);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu services:", error);
+        }
+    }
+    const fetchBookings = async () => {
+        try {
+            const response = await BookingServices.GetAllBooking();
+            const Bookings = response.data.filter(booking => booking.status != "pending");
+            const formattedAppointments = Bookings.map(booking => ({
+                id: booking._id,
+                title: getSubService(booking?.service_id, booking?.sub_service_id).name || "Lịch hẹn",
+                doctor: booking?.doctor_id?.username,
+                startHour: booking.hour,
+                duration: getSubService(booking?.service_id, booking?.sub_service_id).duration || 30,
+                color: booking.status === "confirm" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700",
+                date: new Date(booking.date),
+            }));
+            setAppointments(formattedAppointments);
 
+
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu booking:", error);
+        }
+    };
+
+
+    useEffect(() => {
+        getAllService();
+        fetchBookings();
+    }, []);
+
+
+    const getSubService = (serviceId, subServiceId) => {
+        const service = services.find(s => s._id === serviceId);
+        if (!service) return "Không tìm thấy";
+
+        const subService = service.subServices.find(sub => sub._id === subServiceId);
+        return subService ? subService : "Không tìm thấy";
+    };
     const getWeekStart = (date) => {
         const d = new Date(date);
         d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
@@ -151,8 +198,11 @@ export default function Calendar() {
                                                         gridRow: `span ${event.duration / 30}`,
                                                     }}
                                                 >
-                                                    <div className="font-semibold">{event.title}</div>
+                                                    <div className="font-semibold truncate">{event.title}</div>
                                                     <div className="text-xs">{event.startHour} - {endHour}</div>
+                                                    <div className="text-xs mt-1 italic border-t pt-1 truncate">
+                                                        <span className="font-medium">BS:</span> {event.doctor}
+                                                    </div>
                                                 </div>
                                             );
                                         })}

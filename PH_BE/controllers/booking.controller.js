@@ -43,10 +43,21 @@ const CreateNewBooking = async (req, res) => {
 }
 const GetAllBooking = async (req, res) => {
     try {
-        const bookings = await Booking.find();
+        const bookings = await Booking.find().populate("doctor_id").populate("pet_id")
         return res.status(200).json(bookings);
     } catch (error) {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
     }
 }
-module.exports = { CreateNewBooking, GetAllBooking };
+const AssignDoctor = async (req, res) => {
+    try {
+        const { doctor_id } = req.body
+        const booking_id = req.params.id;
+
+        await Booking.findByIdAndUpdate(booking_id, { doctor_id: doctor_id, status: "confirm" });
+        return res.status(200).json({ message: "Cập nhật bác sĩ thành công!" });
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+    }
+}
+module.exports = { CreateNewBooking, GetAllBooking, AssignDoctor };
