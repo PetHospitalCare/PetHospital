@@ -2,22 +2,15 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import Page from "@/app/dashboard/page";
 import { Services } from "@/services/Services";
 import { BookingServices } from "@/services/BookingService";
+
 const HOURS = [
     "8:00", "8:30", "9:00", "9:30", "10:00", "10:30", "11:00", "13:00",
     "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
 ];
 const BREAK_HOURS = ["11:00", "11:30", "12:00", "12:30", "13:00", "13:30"];
 const DAYS = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"];
-
-// Sample appointment data
-const appointments = [
-    { id: 1, title: "Khám định kỳ", startHour: "10:00", duration: 60, color: "bg-blue-100 text-blue-700", date: new Date(2025, 1, 26) },
-    { id: 2, title: "Tiêm phòng", startHour: "14:15", duration: 120, color: "bg-green-100 text-green-700", date: new Date(2025, 1, 28) },
-    { id: 3, title: "Kiểm tra sức khỏe", startHour: "10:10", duration: 30, color: "bg-red-100 text-red-700", date: new Date(2025, 1, 26) },
-];
 
 export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(() => {
@@ -26,56 +19,72 @@ export default function Calendar() {
     });
     const [appointments, setAppointments] = useState([]);
     const [services, setServices] = useState([]);
-    const [booking, setBooking] = useState([]);
+
+    // Fetch all services
     const getAllService = async () => {
         try {
             const res = await Services.getAllService();
-            setServices(res.data.services);
+            if (res.data.success) {
+                setServices(res.data.services);
+            }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu services:", error);
         }
-    }
+    };
+
+    // Fetch all bookings and format appointments
     const fetchBookings = async () => {
         try {
             const response = await BookingServices.GetAllBooking();
-            const Bookings = response.data.filter(booking => booking.status != "pending");
-            const formattedAppointments = Bookings.map(booking => ({
-                id: booking._id,
-                title: getSubService(booking?.service_id, booking?.sub_service_id).name || "Lịch hẹn",
-                doctor: booking?.doctor_id?.username,
-                startHour: booking.hour,
-                duration: getSubService(booking?.service_id, booking?.sub_service_id).duration || 30,
-                color: booking.status === "confirm" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700",
-                date: new Date(booking.date),
-            }));
+            const bookings = response.data.filter(booking => booking.status !== "pending");
+
+            const formattedAppointments = bookings.map(booking => {
+                const subService = getSubService(booking.service_id, booking.sub_service_id);
+                return {
+                    id: booking._id,
+                    title: subService?.name || "Không tìm thấy dịch vụ",
+                    doctor: booking?.doctor_id?.username || "Không có bác sĩ",
+                    startHour: booking.hour,
+                    duration: subService?.duration || 30,
+                    color: booking.status === "confirm" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700",
+                    date: new Date(booking.date),
+                };
+            });
+
             setAppointments(formattedAppointments);
-
-
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu booking:", error);
         }
     };
 
-
-    useEffect(() => {
-        getAllService();
-        fetchBookings();
-    }, []);
-
-
+    // Get sub-service information
     const getSubService = (serviceId, subServiceId) => {
         const service = services.find(s => s._id === serviceId);
-        if (!service) return "Không tìm thấy";
+        if (!service) return null;
 
         const subService = service.subServices.find(sub => sub._id === subServiceId);
-        return subService ? subService : "Không tìm thấy";
+        return subService || null;
     };
+
+    // Fetch data on component mount
+    useEffect(() => {
+        getAllService();
+    }, []);
+
+    useEffect(() => {
+        if (services.length > 0) {
+            fetchBookings();
+        }
+    }, [services]);
+
+    // Get the start of the week
     const getWeekStart = (date) => {
         const d = new Date(date);
         d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
         return d;
     };
 
+    // Get the date range text for the current week
     const getDateRangeText = () => {
         const weekStart = getWeekStart(currentDate);
         const weekEnd = new Date(weekStart);
@@ -84,6 +93,7 @@ export default function Calendar() {
         return `${weekStart.getDate()}/${weekStart.getMonth() + 1} – ${weekEnd.getDate()}/${weekEnd.getMonth() + 1}, ${weekEnd.getFullYear()}`;
     };
 
+    // Navigate to the previous or next week
     const navigateWeek = (direction) => {
         const newDate = new Date(currentDate);
         newDate.setDate(currentDate.getDate() + direction * 7);
@@ -94,7 +104,6 @@ export default function Calendar() {
     const weekStart = getWeekStart(currentDate);
 
     return (
-
         <div className="container mx-auto p-4">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -104,7 +113,6 @@ export default function Calendar() {
                     <Button variant="ghost" size="icon" onClick={() => navigateWeek(1)}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
-
                     <h2 className="text-xl font-semibold">{getDateRangeText()}</h2>
                     <Button variant="outline" onClick={() => setCurrentDate(getWeekStart(new Date()))}>
                         Today
@@ -131,7 +139,6 @@ export default function Calendar() {
                     })}
                 </div>
 
-
                 <div className="relative">
                     {HOURS.map((hour, rowIndex) => (
                         <div key={hour} className="grid grid-cols-8">
@@ -150,7 +157,6 @@ export default function Calendar() {
                                     const startIdx = HOURS.reduce((prevIdx, h, idx) => {
                                         return getMinutes(h) <= eventStartMinutes ? idx : prevIdx;
                                     }, 0);
-
 
                                     const endIdx = startIdx + event.duration / 30;
 
@@ -181,7 +187,6 @@ export default function Calendar() {
                                             const eventStartMinutes = getMinutes(event.startHour);
                                             const eventEndMinutes = eventStartMinutes + event.duration;
 
-                                            // Tìm index gần nhất của giờ kết thúc
                                             const endHourIndex = HOURS.reduce((prevIdx, h, idx) => {
                                                 return getMinutes(h) <= eventEndMinutes ? idx : prevIdx;
                                             }, 0);
@@ -206,7 +211,6 @@ export default function Calendar() {
                                                 </div>
                                             );
                                         })}
-
                                     </div>
                                 );
                             })}
@@ -215,6 +219,5 @@ export default function Calendar() {
                 </div>
             </div>
         </div>
-
     );
 }

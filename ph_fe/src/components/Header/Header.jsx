@@ -1,8 +1,8 @@
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
-import {Link, useLocation, useNavigate} from "react-router-dom"
-import { useEffect, useState, useContext } from "react";
+import {Link} from "react-router-dom"
+import {useEffect, useState, useContext, useRef} from "react";
 import {
     Dialog,
     DialogPanel,
@@ -46,12 +46,12 @@ import DropdownMenuDemo from "../avatardropdown/avatardropdown"
 import { UserContext } from "../../contexts/UserContext";
 import {ProductService} from "@/services/ProductService.js";
 export default function Header() {
-    const navigate = useNavigate();
-    const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false);
     const { user } = useContext(UserContext);
     const [categories, setCategories] = useState(tempCategories);
+    const [isOpen, setIsOpen] = useState(false);
+    const timeoutRef = useRef(null);
 
     useEffect(() => {
         fetchCategories();
@@ -71,7 +71,7 @@ export default function Header() {
                         .map((category) => ({
                             name: category.name,
                             description: category.description,
-                            to: '/product?category_id=' + category.category_id,
+                            to: '/product?category_id=' + category._id,
                         }))
                 );
             }
@@ -80,11 +80,17 @@ export default function Header() {
         }
     };
 
-    const handleLinkToProductPage = () => {
-        if (location.pathname !== '/product') {
-            navigate('/product');
-        }
-    }
+    const handleMouseEnter = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setIsOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        timeoutRef.current = setTimeout(() => {
+            setIsOpen(false);
+        }, 300);
+    };
+
 
     return (
         <header
@@ -99,8 +105,8 @@ export default function Header() {
                             alt=""
                             src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png"
                             className="h-12 w-auto pointer-events-none select-none"
-                        // onContextMenu="return false;"
-                        // onDrag="retrun false;"
+                            // onContextMenu="return false;"
+                            // onDrag="retrun false;"
 
                         />
                     </Link>
@@ -170,35 +176,53 @@ export default function Header() {
                     {/*    Product*/}
                     {/*</Link>*/}
 
-                    <Popover className="relative">
-                        <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900" onClick={handleLinkToProductPage}>
+                    <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}
+                         onClick={() => setIsOpen(!isOpen)}>
+                        <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">
                             Product
-                            <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
-                        </PopoverButton>
+                            <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400"/>
+                        </div>
 
-                        <PopoverPanel
-                            transition
-                            className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition data-[closed]:translate-y-1 data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-150 data-[enter]:ease-out data-[leave]:ease-in"
-                        >
-                            {categories?.length > 0 && <div className="p-4">
-                                {categories.map((item) => (
-                                    <div
-                                        key={item.name}
-                                        className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm/6 hover:bg-gray-50"
-                                    >
-                                        <div className="flex-auto">
-                                            <Link to={item.to} className="block font-semibold text-gray-900">
-                                                {item.name}
-                                                <span className="absolute inset-0" />
-                                            </Link>
-                                            <p className="mt-1 text-gray-600">{item.description}</p>
+                        {isOpen && (
+                            <div
+                                className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition-opacity duration-200 ease-out opacity-100"
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                    <div className="p-4">
+                                        <div
+                                            key="all"
+                                            className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"
+                                        >
+                                            <div className="flex-auto">
+                                                <Link to="/product" className="block font-semibold text-gray-900">
+                                                    Tất cả sản phẩm
+                                                    <span className="absolute inset-0"/>
+                                                </Link>
+                                                <p className="mt-1 text-gray-600">Xem tất cả sản phẩm</p>
+                                            </div>
                                         </div>
+
+                                        {categories?.length > 0 &&
+                                        categories.map((item) => (
+                                            <div
+                                                key={item.name}
+                                                className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"
+                                            >
+                                                <div className="flex-auto">
+                                                    <Link to={item.to} className="block font-semibold text-gray-900">
+                                                        {item.name}
+                                                        <span className="absolute inset-0"/>
+                                                    </Link>
+                                                    <p className="mt-1 text-gray-600">{item.description}</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                        }
                                     </div>
-                                ))}
                             </div>
-                            }
-                        </PopoverPanel>
-                    </Popover>
+                        )}
+                    </div>
 
                     <Link to="/test" className="text-sm/6 font-semibold text-gray-900">
                         Contact
