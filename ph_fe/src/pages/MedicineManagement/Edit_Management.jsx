@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MedicineService } from "@/services/MedicineService";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
     const petTypes = ["Dog", "Cat"];
@@ -98,7 +99,7 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
             });
 
             const response = await MedicineService.updateMedicine(medicine._id, formDataToSend);
-            alert("Cập nhật thành công");
+            toast.success("Cập nhật thành công");
             onsuccess?.();
             onOpenChange(false);
         } catch (error) {

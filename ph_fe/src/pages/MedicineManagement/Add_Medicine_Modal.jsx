@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { MedicineService } from "@/services/MedicineService";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -111,12 +112,12 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
 
         try {
             await MedicineService.createMedicine(formDataToSend);
-            alert("Thêm thuốc thành công!");
+            toast.success("Thêm thuốc thành công!");
             onSuccess();
             onOpenChange(false);
         } catch (error) {
             console.error("Lỗi thêm thuốc:", error.response?.data || error.message);
-            alert(error.response?.data?.error || "Thêm thuốc thất bại");
+            toast.error(error.response?.data?.error || "Thêm thuốc thất bại");
         }
     };
 
