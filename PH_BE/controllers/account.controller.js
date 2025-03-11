@@ -129,4 +129,22 @@ const getAllDoctor = async (req, res) => {
   }
 };
 
-module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor };
+const getCurrentUser = async (req, res) => {
+  try {
+      const userId = req.userId; // Lấy userId từ middleware verifyToken
+
+      const user = await Account.findById(userId).select("-password"); // Loại bỏ mật khẩu khi trả về
+
+      if (!user) {
+          return res.status(404).json({ success: false, message: "Không tìm thấy người dùng." });
+      }
+
+      res.status(200).json({ success: true, account: user });
+  } catch (error) {
+      console.error("Lỗi khi lấy thông tin người dùng:", error);
+      res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+
+
+module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor, getCurrentUser };

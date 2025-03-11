@@ -18,12 +18,9 @@ db.product = Product
 db.service = Service
 db.category = Category
 db.account = Account
-
 db.otp = OTP
 db.pet = Pet
-
 db.booking = Booking
-
 db.medicine = Medicine
 
 

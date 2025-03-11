@@ -8,7 +8,7 @@ const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const http = require("http");
 
-const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter } = require("./routes");
+const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter } = require("./routes");
 
 
 //khoi tao web server
@@ -42,6 +42,7 @@ app.use("/account", AccountRouter);
 app.use("/medicine", MedicineRouter);
 app.use("/pet-record", PetRecordRouter);
 app.use("/booking", BookingRouter);
+app.use("/pet", PetRouter);
 
 io.on("connection", (socket) => {
     console.log("An user connect: ", socket.id);

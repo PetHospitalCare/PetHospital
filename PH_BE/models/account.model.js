@@ -24,6 +24,9 @@ const accountSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        address: {
+            type: String,
+        },
         role: {
             type: [String],
             enum: ["customer", "doctor", "admin", "staff"],
