@@ -26,6 +26,7 @@ import {
 import AddMedicineDialog from "./Add_Medicine_Modal";
 import SheetDemo from "./Edit_Management";
 import { MedicineService } from "@/services/MedicineService";
+import { toast } from "sonner";
 
 export default function MedicineManagerment() {
     const [data, setData] = useState([]);
@@ -58,10 +59,10 @@ export default function MedicineManagerment() {
                 const response = await MedicineService.deleteMedicine(id);
                 console.log(response)
                 setData((prevData) => prevData.filter((acc) => acc._id !== id));
-                alert("Xóa thuốc thành công!");
+                toast.success("Xóa thuốc thành công!");
             } catch (error) {
                 console.error("Lỗi khi xóa thuốc:", error);
-                alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
         }
     };

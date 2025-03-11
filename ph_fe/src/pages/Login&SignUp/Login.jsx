@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserService } from "../../services/UserService";
 import { UserContext } from "../../contexts/UserContext";
+import { toast } from "sonner";
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -27,7 +28,7 @@ export default function Login() {
       const response = await UserService.signInService(formData);
       if (response.status == 200) {
         loginContext(response.data)
-        alert("Đăng nhập thành công!");
+        toast.success("Đăng nhập thành công!");
         navigate("/");
       } else {
         setError("Vui Lòng kiểm tra lại tài khoản và mật khẩu!!!");
