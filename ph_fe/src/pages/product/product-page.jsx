@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {ProductService} from "@/services/ProductService.js";
 import {useLocation, useNavigate} from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
+import ShoppingCartButton from "@/components/shared/shoping-card-button.jsx";
 
 export default function ProductPage() {
     const location = useLocation();
@@ -136,16 +137,7 @@ export default function ProductPage() {
                     </div>
 
                     <div className="flex-1 text-right">
-                        <button className="relative p-2 bg-white text-black rounded-[10px] border border-gray-300">
-                            <i className="fas fa-shopping-cart"></i>
-
-                            {cartCount >= 0 && (
-                                <span
-                                    className="absolute top-0 right-0 bg-white text-black text-xs rounded-full w-5 h-5 flex items-center justify-center border border-red-500">
-                                {cartCount}
-                                </span>
-                            )}
-                        </button>
+                        <ShoppingCartButton shoppingCartCount={5} />
                     </div>
                 </div>
 
