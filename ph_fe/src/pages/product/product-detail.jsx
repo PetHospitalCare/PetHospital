@@ -1,7 +1,7 @@
 import * as React from "react"
 import {useEffect, useState} from "react";
 import {ProductService} from "@/services/ProductService.js";
-import ShoppingCartButton from "@/components/shared/shoping-card-button.jsx";
+import ShoppingCartButton from "@/components/shared/shopping-cart-button.jsx";
 // import {useLocation} from "react-router-dom";
 // import { useSearchParams } from "react-router-dom";
 
@@ -81,7 +81,7 @@ export default function ProductDetail() {
                     <div className="w-full md:w-1/2 px-4">
                         <div className="flex justify-between items-center">
                             <h2 className="text-3xl font-bold mb-2">{product.name}</h2>
-                            <ShoppingCartButton shoppingCartCount={5} />
+                            <ShoppingCartButton/>
                         </div>
 
                         <p className="text-gray-600 mb-4">Mã sản phẩm: 8850477016903</p>

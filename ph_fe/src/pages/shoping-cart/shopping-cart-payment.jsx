@@ -5,7 +5,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import ShoppingCartButton from "@/components/shared/shopping-cart-button.jsx";
 
-export default function ProductPage() {
+export default function ShoppingCartPayment() {
     const location = useLocation();
     const navigate = useNavigate();
     const [isScrolled, setIsScrolled] = useState(false);
