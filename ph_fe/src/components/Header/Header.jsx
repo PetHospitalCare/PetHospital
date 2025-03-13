@@ -156,7 +156,7 @@ export default function Header() {
                                     <Link
                                         key={item.name}
                                         to={item.to}
-                                        className="flex items-center justify-center gap-x-2.5 p-3 text-sm/6 font-semibold text-gray-900 hover:bg-gray-100"
+                                        className="flex items-center justify-center gap-x-2.5 p-3 text-sm/6 font-semibold text-gray-900 hover:bg-gray-100 rounded-lg"
                                     >
                                         <item.icon aria-hidden="true" className="size-5 flex-none text-gray-400" />
                                         {item.name}
@@ -228,14 +228,16 @@ export default function Header() {
                         Contact
                     </Link>
                 </PopoverGroup>
-                <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-end">
+                <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-end border:">
                     {user ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)
                         :
-                        (<Link to="/Login" className="text-sm/6 font-semibold text-gray-900">
-                            Log in <span aria-hidden="true">&rarr;</span>
-                        </Link>)}
-
-
+                        <Link 
+                         to="/Login"
+                        className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
+                        >
+                         Đăng nhập <span aria-hidden="true"></span>
+                        </Link>
+                        }
                 </div>
 
             </nav>
@@ -309,9 +311,9 @@ export default function Header() {
                             <div className="py-6">
                                 <Link
                                     to="/Login"
-                                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                    className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
                                 >
-                                    Log in
+                                   Đăng nhập
                                 </Link>
                             </div>
                         </div>
