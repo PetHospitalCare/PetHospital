@@ -30,6 +30,7 @@ import PublicLayout from './layout/PublicRoutes'
 
 import { io } from "socket.io-client";
 import UserProfile from './pages/UserProfile/UserProfile'
+import HistoryBooking from './pages/HistoryBooking/historyBooking'
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path='/unauthorized' element={<Unauthorized />} />
           <Route path='/product' element={<ProductPage />} />
           <Route path='/profile' element={<UserProfile />} />
+          <Route path='/history-booking' element={<HistoryBooking />} />
           <Route path='/product-detail' element={<ProductDetail />} />
         </Route>
 

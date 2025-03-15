@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { PetService } from "@/services/PetService";
 import { UserService } from "@/services/UserService";
-import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil, X } from "lucide-react";
 import PetModal from "./Add_Pet_Modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import * as React from "react";
@@ -18,6 +18,7 @@ export default function UserProfile() {
     const [open, setOpen] = React.useState(false);
     const [formData, setFormData] = React.useState({
         username: "",
+        email: "",
         phone: "",
         gender: "",
         address: ""
@@ -31,6 +32,7 @@ export default function UserProfile() {
                 setUser(response.data.account);
                 setFormData({
                     username: response.data.account.username || "",
+                    email: response.data.account.email || "",
                     phone: response.data.account.phone || "",
                     gender: response.data.account.gender || "male",
                     address: response.data.account.address || "",
@@ -67,10 +69,10 @@ export default function UserProfile() {
                 gender: formData.gender,
                 address: formData.address
             };
-    
+
             // Gửi API cập nhật
             const response = await UserService.updateAccount(user._id, updatedUser);
-    
+
             if (response.status == 200) {
                 // Cập nhật state user sau khi cập nhật thành công
                 setUser({ ...user, ...updatedUser });
@@ -93,7 +95,10 @@ export default function UserProfile() {
     const handleEditClick = () => {
         setIsEditing(true);
     };
-
+    //Xử lý nút edit
+    const handleCancelEditClick = () => {
+        setIsEditing(false);
+    };
     //Xử lý dropdown
     const toggleDropdown = (id) => {
         setOpenPets((prev) =>
@@ -103,17 +108,37 @@ export default function UserProfile() {
 
     return (
         <div className="container mx-auto pt-24">
+            <div className="absolute inset-0 -z-10">
+                <img
+                    src="https://res.cloudinary.com/debx8syhr/image/upload/v1737554135/a42b4dc7074a1bd77c694dbc815a4ced_omkgkz.png"
+                    className="w-full h-full object-cover"
+                />
+            </div>
             <div className="grid grid-cols-2 gap-4">
                 {/* Thông tin cá nhân */}
-                <div className="p-6 border rounded-lg shadow-md relative">
+                <div className="p-6 border rounded shadow-md relative bg-white">
                     <h1 className="font-bold text-3xl mb-4">THÔNG TIN CÁ NHÂN</h1>
                     <hr />
-                    <button
-                        className="absolute top-6 right-6 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-                        onClick={handleEditClick}
-                    >
-                        <Pencil className="w-5 h-5" />
-                    </button>
+                    <div className="Button-editing">
+
+                        {isEditing ? (
+                            <button
+                                className="absolute top-6 right-6 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                                onClick={handleCancelEditClick}
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        ) : (
+                            <button
+                                className="absolute top-6 right-6 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                                onClick={handleEditClick}
+                            >
+                                <Pencil className="w-5 h-5" />
+                            </button>
+                        )}
+
+                    </div>
+
                     {user ? (
                         <>
                             <div className="flex mt-3 gap-4">
@@ -141,15 +166,15 @@ export default function UserProfile() {
 
                             <div className="mt-4">
                                 <Label className="text-gray-600 text-lg">Số điện thoại</Label>
-                                <p className="font-bold text-lg">{user?.phone}</p>
+                                <p className="font-semibold text-lg">{user?.phone}</p>
                             </div>
                             <hr />
                             <div className="flex justify-between">
                                 <div className="mt-3">
                                     <Label className="text-gray-600 text-lg">Ngày sinh</Label>
-                                    <p className="font-bold text-lg">07-05-2003</p>
+                                    <p className="font-semibold text-lg">07-05-2003</p>
                                 </div>
-                        
+
                                 <div className="mt-3 flex items-center">
                                     <div className="ml-4 flex items-center space-x-4">
                                         <Label className="flex items-center space-x-2">
@@ -180,7 +205,7 @@ export default function UserProfile() {
                             <hr />
                             <div className="mt-3">
                                 <Label className="text-gray-600 text-lg">Email</Label>
-                                <p className="font-bold text-lg">{user?.email}</p>
+                                <p className="font-semibold text-lg">{user?.email}</p>
                             </div>
                             <hr />
                             <div className="mt-3">
@@ -194,7 +219,7 @@ export default function UserProfile() {
                                         className="border p-2 rounded-md text-lg w-full"
                                     />
                                 ) : (
-                                    <p className="font-bold text-lg">{user?.address}</p>
+                                    <p className="font-semibold text-lg">{user?.address}</p>
                                 )}
                             </div>
                             <hr />
@@ -212,7 +237,7 @@ export default function UserProfile() {
                 </div>
 
                 {/* Thông tin thú cưng */}
-                <div className="p-6 border rounded-lg shadow-md">
+                <div className="p-6 border rounded shadow-md bg-white">
                     <div className="flex justify-between items-center mb-4">
                         <h1 className="font-bold text-3xl">THÔNG TIN THÚ CƯNG</h1>
                         <Button
@@ -230,7 +255,7 @@ export default function UserProfile() {
                             pets.map((pet) => (
                                 <div key={pet._id} className="border rounded mb-4 overflow-hidden">
                                     <div className="bg-[#3F2E2E] text-white p-4 flex justify-between items-center cursor-pointer" onClick={() => toggleDropdown(pet._id)}>
-                                        <p className="text-xl font-semibold">{pet.name}</p>
+                                        <h1 className="text-2xl font-semibold">{pet.name}</h1>
                                         {openPets.includes(pet._id) ? <ChevronUp /> : <ChevronDown />}
                                     </div>
                                     {openPets.includes(pet._id) && (
@@ -239,9 +264,11 @@ export default function UserProfile() {
                                                 <img src={pet.url ? pet.url : "/dogCat.png"} alt={pet.name} className="w-24 h-24 object-cover rounded-md" />
                                                 <div>
                                                     <p className="text-gray-700">Giống: {pet?.type === "dog" ? "Chó" : "Mèo"}</p>
+                                                    <p className="text-gray-700">
+                                                        Giới tính: {pet?.gender === 1 ? "Đực" : pet?.gender === 2 ? "Cái" : "Không xác định"}
+                                                    </p>
                                                     <p className="text-gray-700">Loại: {pet?.species}</p>
                                                     <p className="text-gray-700">Cân nặng: {pet?.weight}kg</p>
-                                                    <p className="text-gray-700">Chi tiết: {pet?.detail}</p>
                                                 </div>
                                             </div>
                                             <Button className="mt-3 bg-[#3F2E2E] text-white">Sửa</Button>
