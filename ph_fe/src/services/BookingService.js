@@ -6,6 +6,9 @@ const CreateNewBooking = (data) => {
 const GetAllBooking = (data) => {
     return axios.get(`/booking/get-all`);
 };
+const GetHistoryBooking = (data) => {
+    return axios.get(`/booking/get-booking-by-user`);
+};
 const AssignDoctor = (id, doctor_id) => {
     return axios.put(`/booking/assigndoctor/${id}`, { doctor_id });
 };
@@ -13,5 +16,5 @@ const UpdateBooking = (id, data) => {
     return axios.put(`/booking/update/${id}`, data);
 }
 export const BookingServices = {
-    CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking
+    CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, GetHistoryBooking
 };
