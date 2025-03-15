@@ -7,6 +7,7 @@ const MedicineController = require("./medicine.controller")
 const PetRecordController = require('./pet-record.controller');
 const BookingController = require('./booking.controller');
 const PetController = require('./pet.controller');
+const ShoppingCartController = require('./shopping-cart.controller');
 
 module.exports = {
     ProductController,
@@ -17,8 +18,8 @@ module.exports = {
     PetRecordController,
     BookingController,
     MedicineController,
-    PetController
-
+    PetController,
+    ShoppingCartController
 };
 
 
