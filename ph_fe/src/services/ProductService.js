@@ -14,10 +14,13 @@ const createCategory = (data) => {
 }
 const getAllCategory = () => axios.get("/category/get-all");
 
+const getProductById = (id) => axios.get(`/product/getById${id}`);
+
 export const ProductService = {
   createProduct,
   getAllProduct,
   deleteProduct,
   createCategory,
-  getAllCategory
+  getAllCategory,
+  getProductById
 };

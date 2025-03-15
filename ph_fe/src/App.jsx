@@ -31,6 +31,7 @@ import PublicLayout from './layout/PublicRoutes'
 import { io } from "socket.io-client";
 import UserProfile from './pages/UserProfile/UserProfile'
 import HistoryBooking from './pages/HistoryBooking/historyBooking'
+import ShoppingCartDetail from "@/pages/shoping-cart/shopping-cart-detail.jsx";
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
           <Route path='/profile' element={<UserProfile />} />
           <Route path='/history-booking' element={<HistoryBooking />} />
           <Route path='/product-detail' element={<ProductDetail />} />
+          <Route path='/shopping-cart-detail' element={<ShoppingCartDetail />} />
         </Route>
 
         {/* Trang dành cho admin */}

@@ -10,6 +10,8 @@ const Booking = require("./booking.model");
 
 const Medicine = require("./medicine.model");
 
+const ShoppingCart = require("./shopping-cart.model");
+
 
 mongoose.Promise = global.Promise;
 
@@ -22,6 +24,7 @@ db.otp = OTP
 db.pet = Pet
 db.booking = Booking
 db.medicine = Medicine
+db.shoppingcart = ShoppingCart
 
 
 const connectDB = async () => {
