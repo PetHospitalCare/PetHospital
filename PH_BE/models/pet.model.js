@@ -28,9 +28,6 @@ const petSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Account",
         },
-        detail:{
-            type: String,
-        },
         url: { type: String },
         publicId: { type: String },
     },

@@ -13,8 +13,11 @@ import {
     User,
     UserPlus,
     Users,
+    CalendarCheck , 
+    Contact ,
+    ShoppingBasket 
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -60,23 +63,33 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuGroup>
                     <Link to="/profile">
                         <DropdownMenuItem onClick={handletest}>
-                            <User />
-                            <span>Profile</span>
+                            <Contact />
+                            <span>Thông tin cá nhân</span>
+                        </DropdownMenuItem>
+                    </Link>
+                    <Link to="/history-booking">
+                        <DropdownMenuItem>
+                            <CalendarCheck />
+                            <span>Lịch sử đặt lịch</span>
                         </DropdownMenuItem>
                     </Link>
                     <DropdownMenuItem>
-                        <CreditCard />
-                        <span>Billing</span>
+                        <User />
+                        <span>Hồ sơ khám bệnh</span>
+
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        <Settings />
-                        <span>Settings</span>
+                        <ShoppingBasket />
+                        <span>Đơn hàng</span>
+
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                     <LogOut />
                     <span>Log out</span>
-                </DropdownMenuItem>
+
+                </DropdownMenuItem> 
             </DropdownMenuContent>
         </DropdownMenu>
     )

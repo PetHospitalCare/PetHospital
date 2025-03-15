@@ -11,10 +11,9 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
     const [formData, setFormData] = React.useState({
         type: "dog",
         name: "",
-        gender: 1, // Mặc định là Đực
+        gender: 1,
         species: "",
         weight: "",
-        detail: ""
     });
 
     const [errors, setErrors] = React.useState({});
@@ -105,11 +104,6 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
                             {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
                         </div>
 
-                        {/* Chi tiết */}
-                        <div className="col-span-2">
-                            <Label htmlFor="detail">Chi tiết</Label>
-                            <Input type="text" id="detail" name="detail" placeholder="Chi tiết" value={formData.detail} onChange={handleChange} className="border p-2 rounded-md w-full" required />
-                        </div>
                     </div>
                 </div>
                 {/* Nút lưu ở cuối */}
