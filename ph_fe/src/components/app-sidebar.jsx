@@ -11,7 +11,8 @@ import {
   Settings2,
   SquareTerminal,
   HeartPulse,
-  CalendarCheck
+  CalendarCheck,
+  User
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -74,12 +75,12 @@ export function AppSidebar({
 
           },
           {
-            title: "Thuốc",
+            title: "Kho Thuốc",
             url: "/Medicine_Managerment",
           },
           {
-            title: "Tài Khoản",
-            url: "/Account_Managerment",
+            title: "Bảng Tin",
+            url: "#",
           },
           {
             title: "Bản Ghi Thú cưng",
@@ -100,6 +101,11 @@ export function AppSidebar({
     ],
     projects: [
       {
+        name: "Thông số & Doanh thu",
+        url: "#",
+        icon: Map,
+      },
+      {
         name: "Lịch khám",
         url: "/Schedule",
         icon: CalendarCheck,
@@ -110,10 +116,11 @@ export function AppSidebar({
         icon: PieChart,
       },
       {
-        name: "Travel",
-        url: "#",
-        icon: Map,
+        name: "Tài Khoản",
+        url: "/Account_Managerment",
+        icon: User,
       },
+      
     ],
   }
 

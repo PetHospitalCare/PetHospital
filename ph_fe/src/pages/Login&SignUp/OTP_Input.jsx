@@ -56,7 +56,7 @@ export default function OTP_Input() {
             if (response.status === 200) {
                 navigate("/loading");
             } else {
-                throw new Error("Invalid OTP or expired");
+                throw new Error("Mã OTP không hợp lệ");
             }
         } catch (err) {
             setError("OTP không hợp lệ hoặc đã hết hạn.");
@@ -76,19 +76,25 @@ export default function OTP_Input() {
 
             {/* Form OTP */}
             <div className="min-h-screen flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
+                <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
                     {/* OTP Input */}
-                    <h1 className="text-2xl font-bold mb-4 text-center text-gray-700">Input your OTP</h1>
+                    <h1 className="text-2xl font-bold mb-4 text-center text-gray-700">Nhập mã OTP</h1>
                     <p className="text-center text-gray-600 mb-4">
-                        The OTP code has been sent to your email <br />
+                        Mã OTP đã được gửi đến Email: <br />
                         <span className="font-bold text-black">{state?.email}</span>
                     </p>
+                    <div className="text-center text-red-600 font-semibold mb-2">
+                    ⚠️ Mã OTP chỉ có hiệu lực trong vòng <span className="font-bold">5 phút</span>
+                    </div>
+                    <div className="text-center text-red-600 font-semibold mb-2">
+                     Vui lòng nhập mã trước khi hết hạn!
+                    </div>
 
                     {/* Form input OTP */}
                     <form className="space-y-5" onSubmit={handleVerifyOTP}>
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">
-                                OTP code<span className="text-red-600">*</span>
+                                Mã OTP<span className="text-red-600">*</span>
                             </label>
                             <Input
                                 type="text"
@@ -101,7 +107,7 @@ export default function OTP_Input() {
                         {/* Change email / Send Again */}
                         <div className="flex justify-between text-sm">
                             <Link to="/change-email" state={{ email: state?.email }} className="text-red-500 font-medium underline">
-                                Change your email
+                                Thay đổi Email
                             </Link>
                             <button
                                 type="button"
@@ -109,7 +115,7 @@ export default function OTP_Input() {
                                 onClick={handleSendAgain}
                                 className="text-blue-500 font-medium underline"
                             >
-                                {countdown > 0 ? `Resend in ${countdown}s` : "Send again"}
+                                {countdown > 0 ? `Resend in ${countdown}s` : "Gửi lại"}
                             </button>
                         </div>
 
@@ -124,7 +130,7 @@ export default function OTP_Input() {
                                 type="submit"
                                 className="w-2/5 bg-blue-400 text-white py-3 rounded font-medium hover:bg-blue-500 transition-colors"
                             >
-                                Next
+                                Xác nhận
                             </Button>
                         </div>
                     </form>
