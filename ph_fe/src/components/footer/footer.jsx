@@ -2,12 +2,12 @@ import { Link } from "react-router-dom"
 
 export default function Footer() {
     return (
-        <footer className="bg-muted py-12">
+        <footer className="bg-muted py-12 flex items-center justify-center w-full text-center">
             <div className="container max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
                 <div className="flex flex-col items-start gap-4">
                     <Link href="#" className="flex items-center gap-2" prefetch={false}>
                         <MountainIcon className="w-6 h-6" />
-                        <span className="text-lg font-semibold">Acme Inc</span>
+                        <span className="text-lg font-semibold">Pet Hospital System</span>
                     </Link>
                     <p className="text-muted-foreground max-w-[300px]">
                         Beautifully designed components that you can copy and paste into your apps.

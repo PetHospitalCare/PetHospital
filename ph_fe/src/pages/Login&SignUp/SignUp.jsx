@@ -116,17 +116,17 @@ export default function SignUp() {
                     <Link to="/Login" className="flex items-center text-gray-500 hover:text-gray-700">
                         <ArrowLeftIcon className="size-4 mr-2" />
                     </Link>
-                    <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">Create Your Account</h1>
+                    <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">Đăng ký</h1>
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                     {/* Form */}
                     <form className="space-y-5" onSubmit={handleSignUp}>
                         {/* UserName */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Username<span className="text-red-600">*</span></label>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Họ & Tên<span className="text-red-600">*</span></label>
                             <Input
                                 type="text"
                                 value={username}
-                                placeholder="Nhập username"
+                                placeholder="Nhập tên người dùng"
                                 onChange={(e) => setUsername(e.target.value)}
                                 required />
                         </div>
@@ -144,7 +144,7 @@ export default function SignUp() {
 
                         {/* Phone Number */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Phone Number<span className="text-red-600">*</span></label>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Số điện thoại<span className="text-red-600">*</span></label>
                             <Input 
                                 type="tel" 
                                 value={phone} 
@@ -161,7 +161,7 @@ export default function SignUp() {
                                 className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
                                 onClick ={(e) => setGender(e.target.value)}
                             >
-                                Male
+                                Nam
                             </Button>
                             <Button
                                 type="button"
@@ -169,13 +169,13 @@ export default function SignUp() {
                                 className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
                                 onClick ={(e) => setGender(e.target.value)}
                             >
-                                Female
+                                Nữ
                             </Button>
                         </div>
 
                         {/* Password */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Password<span className="text-red-600">*</span></label>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Mật khẩu<span className="text-red-600">*</span></label>
                             <Input 
                                 type="password" 
                                 value={password} 
@@ -186,7 +186,7 @@ export default function SignUp() {
 
                         {/* Confirm password */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Confirm Password<span className="text-red-600">*</span></label>
+                            <label className="block text-base font-medium text-gray-600 mb-1">Xác nhận mật khẩu<span className="text-red-600">*</span></label>
                             <Input 
                                 type="password" 
                                 value={confirmPassword} 
@@ -201,7 +201,7 @@ export default function SignUp() {
 
                         {/* Submit form button */}
                         <div className="text-center">
-                            <Button type="submit" className="w-2/5 bg-blue-400 text-white py-3 rounded font-medium hover:bg-blue-500 transition-colors">Next</Button>
+                            <Button type="submit" className="w-2/5 bg-blue-400 text-white py-3 rounded font-medium hover:bg-blue-500 transition-colors">Tiếp theo</Button>
                         </div>
                     </form>
                 </div>

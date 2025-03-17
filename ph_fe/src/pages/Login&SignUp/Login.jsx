@@ -51,7 +51,7 @@ export default function Login() {
         <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-hidden">
           <div className="grid md:grid-cols-2">
             <div className="p-8">
-              <h1 className="text-2xl font-bold mb-10 text-left">Login</h1>
+              <h1 className="text-2xl font-bold mb-10 text-left">Đăng nhập</h1>
 
               {error && <p className="text-red-500">{error}</p>}
 
@@ -69,7 +69,7 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-left">Password</label>
+                  <label className="block text-sm font-medium mb-2 text-left">Mật khẩu</label>
                   <input
                     type="password"
                     name="password"
@@ -81,20 +81,20 @@ export default function Login() {
                 </div>
 
                 <button className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors">
-                  Sign in
+                  Đăng nhập
                 </button>
               </form>
 
               <p className="mt-4 text-sm text-center">
-                Don't have an account?{' '}
+                Bạn chưa có tài khoản?{' '}
                 <Link to="/SignUp" className="text-blue-500 underline">
-                  Sign up
+                  Đăng ký
                 </Link>
               </p>
 
               <div className="text-left mt-8">
                 <Link to="/" className="flex text-gray-400 hover:text-gray-500">
-                  Home page
+                  Trang chủ
                 </Link>
               </div>
             </div>
