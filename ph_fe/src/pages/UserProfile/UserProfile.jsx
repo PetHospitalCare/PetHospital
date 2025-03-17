@@ -1,30 +1,37 @@
 import { Button } from "@/components/ui/button";
-import { PetService } from "@/services/PetService";
 import { UserService } from "@/services/UserService";
-import { ChevronDown, ChevronUp, Pencil, X } from "lucide-react";
-import PetModal from "./Add_Pet_Modal";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pencil, Upload } from "lucide-react";
 import * as React from "react";
-import { Toaster } from "@/components/ui/sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose
+} from "@/components/ui/dialog";
+import PetInfo from "./PetInfo";
 
 export default function UserProfile() {
     const [user, setUser] = React.useState(null);
-    const [pets, setPets] = React.useState([]);
-    const [isEditing, setIsEditing] = React.useState(false);
-    const [openPets, setOpenPets] = React.useState([]);
-    const [open, setOpen] = React.useState(false);
+    const [uploadDialogOpen, setUploadDialogOpen] = React.useState(false);
+    const [imageFile, setImageFile] = React.useState(null);
+    const [imagePreview, setImagePreview] = React.useState(null);
     const [formData, setFormData] = React.useState({
         username: "",
         email: "",
+        dateOfBirth: "",
         phone: "",
         gender: "",
         address: ""
     });
+    const [isLoading, setIsLoading] = React.useState(false);
 
-    //Lấy dữ liệu người dùng hiện tại
+    // Lấy dữ liệu người dùng hiện tại
     const fetchUserData = async () => {
         try {
             const response = await UserService.getCurrentUser();
@@ -33,6 +40,7 @@ export default function UserProfile() {
                 setFormData({
                     username: response.data.account.username || "",
                     email: response.data.account.email || "",
+                    dateOfBirth: response.data.account.dateOfBirth ? new Date(response.data.account.dateOfBirth).toISOString().split('T')[0] : "",
                     phone: response.data.account.phone || "",
                     gender: response.data.account.gender || "male",
                     address: response.data.account.address || "",
@@ -40,43 +48,79 @@ export default function UserProfile() {
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
-        }
-    };
-
-    //Lấy dữ liệu của thú cưng
-    const fetchPetData = async () => {
-        try {
-            const response = await PetService.getPetByUser();
-            if (response.data.success) {
-                setPets(response.data.pets);
-            }
-        } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
+            toast.error("Không thể tải thông tin người dùng");
         }
     };
 
     React.useEffect(() => {
         fetchUserData();
-        fetchPetData();
     }, []);
 
-    //Lưu update user
+    // Xử lý chọn file ảnh
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            // Tạo URL preview cho ảnh
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+        }
+    };
+
+    // Xử lý upload ảnh
+    const handleImageUpload = async () => {
+        if (!imageFile) {
+            toast.error("Vui lòng chọn ảnh");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            // Tạo FormData để gửi file
+            const formData = new FormData();
+            formData.append("image", imageFile);
+            console.log(imageFile)
+            // Gọi API upload ảnh (giả định bạn có API này trong UserService)
+            const response = await UserService.uploadAvatar(formData);
+
+            if (response.status === 200) {
+                // Cập nhật user với URL ảnh mới
+                const updatedUser = { ...user, url: response.data.url, publicId: response.data.publicId };
+                setUser(updatedUser);
+                toast.success("Cập nhật ảnh đại diện thành công");
+                setUploadDialogOpen(false);
+                // Xóa các state liên quan đến upload
+                setImageFile(null);
+                setImagePreview(null);
+            } else {
+                toast.error("Cập nhật ảnh đại diện thất bại");
+            }
+        } catch (error) {
+            console.error("Lỗi khi upload ảnh:", error);
+            toast.error("Lỗi khi tải ảnh lên");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Lưu update user
     const handleSave = async () => {
+        setIsLoading(true);
         try {
             const updatedUser = {
                 username: formData.username,
                 phone: formData.phone,
                 gender: formData.gender,
-                address: formData.address
+                address: formData.address,
+                dateOfBirth: formData.dateOfBirth,
             };
 
             // Gửi API cập nhật
-            const response = await UserService.updateAccount(user._id, updatedUser);
+            const response = await UserService.updateUserAccount(updatedUser);
 
-            if (response.status == 200) {
+            if (response.status === 200) {
                 // Cập nhật state user sau khi cập nhật thành công
                 setUser({ ...user, ...updatedUser });
-                setIsEditing(false);
                 toast.success("Chỉnh sửa thành công");
             } else {
                 toast.error("Chỉnh sửa thất bại");
@@ -84,95 +128,74 @@ export default function UserProfile() {
         } catch (error) {
             console.error("Lỗi khi cập nhật dữ liệu:", error);
             toast.error("Lỗi khi cập nhật tài khoản");
+        } finally {
+            setIsLoading(false);
         }
     };
-    //thay đổi trong form
+
+    // Thay đổi trong form
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    //Xử lý nút edit
-    const handleEditClick = () => {
-        setIsEditing(true);
-    };
-    //Xử lý nút edit
-    const handleCancelEditClick = () => {
-        setIsEditing(false);
-    };
-    //Xử lý dropdown
-    const toggleDropdown = (id) => {
-        setOpenPets((prev) =>
-            prev.includes(id) ? prev.filter((petId) => petId !== id) : [...prev, id]
-        );
-    };
-
     return (
         <div className="container mx-auto pt-24">
-            <div className="absolute inset-0 -z-10">
-                <img
-                    src="https://res.cloudinary.com/debx8syhr/image/upload/v1737554135/a42b4dc7074a1bd77c694dbc815a4ced_omkgkz.png"
-                    className="w-full h-full object-cover"
-                />
-            </div>
             <div className="grid grid-cols-2 gap-4">
                 {/* Thông tin cá nhân */}
                 <div className="p-6 border rounded shadow-md relative bg-white">
                     <h1 className="font-bold text-3xl mb-4">THÔNG TIN CÁ NHÂN</h1>
                     <hr />
-                    <div className="Button-editing">
-
-                        {isEditing ? (
-                            <button
-                                className="absolute top-6 right-6 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-                                onClick={handleCancelEditClick}
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        ) : (
-                            <button
-                                className="absolute top-6 right-6 p-2 bg-gray-200 rounded-full hover:bg-gray-300"
-                                onClick={handleEditClick}
-                            >
-                                <Pencil className="w-5 h-5" />
-                            </button>
-                        )}
-
-                    </div>
-
                     {user ? (
                         <>
                             <div className="flex mt-3 gap-4">
-                                <div className="w-32 h-32 bg-gray-200 rounded-md flex items-center justify-center">
+                                <div className="w-32 h-32 bg-gray-200 rounded-md flex items-center justify-center relative group">
                                     <img
                                         src={user?.url ? user.url : "/profile.png"}
                                         alt="Avatar"
                                         className="w-full h-full object-cover rounded-md"
                                     />
+                                    {/* Overlay with pencil icon on hover */}
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 rounded-md flex items-center justify-center">
+                                        <Button
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-black hover:bg-gray-200"
+                                            onClick={() => setUploadDialogOpen(true)}
+                                        >
+                                            <Pencil size={20} />
+                                        </Button>
+                                    </div>
                                 </div>
                                 <div className="flex flex-col">
-                                    {isEditing ? (
-                                        <Input
-                                            type="text"
-                                            name="username"
-                                            value={formData.username}
-                                            onChange={handleChange}
-                                            className="border p-2 rounded-md text-lg w-full"
-                                        />
-                                    ) : (
-                                        <p className="text-2xl font-semibold">{user?.username.toUpperCase()}</p>
-                                    )}
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        className="border-b-2 font-bold border-gray-400 focus:outline-none focus:border-blue-500  text-2xl w-full"
+                                    />
                                 </div>
                             </div>
 
                             <div className="mt-4">
                                 <Label className="text-gray-600 text-lg">Số điện thoại</Label>
-                                <p className="font-semibold text-lg">{user?.phone}</p>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
+                                />
                             </div>
                             <hr />
                             <div className="flex justify-between">
                                 <div className="mt-3">
                                     <Label className="text-gray-600 text-lg">Ngày sinh</Label>
-                                    <p className="font-semibold text-lg">07-05-2003</p>
+                                    <input
+                                        type="date"
+                                        name="dateOfBirth"
+                                        value={formData.dateOfBirth}
+                                        onChange={handleChange}
+                                        className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
+                                    />
                                 </div>
 
                                 <div className="mt-3 flex items-center">
@@ -184,7 +207,6 @@ export default function UserProfile() {
                                                 value="male"
                                                 checked={formData.gender === "male"}
                                                 onChange={handleChange}
-                                                disabled={!isEditing}
                                             />
                                             <span className="text-lg">Nam</span>
                                         </Label>
@@ -195,93 +217,111 @@ export default function UserProfile() {
                                                 value="female"
                                                 checked={formData.gender === "female"}
                                                 onChange={handleChange}
-                                                disabled={!isEditing}
                                             />
                                             <span className="text-lg">Nữ</span>
                                         </Label>
                                     </div>
                                 </div>
                             </div>
-                            <hr />
+
                             <div className="mt-3">
                                 <Label className="text-gray-600 text-lg">Email</Label>
-                                <p className="font-semibold text-lg">{user?.email}</p>
+                                <input
+                                    type="text"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
+                                    disabled
+                                />
                             </div>
-                            <hr />
+
                             <div className="mt-3">
                                 <Label className="text-gray-600 text-lg">Địa chỉ</Label>
-                                {isEditing ? (
-                                    <Input
-                                        type="text"
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        className="border p-2 rounded-md text-lg w-full"
-                                    />
-                                ) : (
-                                    <p className="font-semibold text-lg">{user?.address}</p>
-                                )}
+                                <input
+                                    type="text"
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                    className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
+                                />
                             </div>
-                            <hr />
-                            {isEditing && (
-                                <div className="mt-5 text-right">
-                                    <Button className="rounded p-3 text-base bg-[#3F2E2E]" onClick={handleSave}>
-                                        Lưu
-                                    </Button>
-                                </div>
-                            )}
+
+                            <div className="mt-5 text-right">
+                                <Button
+                                    className="rounded p-3 text-base bg-[#533b3b]"
+                                    onClick={handleSave}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? "Đang lưu..." : "Lưu"}
+                                </Button>
+                            </div>
                         </>
                     ) : (
                         <p>Đang tải...</p>
                     )}
-                </div>
 
-                {/* Thông tin thú cưng */}
-                <div className="p-6 border rounded shadow-md bg-white">
-                    <div className="flex justify-between items-center mb-4">
-                        <h1 className="font-bold text-3xl">THÔNG TIN THÚ CƯNG</h1>
-                        <Button
-                            className="rounded p-5 text-base bg-[#3F2E2E]"
-                            onClick={() => setOpen(true)}
-                        >
-                            Thêm mới
-                        </Button>
-                        <PetModal open={open} onOpenChange={setOpen} onSuccess={fetchPetData} />
-
-                    </div>
-                    <hr />
-                    <div>
-                        {pets.length > 0 ? (
-                            pets.map((pet) => (
-                                <div key={pet._id} className="border rounded mb-4 overflow-hidden">
-                                    <div className="bg-[#3F2E2E] text-white p-4 flex justify-between items-center cursor-pointer" onClick={() => toggleDropdown(pet._id)}>
-                                        <h1 className="text-2xl font-semibold">{pet.name}</h1>
-                                        {openPets.includes(pet._id) ? <ChevronUp /> : <ChevronDown />}
+                    {/* Dialog cho upload ảnh */}
+                    <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Cập nhật ảnh đại diện</DialogTitle>
+                                <DialogDescription>
+                                    Chọn ảnh từ thiết bị của bạn để cập nhật ảnh đại diện
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex flex-col items-center space-y-4">
+                                {imagePreview && (
+                                    <div className="w-40 h-40 overflow-hidden rounded-md">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                        />
                                     </div>
-                                    {openPets.includes(pet._id) && (
-                                        <div className="p-4 bg-white border-t">
-                                            <div className="flex gap-4">
-                                                <img src={pet.url ? pet.url : "/dogCat.png"} alt={pet.name} className="w-24 h-24 object-cover rounded-md" />
-                                                <div>
-                                                    <p className="text-gray-700">Giống: {pet?.type === "dog" ? "Chó" : "Mèo"}</p>
-                                                    <p className="text-gray-700">
-                                                        Giới tính: {pet?.gender === 1 ? "Đực" : pet?.gender === 2 ? "Cái" : "Không xác định"}
-                                                    </p>
-                                                    <p className="text-gray-700">Loại: {pet?.species}</p>
-                                                    <p className="text-gray-700">Cân nặng: {pet?.weight}kg</p>
-                                                </div>
-                                            </div>
-                                            <Button className="mt-3 bg-[#3F2E2E] text-white">Sửa</Button>
-                                        </div>
-                                    )}
+                                )}
+                                <div className="flex items-center space-x-2">
+                                    <Label
+                                        htmlFor="avatar-upload"
+                                        className="cursor-pointer flex items-center justify-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+                                    >
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        <span>Chọn ảnh</span>
+                                    </Label>
+                                    <Input
+                                        id="avatar-upload"
+                                        type="file"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                    />
                                 </div>
-                            ))
-                        ) : (
-                            <p>Chưa có thú cưng nào.</p>
-                        )}
-                    </div>
+                                <div className="flex justify-end space-x-2 w-full">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setUploadDialogOpen(false);
+                                            setImageFile(null);
+                                            setImagePreview(null);
+                                        }}
+                                    >
+                                        Hủy
+                                    </Button>
+                                    <Button
+                                        onClick={handleImageUpload}
+                                        disabled={!imageFile || isLoading}
+                                        className="bg-[#3F2E2E]"
+                                    >
+                                        {isLoading ? "Đang tải lên..." : "Lưu"}
+                                    </Button>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
-            </div>
-        </div>
+                {/* Thông tin thú cưng */}
+                <PetInfo/>
+            </div >
+        </div >
     );
 }

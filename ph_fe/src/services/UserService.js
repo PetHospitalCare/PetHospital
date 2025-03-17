@@ -32,6 +32,12 @@ const getAllDoctor = (id) => {
 const getCurrentUser = (id) => {
   return axios.get(`/account/current-user`);
 }
+const updateUserAccount = (data) => {
+  return axios.put(`/account/update-user-profile`, data);
+}
+const uploadAvatar = (data) => {
+  return axios.post(`/account/upload-avatar`, data);
+}
 export const UserService = {
   signInService,
   signUpService,
@@ -42,5 +48,7 @@ export const UserService = {
   updateAccount,
   deleteAccount,
   getAllDoctor,
-  getCurrentUser
+  getCurrentUser,
+  updateUserAccount,
+  uploadAvatar
 };

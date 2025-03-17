@@ -1,7 +1,16 @@
 const { generateToken, comparePassword } = require("../utils/auth");
 const bcrypt = require("bcrypt");
 const db = require("../models");
+const uploadCloud = require("../middlewares/UploadCloud");
 const Account = db.account
+const cloudinary = require('cloudinary').v2;
+
+// Cấu hình Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+});
 // Signup
 const signup = async (req, res) => {
   try {
@@ -146,5 +155,81 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
+// Cập nhật thông tin tài khoản 
+const updateUserAccount = async (req, res) => {
+  try {
+    const id = req.userId;
+    const { username, phone, gender, address, dateOfBirth } = req.body;
 
-module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor, getCurrentUser };
+    // Cập nhật thông tin tài khoản
+    const updatedAccount = await Account.findByIdAndUpdate(
+      id,
+      { 
+        username, 
+        phone, 
+        gender, 
+        address, 
+        dateOfBirth: new Date(dateOfBirth) 
+      },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Cập nhật thông tin thành công", 
+      account: updatedAccount 
+    });
+  } catch (error) {
+    console.error("Lỗi khi cập nhật tài khoản:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+
+// Upload ảnh đại diện
+const uploadAvatar = async (req, res) => {
+  try {
+    const uploadMiddleware = uploadCloud.single('image');
+
+    uploadMiddleware(req, res, async function(err) {
+
+      // Không có file được upload
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: "Vui lòng chọn file ảnh" });
+      }
+
+      const id  = req.userId;
+      const user = await Account.findById(id);
+
+      // Nếu người dùng đã có ảnh đại diện, xóa ảnh cũ trên Cloudinary
+      if (user.publicId) {
+        await cloudinary.uploader.destroy(user.publicId);
+      }
+
+      // Lấy thông tin từ file đã upload
+      const url = req.file.path;
+      const publicId = req.file.filename;
+      
+      // Cập nhật thông tin ảnh đại diện trong database
+      const updatedUser = await Account.findByIdAndUpdate(
+        id,
+        { 
+          url: url, 
+          publicId: publicId
+        },
+        { new: true }
+      ).select("-password");
+
+      return res.status(200).json({
+        success: true,
+        message: "Upload ảnh đại diện thành công",
+        url: url,
+        publicId: publicId,
+        account: updatedUser
+      });
+    });
+  } catch (error) {
+    console.error("Lỗi khi upload ảnh đại diện:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor, getCurrentUser, updateUserAccount,uploadAvatar };
