@@ -11,13 +11,13 @@ const deleteShoppingCart = (id) => {
 
 const getShoppingCartByUserId = (userId) => axios.get(`/shopping-cart/get-card${userId}`);
 
-const updateShoppingCart = (id) => {
-    return axios.put(`/shopping-cart/update${id}`);
+const updateShoppingCartByUserId = (userId, data) => {
+    return axios.put(`/shopping-cart/update${userId}`, data);
 }
 
 export const ShoppingCartService = {
     createShoppingCart,
     deleteShoppingCart,
     getShoppingCartByUserId,
-    updateShoppingCart
+    updateShoppingCartByUserId
 };
