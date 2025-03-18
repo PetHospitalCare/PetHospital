@@ -21,7 +21,7 @@ module.exports = {
     BookingController,
     MedicineController,
 
-    MedicalController
+    MedicalController,
 
 
     PetController,

@@ -7,7 +7,7 @@ const PetRecordRouter = require('./pet-record.route');
 const BookingRouter = require('./booking.route');
 
 const MedicalRoute = require('./medical.route');
-=======
+
 const PetRouter = require('./pet.route');
 const ShoppingCartRouter = require('./shopping-cart.route');
 
@@ -21,7 +21,7 @@ module.exports = {
     BookingRouter,
     MedicineRouter,
 
-    MedicalRoute
+    MedicalRoute,
 
     ShoppingCartRouter
 
