@@ -104,4 +104,31 @@ const deleteProduct = async (req, res) => {
         });
     }
 };
-module.exports = { CreateNewProduct, getAllProduct, deleteProduct };
+
+const getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const productData = await Product.findById(id);
+
+        if (!productData) {
+            return res.status(404).json({
+                success: false,
+                message: "Sản phẩm không tìm thấy",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Lấy thông tin sản phẩm đã thành công",
+            productData
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
+module.exports = { CreateNewProduct, getAllProduct, deleteProduct, getProductById };

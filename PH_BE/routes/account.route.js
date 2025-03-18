@@ -12,4 +12,7 @@ accountRouter.post("/createnewaccount", AccountController.createNewAccount);
 accountRouter.delete("/delete:id", AccountController.deleteAccount);
 accountRouter.put("/edit/:id", AccountController.editaccount);
 accountRouter.get("/get-all-doctor", AccountController.getAllDoctor);
+accountRouter.get("/current-user",verifyToken, AccountController.getCurrentUser);
+accountRouter.put("/update-user-profile",verifyToken, AccountController.updateUserAccount);
+accountRouter.post("/upload-avatar",verifyToken, AccountController.uploadAvatar)
 module.exports = accountRouter;

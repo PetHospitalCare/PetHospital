@@ -24,11 +24,17 @@ const accountSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        address: {
+            type: String,
+        },
+        dateOfBirth: {
+            type: Date
+        },
         role: {
             type: [String],
             enum: ["customer", "doctor", "admin", "staff"],
             required: true
-        },
+        }
     },
     { timestamps: true }
 );

@@ -6,19 +6,26 @@ const OTPController = require("./otp.controller");
 const MedicineController = require("./medicine.controller")
 const PetRecordController = require('./pet-record.controller');
 const BookingController = require('./booking.controller');
+
 const MedicalController = require('./medical.controller');
+const PetController = require('./pet.controller');
+const ShoppingCartController = require('./shopping-cart.controller');
+
 module.exports = {
     ProductController,
     CategoryController,
     ServiceController,
     AccountController,
     OTPController,
-
     PetRecordController,
     BookingController,
-
     MedicineController,
+
     MedicalController
+
+
+    PetController,
+    ShoppingCartController
 
 };
 

@@ -9,6 +9,12 @@ const petSchema = new mongoose.Schema(
         dateOfBirth: {
             type: Date
         },
+        gender:{
+            type: Number,
+        },
+        weight: {
+            type: Number
+        },
         type: {
             type: String,
             enum: ["dog", "cat"],
@@ -21,9 +27,6 @@ const petSchema = new mongoose.Schema(
         account_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Account",
-        },
-        weight: {
-            type: Number
         },
         url: { type: String },
         publicId: { type: String },

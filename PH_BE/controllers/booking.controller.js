@@ -82,6 +82,7 @@ const UpdateBooking = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
     }
+
 }
 const getBookingbyId = async (req, res) => {
     try {
@@ -97,3 +98,25 @@ const getBookingbyId = async (req, res) => {
 }
 
 module.exports = { CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, getBookingbyId };
+
+};
+
+const getBookingByUser = async (req, res) =>{
+    try{
+        const userId = req.userId;
+
+        const userBooking = await Booking.find({account_id: userId}).populate("doctor_id").populate("pet_id").populate("service_id")
+        if (!userBooking) {
+            return res.status(404).json({ success: false, message: "Không tìm thấy thông tin đặt lịch khám của người dùng" });
+        }
+
+        res.status(200).json({success: true, booking: userBooking});
+  
+    }    
+    catch(error){
+        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+    }
+};
+
+module.exports = { CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, getBookingByUser,getBookingbyId };
+

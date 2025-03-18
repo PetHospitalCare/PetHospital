@@ -13,8 +13,11 @@ import {
     User,
     UserPlus,
     Users,
+    CalendarCheck , 
+    Contact ,
+    ShoppingBasket 
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -30,7 +33,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/UserContext";
 export default function DropdownMenuDemo(user) {
@@ -58,81 +61,35 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={handletest}>
+                    <Link to="/profile">
+                        <DropdownMenuItem onClick={handletest}>
+                            <Contact />
+                            <span>Thông tin cá nhân</span>
+                        </DropdownMenuItem>
+                    </Link>
+                    <Link to="/history-booking">
+                        <DropdownMenuItem>
+                            <CalendarCheck />
+                            <span>Lịch sử đặt lịch</span>
+                        </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem>
                         <User />
-                        <span>Profile</span>
+                        <span>Hồ sơ khám bệnh</span>
 
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                        <CreditCard />
-                        <span>Billing</span>
-
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Settings />
-                        <span>Settings</span>
-
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Keyboard />
-                        <span>Keyboard shortcuts</span>
+                        <ShoppingBasket />
+                        <span>Đơn hàng</span>
 
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <Users />
-                        <span>Team</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                            <UserPlus />
-                            <span>Invite users</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                                <DropdownMenuItem>
-                                    <Mail />
-                                    <span>Email</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <MessageSquare />
-                                    <span>Message</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <PlusCircle />
-                                    <span>More...</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                    <DropdownMenuItem>
-                        <Plus />
-                        <span>New Team</span>
-
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <Github />
-                    <span>GitHub</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <LifeBuoy />
-                    <span>Support</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                    <Cloud />
-                    <span>API</span>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                     <LogOut />
                     <span>Log out</span>
 
-                </DropdownMenuItem>
+                </DropdownMenuItem> 
             </DropdownMenuContent>
         </DropdownMenu>
     )

@@ -5,11 +5,14 @@ const Service = require("./service.model");
 const Account = require("./account.model");
 const OTP = require("./otp.model");
 const Pet = require("./pet.model");
-
 const Booking = require("./booking.model");
-
 const Medicine = require("./medicine.model");
+
 const MedicalRecord = require("./medicalRecord.model");
+
+const ShoppingCart = require("./shopping-cart.model");
+const Payment = require("./payment.model");
+
 
 mongoose.Promise = global.Promise;
 
@@ -18,14 +21,17 @@ db.product = Product
 db.service = Service
 db.category = Category
 db.account = Account
-
 db.otp = OTP
 db.pet = Pet
-
 db.booking = Booking
-
 db.medicine = Medicine
+
 db.medicalRecord = MedicalRecord
+
+db.shoppingcart = ShoppingCart
+db.payment = Payment
+
+
 
 const connectDB = async () => {
     await mongoose

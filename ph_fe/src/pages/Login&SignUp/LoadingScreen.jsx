@@ -11,16 +11,6 @@ export default function LoadingScreen() {
     useEffect(() => {
         const verifyOTP = async () => {
             try {
-                // const storedEmail = JSON.parse(localStorage.getItem("tempSignupData"))?.email;
-                // const email = state?.email || storedEmail;
-
-                // const response = await UserService.verifyOTP({ email: email, otp: state?.otp });
-                // console.log(response.status)
-                // if (response.status !== 200) {
-                //     console.log("Invalid OTP or expired")
-                //     navigate("/otp", { state: { email: state?.email, error: "Invalid OTP or expired" } });
-                //     return;
-                // }
                     const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
                     console.log(tempData)
     

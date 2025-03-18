@@ -24,10 +24,15 @@ import PetRecordManagement from "@/pages/pet-record-management/pet-record-manage
 import AdminLayout from './layout/AdminRoutes'
 import ManageBooking from './pages/BookingSchedule/ManageBooking'
 
-import ProductPage from "@/pages/product-page/product-page.jsx";
+import ProductPage from "@/pages/product/product-page.jsx";
+import ProductDetail from "@/pages/product/product-detail.jsx";
 import PublicLayout from './layout/PublicRoutes'
 
 import { io } from "socket.io-client";
+import UserProfile from './pages/UserProfile/UserProfile'
+import HistoryBooking from './pages/HistoryBooking/historyBooking'
+import ShoppingCartDetail from "@/pages/shoping-cart/shopping-cart-detail.jsx";
+import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -44,6 +49,11 @@ function App() {
           <Route path='/signup-success' element={<SignupSuccess />} />
           <Route path='/unauthorized' element={<Unauthorized />} />
           <Route path='/product' element={<ProductPage />} />
+          <Route path='/profile' element={<UserProfile />} />
+          <Route path='/history-booking' element={<HistoryBooking />} />
+          <Route path='/product-detail' element={<ProductDetail />} />
+          <Route path='/shopping-cart-detail' element={<ShoppingCartDetail />} />
+          <Route path='/shopping-cart-payment' element={<ShoppingCartPayment />} />
         </Route>
 
         {/* Trang dành cho admin */}
