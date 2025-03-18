@@ -1,6 +1,7 @@
 const db = require("../models");
 const cloudinary = require('cloudinary').v2;
 const ShoppingCart = db.shoppingcart;
+const Payment = db.payment;
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -82,4 +83,46 @@ const updateShoppingCartByUserId = async (req, res) => {
     }
 };
 
-module.exports = { getShoppingCartByUserId, updateShoppingCartByUserId };
+const payment = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const data = req.body;
+
+        let shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
+
+        if (!shoppingCart) {
+            return res.status(500).json({
+                message: "Lỗi hệ thống Back-end"
+            });
+        }
+
+        // if (data.order === 'add') {
+        //
+        // }
+        //
+        // const savedShoppingCart = await shoppingCart.save();
+
+        const payment = new Payment({
+            userId: shoppingCart.userId,
+            items: shoppingCart.items,
+            totalPrice: shoppingCart.totalPrice,
+            shipFee: shoppingCart.shipFee,
+            address: shoppingCart.address
+        });
+
+        const savedPayment = await payment.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Thanh toán thành công',
+            savedPayment,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
+module.exports = { getShoppingCartByUserId, updateShoppingCartByUserId, payment };

@@ -8,7 +8,7 @@ export function useAddToCart() {
         const tempUserId = userId || null;
 
         if (tempUserId) {
-            console.log("Adding to cart:", productInput, "User ID:", tempUserId);
+            // console.log("Adding to cart:", productInput, "User ID:", tempUserId);
             callAPIUpdateCart(tempUserId, productInput, contextFunction);
             // call api insert to cart and get response
         } else {
@@ -27,7 +27,7 @@ async function callAPIUpdateCart(userIdInput, productInput, contextFunction) {
     updateLocalStorageShoppingCart(response.data.savedShoppingCart, 'replace')
     contextFunction(response.data.savedShoppingCart.items.reduce((acc, item) => acc + item.quantity, 0));
 
-    console.log('response: ', response.data.savedShoppingCart.items);
+    // console.log('response: ', response.data.savedShoppingCart.items);
 }
 
 function updateLocalStorageShoppingCart(productInput, order) {
