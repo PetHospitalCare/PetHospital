@@ -15,9 +15,8 @@ import { CheckIcon } from '@heroicons/react/20/solid';
 import { BookingServices } from "@/services/BookingService";
 import { toast } from "sonner";
 
-export default function BookingDialog({ open, onClose, fetchBookings }) {
+export default function BookingDialog({ open, onClose }) {
     const { user } = useContext(UserContext);
-
     const [service, setService] = useState([]);
     const [pet, setPet] = useState([]);
     const [formData, setFormData] = useState({
@@ -114,7 +113,6 @@ export default function BookingDialog({ open, onClose, fetchBookings }) {
                         onClick: () => console.log('Undo')
                     }
                 });
-                fetchBookings();
                 handleClose();
             }
         } catch (error) {
@@ -124,9 +122,9 @@ export default function BookingDialog({ open, onClose, fetchBookings }) {
 
     const handleClose = () => {
         setFormData({
-            name: user?.role?.includes("customer") ? user?.username || "" : "",
-            phone: user?.role?.includes("customer") ? user?.phone || "" : "",
-            email: user?.role?.includes("customer") ? user?.email || "" : "",
+            name: "",
+            phone: "",
+            email: "",
             type: "dog",
             scheduleType: "",
             subServiceId: "",
