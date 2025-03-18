@@ -1,0 +1,25 @@
+import axios from "../axios";
+
+const CreateNewBooking = (data) => {
+    return axios.post(`/booking/create`, data);
+};
+const GetAllBooking = (data) => {
+    return axios.get(`/booking/get-all`);
+};
+const GetHistoryBooking = (data) => {
+    return axios.get(`/booking/get-booking-by-user`);
+};
+const AssignDoctor = (id, doctor_id) => {
+    return axios.put(`/booking/assigndoctor/${id}`, { doctor_id });
+};
+const UpdateBooking = (id, data) => {
+    return axios.put(`/booking/update/${id}`, data);
+}
+const GetBookingbyId = (id) => {
+    return axios.get(`/booking/get-by-id/${id}`);
+}
+export const BookingServices = {
+
+    CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, GetBookingbyId,GetHistoryBooking
+
+};

@@ -1,1 +1,6 @@
 # PetHospital
+# Backend .env
+PORT = 9999
+HOST_NAME = localhost
+MONGO_URI = "mongodb+srv://minhvhhe170320:j0pzndgKFTct1vtA@minhdb.qmgwd.mongodb.net/"
+FRONT_END_URL = http://localhost:5173
