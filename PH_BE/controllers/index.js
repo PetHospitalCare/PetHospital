@@ -6,6 +6,7 @@ const OTPController = require("./otp.controller");
 const MedicineController = require("./medicine.controller")
 const PetRecordController = require('./pet-record.controller');
 const BookingController = require('./booking.controller');
+const MedicalController = require('./medical.controller');
 module.exports = {
     ProductController,
     CategoryController,
@@ -17,7 +18,7 @@ module.exports = {
     BookingController,
 
     MedicineController,
-
+    MedicalController
 
 };
 

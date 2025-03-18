@@ -9,7 +9,7 @@ const Pet = require("./pet.model");
 const Booking = require("./booking.model");
 
 const Medicine = require("./medicine.model");
-
+const MedicalRecord = require("./medicalRecord.model");
 
 mongoose.Promise = global.Promise;
 
@@ -25,7 +25,7 @@ db.pet = Pet
 db.booking = Booking
 
 db.medicine = Medicine
-
+db.medicalRecord = MedicalRecord
 
 const connectDB = async () => {
     await mongoose

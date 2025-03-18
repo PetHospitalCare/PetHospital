@@ -8,7 +8,7 @@ const SubServiceSchema = new mongoose.Schema({
         cat: { type: Number, required: false }
     }, // Giá theo từng loại thú cưng
     status: { type: String, enum: ["active", "inactive"], default: "active" }, // Trạng thái
-});
+}, { _id: true });
 
 const ServiceSchema = new mongoose.Schema({
     name: { type: String, required: true },

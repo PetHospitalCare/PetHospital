@@ -17,17 +17,17 @@ const medicineSchema = new mongoose.Schema({
     type: {
         type: String
     },
-    pet_type:{
+    pet_type: {
         type: [String],
-        enum: ["Dog","Cat"]
+        enum: ["Dog", "Cat"]
     },
-    dosage:{
+    dosage: {
         type: String
     },
-    manufacturer:{
+    manufacturer: {
         type: String
     },
-    unit:{
+    unit: {
         type: String
     },
     price: {
@@ -36,10 +36,10 @@ const medicineSchema = new mongoose.Schema({
     quantity: {
         type: Number
     },
-    
-    expiry_date:{
+
+    expiry_date: {
         type: Date
-    }, 
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Medicine', medicineSchema);

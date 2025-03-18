@@ -83,5 +83,17 @@ const UpdateBooking = async (req, res) => {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
     }
 }
+const getBookingbyId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const booking = await Booking.findById(id).populate("doctor_id").populate("pet_id").populate("account_id");
+        if (!booking) {
+            return res.status(404).json({ success: false, message: "Booking not found" });
+        }
+        res.status(200).json({ success: true, booking });
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+    }
+}
 
-module.exports = { CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking };
+module.exports = { CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, getBookingbyId };
