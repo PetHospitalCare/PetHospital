@@ -1,3 +1,4 @@
+const uploadCloud = require("../middlewares/UploadCloud");
 const db = require("../models");
 const Pet = db.pet
 
@@ -9,6 +10,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_SECRET
 });
 
+//Lấy thông tin thú cưng của 1 user
 const getPetsByUser = async (req, res) => {
     try {
         const userId = req.userId
@@ -61,4 +63,87 @@ const createPetByUser = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server" });
     }
 };
-module.exports = { getPetsByUser, createPetByUser };
+
+// Cập nhật thông tin thú cưng
+const updatedPet = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, dateOfBirth, gender, weight, type, species } = req.body;
+
+        // Cập nhật thông tin thú cưng
+        const updatedPet = await Pet.findByIdAndUpdate(
+            id,
+            {
+                name,
+                dateOfBirth: new Date(dateOfBirth),
+                gender,
+                weight,
+                type,
+                species
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedPet) {
+            return res.status(404).json({ message: "Không tìm thấy thú cưng" });
+        }
+        console.log("Received data in backend:", req.params, req.body);
+
+        return res.status(200).json({
+            success: true,
+            message: "Cập nhật thông tin thành công",
+            pet: updatedPet
+        });
+    } catch (error) {
+        console.error("Lỗi khi cập nhật thú cưng:", error);
+        res.status(500).json({ success: false, message: "Lỗi server" });
+    }
+};
+// Upload ảnh cho pet
+const uploadPetAvatar = async (req, res) => {
+  try {
+    const uploadMiddleware = uploadCloud.single('image');
+
+    uploadMiddleware(req, res, async function(err) {
+
+      // Không có file được upload
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: "Vui lòng chọn file ảnh" });
+      }
+
+      const {id}  = req.params;
+      const pet = await Pet.findById(id);
+
+      // Nếu thú cưng của KH đã có ảnh thú cưng, xóa ảnh cũ trên Cloudinary
+      if (pet.publicId) {
+        await cloudinary.uploader.destroy(pet.publicId);
+      }
+
+      // Lấy thông tin từ file đã upload
+      const url = req.file.path;
+      const publicId = req.file.filename;
+      
+      // Cập nhật thông tin ảnh thú cưng trong database
+      const updatedPet = await Pet.findByIdAndUpdate(
+        id,
+        { 
+          url: url, 
+          publicId: publicId
+        },
+        { new: true }
+      ).select("-password");
+
+      return res.status(200).json({
+        success: true,
+        message: "Upload ảnh thú cưng thành công",
+        url: url,
+        publicId: publicId,
+        account: updatedPet
+      });
+    });
+  } catch (error) {
+    console.error("Lỗi khi upload ảnh thú cưng:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+module.exports = { getPetsByUser, createPetByUser, updatedPet, uploadPetAvatar };

@@ -14,6 +14,7 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
         gender: 1,
         species: "",
         weight: "",
+        dateOfBirth: ""
     });
 
     const [errors, setErrors] = React.useState({});
@@ -39,13 +40,20 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
     const handleSubmit = async () => {
         try {
             if (!validateForm()) return;
-
-            const response = await PetService.createPetByUser(formData);
+    
+            const formattedData = {
+                ...formData,
+                weight: parseFloat(formData.weight), // Chuyển về số
+                dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : null // Chuyển về dạng ISODate
+            };
+    
+            const response = await PetService.createPetByUser(formattedData);
             onSuccess(response.pet);
             onOpenChange(false);
             toast.success("Thêm thú cưng thành công!");
-
+    
         } catch (error) {
+            console.error("Lỗi khi thêm thú cưng:", error);
             toast.error("Thêm thú cưng thất bại!");
         }
     };
@@ -103,7 +111,10 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
                             <Input type="number" id="weight" name="weight" placeholder="Cân nặng" value={formData.weight} onChange={handleChange} className="border p-2 rounded-md w-full" required />
                             {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
                         </div>
-
+                        <div className="col-span-1">
+                            <Label htmlFor="dateOfBirth">Ngày sinh</Label>
+                            <Input type="date" id="dateOfBirth" name="dateOfBirth" placeholder="Cân nặng" value={formData.dateOfBirth} onChange={handleChange} className="border p-2 rounded-md w-full" required />
+                        </div>
                     </div>
                 </div>
                 {/* Nút lưu ở cuối */}
