@@ -10,7 +10,7 @@ const MedicalRoute = require('./medical.route');
 
 const PetRouter = require('./pet.route');
 const ShoppingCartRouter = require('./shopping-cart.route');
-
+const NewRouter = require("./new.route")
 module.exports = {
     ProductRouter,
     ServiceRouter,
@@ -20,6 +20,9 @@ module.exports = {
     PetRouter,
     BookingRouter,
     MedicineRouter,
+
+    ShoppingCartRouter,
+    NewRouter
 
     MedicalRoute,
 
