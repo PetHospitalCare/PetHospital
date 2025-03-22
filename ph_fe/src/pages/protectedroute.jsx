@@ -55,7 +55,12 @@ const ProtectedRoute = ({ allowedRoles }) => {
         // return () => { };
     }, [location.pathname, setUser]);
 
-    if (checkingAuth) return <div>Loading...</div>;
+    if (checkingAuth) return <div className="flex items-center justify-center h-[50vh]">
+        <div className="text-center space-y-2">
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+            <p className="text-sm text-muted-foreground">Đang tải dữ liệu...</p>
+        </div>
+    </div>;
 
     if (!user || !user._id) {
         return <Navigate to="/Login" />;

@@ -27,6 +27,7 @@ const UserProvider = ({ children }) => {
         if (jwtToken) {
             try {
                 const decoded = jwtDecode(jwtToken);
+
                 setUser({
                     _id: decoded.id,
                     role: decoded.role,

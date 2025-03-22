@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const db = require("./models");
+
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const http = require("http");
@@ -34,6 +35,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
+
 app.use(bodyParser.json({ limit: "64mb" }));
 app.use(bodyParser.urlencoded({ limit: "64mb", extended: true }));
 // Define route dưới đây //

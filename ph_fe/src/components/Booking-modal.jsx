@@ -72,6 +72,7 @@ export default function BookingDialog({ open, onClose }) {
                 account_id: user?._id || "",
             }));
         }
+        console.log(user);
     }, [user]);
 
     useEffect(() => {
@@ -166,6 +167,7 @@ export default function BookingDialog({ open, onClose }) {
                             onChange={handleChange}
                             required
                             className="bg-white border-gray-300 rounded-lg"
+
                         />
                     </div>
                     <div>
