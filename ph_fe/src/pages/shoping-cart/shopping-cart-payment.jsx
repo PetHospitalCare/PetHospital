@@ -1,166 +1,117 @@
-import * as React from "react"
-import {useEffect, useState} from "react";
-import {ProductService} from "@/services/ProductService.js";
-import {useLocation, useNavigate} from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
-import ShoppingCartButton from "@/components/shared/shopping-cart-button.jsx";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "@/contexts/UserContext.jsx";
+import { ShoppingCartService } from "@/services/ShoppingCartService.js";
 
 export default function ShoppingCartPayment() {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [products, setProducts] = useState([]);
-    const [cartCount, setCartCount] = useState(0);
-    const [searchText, setSearchText] = useState('');
-    const [filteredProducts, setFilteredProducts] = useState(products);
-    const [debounceTimeout, setDebounceTimeout] = useState(null);
-    const [searchParams] = useSearchParams();
+    const [cart, setCart] = useState(null);
+    const { user } = useContext(UserContext);
 
     useEffect(() => {
-        fetchData();
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 0);
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+        makeData()
     }, []);
 
-    useEffect(() => {
-        searchProductsByCategoryId();
-    }, [searchParams]);
 
-    const fetchData = async () => {
-        try {
-            const match = location.search.match(/category_id=([^&]+)/);
-            const categoryIdMatch = match ? match[1] : null;
-            const response = await ProductService.getAllProduct()
-
-            if (response.data.success) {
-                let formattedData = response.data.products.map((product) => ({
-                    id: product._id,
-                    name: product.name,
-                    imageUrl: product.images,
-                    description: product.description,
-                    price: product.price,
-                    quantity: product.quantity,
-                    type: product.type,
-                    category:
-                        product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
-                    category_id: product.categoryId
-                }));
-
-                setProducts(formattedData);
-
-                if (categoryIdMatch !== undefined && categoryIdMatch !== null && categoryIdMatch?.trim()?.length > 0) {
-                    formattedData = formattedData.filter(item =>
-                        item.category_id.some(categoryItem => categoryItem?._id.toString() === categoryIdMatch)
-                    );
-                }
-
-                setFilteredProducts(formattedData);
-                // console.log(...formattedData)
-            }
-        } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+    const handlePayment = async () => {
+        event.preventDefault();
+        console.log(11212)
+        if (user && user._id && cart) {
+            const response = await ShoppingCartService.paymentShoppingCartByUserId(user._id, cart);
+            console.log('response: ', response)
         }
-    };
+    }
 
-    const searchProductsByText = (textInput) => {
-        let tempProducts = products.filter((product) => {
-            return product.name.toLowerCase().indexOf(textInput.toLowerCase()) > -1;
-        });
+    const makeData = () => {
+        const cartLocal = localStorage.getItem("cart");
 
-        const match = location.search.match(/category_id=([^&]+)/);
-        const categoryIdMatch = match ? match[1] : null;
-
-        if (categoryIdMatch !== undefined && categoryIdMatch !== null && categoryIdMatch?.trim()?.length > 0) {
-            tempProducts = tempProducts.filter(
-                item =>
-                    item.category_id.some(categoryItem => categoryItem?._id.toString() === categoryIdMatch)
-            );
+        if (cartLocal) {
+            setCart(JSON.parse(cartLocal));
         }
-
-        setFilteredProducts(tempProducts);
-    };
-
-    const searchProductsByCategoryId = () => {
-        const match = location.search.match(/category_id=([^&]+)/);
-        const categoryIdMatch = match ? match[1] : null;
-
-        if (categoryIdMatch !== undefined && categoryIdMatch !== null && categoryIdMatch?.trim()?.length > 0) {
-            const tempProducts = products.filter(
-                item =>
-                    item.category_id.some(categoryItem => categoryItem?._id.toString() === categoryIdMatch)
-            );
-
-            setFilteredProducts(tempProducts);
-        } else {
-            setFilteredProducts(products)
-        }
-    };
-
-    const handleInputChange = (e) => {
-        const {value} = e.target;
-        setSearchText(value);
-
-        if (debounceTimeout) {
-            clearTimeout(debounceTimeout);
-        }
-
-        const newTimeout = setTimeout(() => {
-            searchProductsByText(value);
-        }, 500);
-
-        setDebounceTimeout(newTimeout);
-    };
-
-    const goToDetail = (idInput) => {
-        navigate(`/product-detail?product_id=${idInput}`);
     }
 
     return (
-        <div className="bg-gradient-to-bl from-blue-50 to-violet-50 flex items-center justify-center min-h-screen">
-            <div className="container mx-auto p-4 pt-40">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex-1">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm..."
-                                className="w-72 p-2 pl-10 border rounded-[10px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={searchText}
-                                onChange={handleInputChange}
-                            />
-                            <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                        </div>
-                    </div>
+        <div className="container mx-auto px-4 py-8 pt-32">
+            {/* Bố cục chung */}
+            <div className="flex flex-col lg:flex-row gap-6">
+                {/* Form Thanh Toán */}
+                <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-bold mb-4">Thanh toán</h2>
 
-                    <div className="flex-1 text-right">
-                        <ShoppingCartButton/>
-                    </div>
+                    <button className="w-full bg-black text-white py-2 rounded mb-4">QR Code</button>
+                    <p className="text-center text-gray-500 mb-4">or</p>
+
+                    <form className="space-y-4">
+                        <input type="email" placeholder="Địa chỉ email"
+                            className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled value={user && user.email} />
+                        <input type="text" placeholder="Tên thẻ"
+                            className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+                        <input type="text" placeholder="Số thẻ"
+                            className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+
+                        <div className="flex gap-4">
+                            <input type="text" placeholder="Thời gian hiệu lực (MM/YY)"
+                                className="w-1/2 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+                            <input type="text" placeholder="CVC"
+                                className="w-1/2 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+
+                        <input type="text" placeholder="Địa chỉ"
+                            className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500"
+                            value={user && user.address} />
+
+                        <div className="flex gap-4">
+                            <input type="text" placeholder="Thành phố"
+                                className="w-1/3 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+                            <input type="text" placeholder="Xã/Phường"
+                                className="w-1/3 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+                            <input type="text" placeholder="Mã bưu chính"
+                                className="w-1/3 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+
+                        <label className="flex items-center gap-2">
+                            <input type="checkbox" />
+                            <span>Địa chỉ thanh toán giống với địa chỉ giao hàng</span>
+                        </label>
+
+                        <button className="w-full bg-blue-600 text-white py-2 rounded" type="button" onClick={handlePayment}>Thanh
+                            toán
+                        </button>
+                    </form>
                 </div>
 
-                <p className="text-3xl font-bold text-center mb-8">PRODUCTS</p>
+                {/* Giỏ Hàng */}
+                <div className="w-full lg:w-1/3 bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-bold mb-4">Giỏ hàng</h2>
 
-                <div className="mt-16 min-h-[calc(100vh-200px)]">
-                    <div
-                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                        {filteredProducts && filteredProducts.map((product) => (
-                            <div key={product.id} className="bg-white rounded-[10px] border p-4" onClick={() => goToDetail(product.id)}>
-                                <img src={product.imageUrl[0].url} alt=""
-                                     className="w-full h-80 rounded-md object-cover"/>
-                                <div className="px-1 py-4">
-                                    <div className="font-bold text-xl mb-2 text-center">{product.name}</div>
-                                    <p className="text-gray-700 text-base text-center">
-                                        <strong>{product.price} VNĐ</strong>
-                                    </p>
+                    <div className="space-y-4">
+                        {/* Sản phẩm */}
+                        {cart?.items && cart.items.length > 0 && (
+                            cart.items.map((item, index) => (
+                                <div className="flex gap-4" key={index}>
+                                    <img src={item.imageUrl} alt="Product" className="w-16 h-16" />
+                                    <div className="flex-1">
+                                        <p className="font-semibold">{item.name}</p>
+                                        <p className="text-gray-500">{item.price}</p>
+                                        <p className="text-sm">Số lượng: {item.quantity}</p>
+                                    </div>
+                                    <div className="text-right text-sm text-gray-500">
+                                        <a className="text-blue-500">Chỉnh sửa</a> | <a
+                                            className="text-red-500">Loại
+                                            bỏ</a>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )))}
+
+                        {/* Mã giảm giá */}
+                        <div className="flex justify-between">
+                            <input type="text" placeholder="Mã giảm giá"
+                                className="w-2/3 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
+                            <button className="w-1/3 bg-gray-300 py-2 rounded ml-3">Áp dụng</button>
+                        </div>
+
+                        <p className="text-right font-bold">{cart && cart?.totalPrice ? cart.totalPrice : 0} VNĐ</p>
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        </div>)
 }
