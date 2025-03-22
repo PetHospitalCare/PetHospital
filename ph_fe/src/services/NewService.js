@@ -1,13 +1,28 @@
 import axios from "../axios";
 
+//Lấy danh sách bài viết
 const GetAllNews = (data) => {
     return axios.get(`/new/get-all`);
 };
-const CreateNews = (data) => {
-    return axios.post(`/new/create`, data);
+
+//Tạo bài viết mới
+const CreateNew = (data) => {
+    return axios.post(`/new/create-new`, data);
 };
+
+//Chỉnh sửa thuốc
+const updateNew = (id, data) => {
+    return axios.put(`/new/update-new/${id}`, data);
+}
+
+//Xóa bài viết
+const deleteNew = (id) => {
+    return axios.delete(`/new/delete-new/${id}`);
+}
 
 export const NewServices = {
     GetAllNews,
-    CreateNews
+    CreateNew,
+    updateNew,
+    deleteNew
 };
