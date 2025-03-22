@@ -13,29 +13,57 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { NewServices } from '@/services/NewService';
+import { X } from 'lucide-react';
+import { toast } from 'sonner';
 
-const EditNew = ({ open, onOpenChange, post, onSuccess }) => {
+const EditNew = ({ open, onOpenChange, post, onsuccess }) => {
     const [content, setContent] = useState('');
     const [title, setTitle] = useState('');
+    const [image, setImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const quillRef = useRef(null);
 
     useEffect(() => {
         if (post) {
             setTitle(post.title || '');
             setContent(post.content || '');
+            setImagePreview(post.images?.url || null);
         }
     }, [post]);
 
+    const handleImageChange = (e) => {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            setImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleRemoveImage = () => {
+        setImage(null);
+        setImagePreview(null);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setIsSubmitting(true);
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', content);
+        if (image) {
+            // Make sure the field name matches what your backend expects
+            formData.append('image', image);
+        }
         try {
-            // const response = await NewServices.UpdateNews(post._id, { title, content });
-            console.log('Post updated:', response.data);
-            onSuccess(); // Callback khi cập nhật bài viết thành công
+            const response = await NewServices.updateNew(post._id,formData);
+            onsuccess(); // Callback khi cập nhật bài viết thành công
             onOpenChange(false); // Đóng dialog
+            toast.success("Chỉnh sửa bài viết thành công");
         } catch (error) {
             console.error('Error updating post:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -62,23 +90,60 @@ const EditNew = ({ open, onOpenChange, post, onSuccess }) => {
 
                     <div className='mt-6'>
                         <Label htmlFor="content">Nội dung bài viết</Label>
-                        <ReactQuill
-                            ref={quillRef}
-                            id="content"
-                            theme="snow"
-                            value={content}
-                            onChange={setContent}
-                            modules={{
-                                toolbar: [
-                                    ['bold', 'italic', 'underline'],
-                                    ['link', 'image', 'video']
-                                ]
-                            }}
+                        <div style={{ height: '300px', overflowY: 'auto' }}>
+                            <ReactQuill
+                                ref={quillRef}
+                                id="content"
+                                theme="snow"
+                                value={content}
+                                onChange={setContent}
+                                modules={{
+                                    toolbar: [
+                                        [{ header: [1, 2, 3, false] }],
+                                        [{ font: [] }],
+                                        [{ size: ['small', false, 'large', 'huge'] }],
+                                        ['bold', 'italic', 'underline', 'strike'],
+                                        [{ color: [] }, { background: [] }],
+                                        [{ script: 'sub' }, { script: 'super' }],
+                                        [{ align: [] }],
+                                        [{ list: 'ordered' }, { list: 'bullet' }],
+                                        [{ indent: '-1' }, { indent: '+1' }],
+                                        ['blockquote', 'code-block'],
+                                        ['link', 'image', 'video'],
+                                        ['clean']
+                                    ]
+                                }}
+                                style={{ height: '250px' }}
+                            />
+                        </div>
+                    </div>
+                    <div className='mt-6'>
+                        <Label htmlFor="image">Chọn ảnh</Label>
+                        <Input
+                            type="file"
+                            id="image"
+                            name="image"
+                            accept="image/*"
+                            onChange={handleImageChange}
                         />
                     </div>
 
+                    {imagePreview && (
+                        <div className="relative mt-4 w-48">
+                            <img src={imagePreview} alt="Preview" className="w-full h-auto rounded-lg shadow" />
+                            <button
+                                type="button"
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                                onClick={handleRemoveImage}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                    )}
                     <DialogFooter className='mt-4'>
-                        <Button type="submit">Lưu thay đổi</Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? 'Đang xử lý...' : 'Đăng bài'}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -12,7 +12,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import Page from "@/app/dashboard/page";
 import axios from "axios";
 import { ArrowUpDown, Pen, Trash2 } from "lucide-react";
 import {
@@ -23,8 +22,8 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import CreateNew from "./Create_new"
-import EditNew from "./Edit_new"
+import CreateNew from "./Create_new";
+import EditNew from "./Edit_new";
 import { MedicineService } from "@/services/MedicineService";
 import { toast } from "sonner";
 import { NewServices } from "@/services/NewService";
@@ -39,9 +38,10 @@ export default function News_Management() {
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
     const [open, setOpen] = useState(false);
+
     const fetchData = async () => {
         try {
-            const response = await NewServices.GetAllNews()
+            const response = await NewServices.GetAllNews();
             if (response.data.success) {
                 setData(response.data.news);
             }
@@ -49,23 +49,24 @@ export default function News_Management() {
             console.error("Lỗi khi lấy dữ liệu bài viết:", error);
         }
     };
+
     useEffect(() => {
         fetchData();
     }, []);
 
     const handleDelete = async (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa thuốc này?")) {
+        if (window.confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
             try {
-                const response = await MedicineService.deleteMedicine(id);
-                console.log(response)
-                setData((prevData) => prevData.filter((acc) => acc._id !== id));
-                toast.success("Xóa thuốc thành công!");
+                const response = await NewServices.deleteNew(id);
+                setData((prevData) => prevData.filter((item) => item._id !== id));
+                toast.success("Xóa bài viết thành công!");
             } catch (error) {
-                console.error("Lỗi khi xóa thuốc:", error);
+                console.error("Lỗi khi xóa bài viết:", error);
                 toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
         }
     };
+
     const columns = [
         {
             id: "select",
@@ -93,114 +94,98 @@ export default function News_Management() {
             enableSorting: false,
             enableHiding: false,
         },
-        // {
-        //     accessorKey: "images",
-        //     header: () => <div className="text-center">Ảnh</div>,
-        //     cell: ({ row }) => {
-        //         const images = row.original.images; // Lấy danh sách ảnh từ API
-        //         return (
-        //             <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
-        //                 {images.map((image, index) => (
-        //                     <Zoom>
-        //                         <img
-        //                             src={image.url}
-        //                             alt={`Medicine ${index}`}
-        //                             className="h-28 w-28 object-cover rounded-md"
-        //                         />
-        //                     </Zoom>
-        //                 ))}
-        //             </div>
-        //         );
-        //     },
-        //     enableSorting: false,
-        //     enableHiding: false,
-        // },
+        {
+            accessorKey: "images",
+            header: () => <div className="text-center">Ảnh</div>,
+            cell: ({ row }) => {
+                const images = row.original.images;
+                return (
+                    <div className="flex justify-center">
+                        {images && (
+                            <Zoom>
+                                <img
+                                    src={typeof images === 'object' ? images.url : images}
+                                    alt={row.original.title || "Ảnh bài viết"}
+                                    className="h-16 w-16 object-cover rounded-md cursor-pointer"
+                                />
+                            </Zoom>
+                        )}
+                        {!images && (
+                            <div className="h-16 w-16 bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-500">
+                                Không có ảnh
+                            </div>
+                        )}
+                    </div>
+                );
+            },
+            enableSorting: false,
+        },
         {
             accessorKey: "title",
             header: () => <div className="text-center">Tiêu đề bài viết</div>,
-            cell: ({ row }) => <div className=" text-center">{row.getValue("title")}</div>,
+            cell: ({ row }) => <div className="text-center">{row.getValue("title")}</div>,
+        },
+        {
+            accessorKey: "createdBy",
+            header: () => <div className="text-center">Người tạo</div>,
+            cell: ({ row }) => {
+                const createdBy = row.original.createdBy;
+                return (
+                    <div className="text-center">
+                        {createdBy && createdBy.username ? createdBy.username : "N/A"}
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: "updatedBy",
+            header: () => <div className="text-center">Người cập nhật</div>,
+            cell: ({ row }) => {
+                const updatedBy = row.original.updatedBy;
+                return (
+                    <div className="text-center">
+                        {updatedBy && updatedBy.username ? updatedBy.username : "N/A"}
+                    </div>
+                );
+            },
         },
         {
             accessorKey: "createdAt",
-            header: () => <div className="text-center">Ngày tạo bài viết</div>,
-            cell: ({ row }) => <div className=" text-center">{row.getValue("createdAt")}</div>,
+            header: () => <div className="text-center">Ngày tạo</div>,
+            cell: ({ row }) => {
+                const date = new Date(row.original.createdAt);
+                return (
+                    <div className="text-center">
+                        {date.toLocaleDateString("vi-VN")}
+                    </div>
+                );
+            },
         },
-        // {
-        //     accessorKey: "title",
-        //     header: () => <div className="text-center">Tiêu đề bài viết</div>,
-        //     cell: ({ row }) => <div className=" text-center">{row.getValue("title")}</div>,
-        // },
-        // {
-        //     accessorKey: "pet_type",
-        //     header: () => <div className="text-center">Dành cho</div>,
-        //     cell: ({ row }) => {
-        //         const petType = row.getValue("pet_type");
-
-        //         // Kiểm tra nếu petType là mảng, thì chuyển sang tiếng Việt
-        //         const translatedPetType = Array.isArray(petType)
-        //             ? petType.map((type) => (type === "Dog" ? "Chó" : type === "Cat" ? "Mèo" : type)).join(", ")
-        //             : petType === "Dog"
-        //                 ? "Chó"
-        //                 : petType === "Cat"
-        //                     ? "Mèo"
-        //                     : petType;
-
-        //         return <div className="text-center">{translatedPetType}</div>;
-        //     }
-        // },
-        // {
-        //     accessorKey: "quantity",
-        //     header: ({ column }) => (
-        //         <div className="text-center">
-        //             <Button
-        //                 variant="ghost"
-        //                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        //             >
-        //                 Số lượng
-        //                 <ArrowUpDown />
-        //             </Button>
-        //         </div>
-        //     ),
-        //     cell: ({ row }) => <div className="lowercase text-center">{row.getValue("quantity")}</div>,
-        // },
-        // {
-        //     accessorKey: "price",
-        //     header: () => <div className="text-right">Giá tiền</div>,
-        //     cell: ({ row }) => {
-        //         const amount = parseFloat(row.getValue("price"));
-        //         return <div className="text-right font-medium">{amount.toLocaleString()}₫</div>;
-        //     },
-        // },
-        // {
-        //     accessorKey: "expiry_date",
-        //     header: () => <div className="text-center">Ngày hết hạn</div>,
-        //     cell: ({ row }) => {
-        //         const rawDate = row.getValue("expiry_date");
-        //         if (!rawDate) return <div className="text-center">Không có ngày</div>;
-
-
-
-        //         const date = new Date(rawDate);
-        //         const formattedDate = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
-
-        //         return <div className="text-center">{formattedDate}</div>;
-        //     },
-        // },
+        {
+            accessorKey: "updatedAt",
+            header: () => <div className="text-center">Ngày cập nhật</div>,
+            cell: ({ row }) => {
+                const date = new Date(row.original.updatedAt);
+                return (
+                    <div className="text-center">
+                        {row.original.updatedBy ? date.toLocaleDateString("vi-VN") : "N/A"}
+                    </div>
+                );
+            },
+        },
         {
             id: "actions",
             header: () => <div className="text-center font-semibold">...</div>,
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
                     <button>
-                        <Pen className="size-6 p-1 mr-1 " onClick={() => {
+                        <Pen className="size-6 p-1 mr-1" onClick={() => {
                             setOpenEdit(true);
                             setSelectedNew(row.original);
                         }} />
-
                     </button>
-
                     <button onClick={() => handleDelete(row.original._id)}>
-                        <Trash2 className="size-6 p-1 " />
+                        <Trash2 className="size-6 p-1" />
                     </button>
                 </div>
             ),
@@ -226,17 +211,21 @@ export default function News_Management() {
         },
     });
 
-
     return (
-
         <div className="w-full">
             <EditNew open={openEdit} onOpenChange={setOpenEdit} post={selectedNew} onsuccess={fetchData} />
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Tìm kiếm sản phẩm..."
-                    value={(table.getColumn("name")?.getFilterValue()) ?? ""}
-                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                    placeholder="Tìm kiếm tiêu đề bài viết..."
+                    value={(table.getColumn("title")?.getFilterValue()) ?? ""}
+                    onChange={(e) => table.getColumn("title")?.setFilterValue(e.target.value)}
                     className="max-w-sm"
+                />
+                <Input
+                    placeholder="Tìm kiếm tên người tạo bài viết..."
+                    value={(table.getColumn("username")?.getFilterValue()) ?? ""}
+                    onChange={(e) => table.getColumn("username")?.setFilterValue(e.target.value)}
+                    className="max-w-sm ml-2"
                 />
                 <div className="text-center ml-auto">
                     <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
@@ -244,10 +233,9 @@ export default function News_Management() {
                     </Button>
                     <CreateNew open={open} onOpenChange={setOpen} onSuccess={fetchData} />
                 </div>
-
             </div>
-            <div className="rounded-md border  ">
-                <Table >
+            <div className="rounded-md border">
+                <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -266,7 +254,6 @@ export default function News_Management() {
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
-
                                         </TableCell>
                                     ))}
                                 </TableRow>
@@ -281,7 +268,7 @@ export default function News_Management() {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end py-4">
+            <div className="flex items-center justify-end space-x-2 py-4">
                 <Button
                     variant="outline"
                     size="sm"
@@ -300,6 +287,5 @@ export default function News_Management() {
                 </Button>
             </div>
         </div>
-
     );
 }
