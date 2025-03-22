@@ -10,7 +10,9 @@ const http = require("http");
 
 
 
-const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute } = require("./routes");
+
+const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute,NewRouter } = require("./routes");
+
 
 
 
@@ -50,6 +52,7 @@ app.use("/medical", MedicalRoute);
 
 app.use("/pet", PetRouter);
 app.use("/shopping-cart", ShoppingCartRouter);
+app.use("/new", NewRouter);
 
 
 io.on("connection", (socket) => {
