@@ -27,8 +27,7 @@ module.exports = {
     PetController,
 
     ShoppingCartController,
-    NewController
-
+    NewController,
     ShoppingCartController
 
 };

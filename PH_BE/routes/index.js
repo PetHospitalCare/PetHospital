@@ -22,7 +22,7 @@ module.exports = {
     MedicineRouter,
 
     ShoppingCartRouter,
-    NewRouter
+    NewRouter,
 
     MedicalRoute,
 

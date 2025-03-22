@@ -14,7 +14,7 @@ const New = require("./new.model")
 
 const MedicalRecord = require("./medicalRecord.model");
 
-const ShoppingCart = require("./shopping-cart.model");
+
 const Payment = require("./payment.model");
 
 
@@ -32,7 +32,7 @@ db.medicine = Medicine
 
 db.medicalRecord = MedicalRecord
 
-db.shoppingcart = ShoppingCar
+db.shoppingcart = ShoppingCart
 db.new = New
 
 db.payment = Payment
