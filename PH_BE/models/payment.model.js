@@ -8,16 +8,15 @@ const cartItemSchema = new mongoose.Schema({
     name: { type: String },
 });
 
-const shoppingCartSchema = new mongoose.Schema(
+const paymentSchema = new mongoose.Schema(
     {
         userId: { type: String, required: true },
         items: [cartItemSchema],
         totalPrice: { type: Number, default: 0 },
         shipFee: { type: Number, default: 20000 },
-        address: { type: String },
-        status: { type: Number, default: 0 }
+        address: { type: String }
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model("ShoppingCart", shoppingCartSchema);
+module.exports = mongoose.model("Payment", paymentSchema);

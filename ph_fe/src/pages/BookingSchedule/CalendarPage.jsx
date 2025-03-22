@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Services } from "@/services/Services";
 import { BookingServices } from "@/services/BookingService";
-
+import MedicalExaminationDialog from "../MedicalExamination/Medicalexamination";
 const HOURS = [
     "8:00", "8:30", "9:00", "9:30", "10:00", "10:30", "11:00", "13:00",
     "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
@@ -19,7 +19,8 @@ export default function Calendar() {
     });
     const [appointments, setAppointments] = useState([]);
     const [services, setServices] = useState([]);
-
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     // Fetch all services
     const getAllService = async () => {
         try {
@@ -42,16 +43,17 @@ export default function Calendar() {
                 const subService = getSubService(booking.service_id, booking.sub_service_id);
                 return {
                     id: booking._id,
+                    owner: booking?.guest_name || "Không có tên",
                     title: subService?.name || "Không tìm thấy dịch vụ",
                     doctor: booking?.doctor_id?.username || "Không có bác sĩ",
                     startHour: booking.hour,
                     duration: subService?.duration || 30,
-                    color: booking.status === "confirm" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700",
+                    color: "bg-green-100 text-green-700",
                     date: new Date(booking.date),
                 };
             });
-
             setAppointments(formattedAppointments);
+            console.log(appointments)
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu booking:", error);
         }
@@ -202,12 +204,29 @@ export default function Calendar() {
                                                         minWidth: "48px",
                                                         gridRow: `span ${event.duration / 30}`,
                                                     }}
+                                                // onClick={() => {
+                                                //     setSelectedAppointment(event);
+                                                //     setIsDialogOpen(true);
+                                                // }}
                                                 >
                                                     <div className="font-semibold truncate">{event.title}</div>
-                                                    <div className="text-xs">{event.startHour} - {endHour}</div>
+                                                    <div className="text-xs">{event.startHour} - {endHour} ({event.owner})</div>
                                                     <div className="text-xs mt-1 italic border-t pt-1 truncate">
                                                         <span className="font-medium">BS:</span> {event.doctor}
                                                     </div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="mt-2 px-3 py-1 text-xs"
+                                                        onClick={() => {
+                                                            setSelectedAppointment(event);
+                                                            setIsDialogOpen(true);
+                                                        }}
+                                                    >
+                                                        <ChevronRight className="w-3 h-3 mr-1" /> Khám bệnh
+                                                    </Button>
+
+
                                                 </div>
                                             );
                                         })}
@@ -218,6 +237,11 @@ export default function Calendar() {
                     ))}
                 </div>
             </div>
+            <MedicalExaminationDialog
+                open={isDialogOpen}
+                onOpenChange={() => setIsDialogOpen(false)}
+                appointment={selectedAppointment}
+            />
         </div>
     );
 }

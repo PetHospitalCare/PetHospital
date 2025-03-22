@@ -7,8 +7,16 @@ const OTP = require("./otp.model");
 const Pet = require("./pet.model");
 const Booking = require("./booking.model");
 const Medicine = require("./medicine.model");
+
 const ShoppingCart = require("./shopping-cart.model");
 const New = require("./new.model")
+
+
+const MedicalRecord = require("./medicalRecord.model");
+
+const ShoppingCart = require("./shopping-cart.model");
+const Payment = require("./payment.model");
+
 
 mongoose.Promise = global.Promise;
 
@@ -21,8 +29,16 @@ db.otp = OTP
 db.pet = Pet
 db.booking = Booking
 db.medicine = Medicine
-db.shoppingcart = ShoppingCart
+
+db.medicalRecord = MedicalRecord
+
+db.shoppingcart = ShoppingCar
 db.new = New
+
+db.payment = Payment
+
+
+
 
 const connectDB = async () => {
     await mongoose

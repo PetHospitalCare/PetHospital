@@ -16,9 +16,16 @@ import { UserProvider } from './contexts/UserContext.jsx'
 import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
 import { Toaster } from "@/components/ui/sonner"
 
+import "./index.css"
+
+import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext.jsx";
+
+
 createRoot(document.getElementById('root')).render(
-  <UserProvider>
-    <Toaster richColors position="top-right" expand={true} closeButton />
-    <App />
-  </UserProvider>
+    <UserProvider>
+        <ShoppingCartProvider>
+            <Toaster richColors position="top-right" expand={true} closeButton />
+            <App />
+        </ShoppingCartProvider>
+    </UserProvider>
 )
