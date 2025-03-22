@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-
+import { format } from "date-fns"
 export function PetInfo({ petInfo }) {
     return (
         <Card>
@@ -22,14 +22,17 @@ export function PetInfo({ petInfo }) {
                 </div>
                 <div className="grid grid-cols-2">
                     <span className="text-muted-foreground">Ngày sinh:</span>
-                    <span>{petInfo?.dob}</span>
+                    <span>
+                        {petInfo?.dob ? format(new Date(petInfo.dob), "dd-MM-yyyy") : ""}
+                    </span>
+                    {/* <span>{petInfo?.dob}</span> */}
                 </div>
                 <div className="grid grid-cols-2">
                     <span className="text-muted-foreground">Giới tính:</span>
                     <span>{petInfo?.gender}</span>
                 </div>
                 <div className="grid grid-cols-2">
-                    <span className="text-muted-foreground">Cân nặng:</span>
+                    <span className="text-muted-foreground">Cân nặng (kg):</span>
                     <span>{petInfo?.weight}</span>
                 </div>
                 <Separator className="my-1" />
