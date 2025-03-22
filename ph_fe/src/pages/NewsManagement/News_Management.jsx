@@ -23,16 +23,17 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import AddMedicineDialog from "./Add_Medicine_Modal";
-import SheetDemo from "./Edit_Management";
+import CreateNew from "./Create_new"
+import EditNew from "./Edit_new"
 import { MedicineService } from "@/services/MedicineService";
 import { toast } from "sonner";
+import { NewServices } from "@/services/NewService";
 
-export default function MedicineManagerment() {
+export default function News_Management() {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
     const [openEdit, setOpenEdit] = useState(false);
-    const [selectedMedicine, setSelectedMedicine] = useState(null);
+    const [selectedNew, setSelectedNew] = useState(null);
     const [sorting, setSorting] = useState([]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState({});
@@ -40,12 +41,12 @@ export default function MedicineManagerment() {
     const [open, setOpen] = useState(false);
     const fetchData = async () => {
         try {
-            const response = await MedicineService.getAllMedicine()
+            const response = await NewServices.GetAllNews()
             if (response.data.success) {
-                setData(response.data.medicines);
+                setData(response.data.news);
             }
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu thuốc:", error);
+            console.error("Lỗi khi lấy dữ liệu bài viết:", error);
         }
     };
     useEffect(() => {
@@ -92,89 +93,99 @@ export default function MedicineManagerment() {
             enableSorting: false,
             enableHiding: false,
         },
+        // {
+        //     accessorKey: "images",
+        //     header: () => <div className="text-center">Ảnh</div>,
+        //     cell: ({ row }) => {
+        //         const images = row.original.images; // Lấy danh sách ảnh từ API
+        //         return (
+        //             <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
+        //                 {images.map((image, index) => (
+        //                     <Zoom>
+        //                         <img
+        //                             src={image.url}
+        //                             alt={`Medicine ${index}`}
+        //                             className="h-28 w-28 object-cover rounded-md"
+        //                         />
+        //                     </Zoom>
+        //                 ))}
+        //             </div>
+        //         );
+        //     },
+        //     enableSorting: false,
+        //     enableHiding: false,
+        // },
         {
-            accessorKey: "images",
-            header: () => <div className="text-center">Ảnh</div>,
-            cell: ({ row }) => {
-                const images = row.original.images; // Lấy danh sách ảnh từ API
-                return (
-                    <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
-                        {images.map((image, index) => (
-                            <Zoom>
-                                <img
-                                    src={image.url}
-                                    alt={`Medicine ${index}`}
-                                    className="h-28 w-28 object-cover rounded-md"
-                                />
-                            </Zoom>
-                        ))}
-                    </div>
-                );
-            },
-            enableSorting: false,
-            enableHiding: false,
+            accessorKey: "title",
+            header: () => <div className="text-center">Tiêu đề bài viết</div>,
+            cell: ({ row }) => <div className=" text-center">{row.getValue("title")}</div>,
         },
         {
-            accessorKey: "name",
-            header: () => <div className="text-center">Tên thuốc</div>,
-            cell: ({ row }) => <div className=" text-center">{row.getValue("name")}</div>,
+            accessorKey: "createdAt",
+            header: () => <div className="text-center">Ngày tạo bài viết</div>,
+            cell: ({ row }) => <div className=" text-center">{row.getValue("createdAt")}</div>,
         },
-        {
-            accessorKey: "pet_type",
-            header: () => <div className="text-center">Dành cho</div>,
-            cell: ({ row }) => {
-                const petType = row.getValue("pet_type");
+        // {
+        //     accessorKey: "title",
+        //     header: () => <div className="text-center">Tiêu đề bài viết</div>,
+        //     cell: ({ row }) => <div className=" text-center">{row.getValue("title")}</div>,
+        // },
+        // {
+        //     accessorKey: "pet_type",
+        //     header: () => <div className="text-center">Dành cho</div>,
+        //     cell: ({ row }) => {
+        //         const petType = row.getValue("pet_type");
 
-                // Kiểm tra nếu petType là mảng, thì chuyển sang tiếng Việt
-                const translatedPetType = Array.isArray(petType)
-                    ? petType.map((type) => (type === "Dog" ? "Chó" : type === "Cat" ? "Mèo" : type)).join(", ")
-                    : petType === "Dog"
-                        ? "Chó"
-                        : petType === "Cat"
-                            ? "Mèo"
-                            : petType;
+        //         // Kiểm tra nếu petType là mảng, thì chuyển sang tiếng Việt
+        //         const translatedPetType = Array.isArray(petType)
+        //             ? petType.map((type) => (type === "Dog" ? "Chó" : type === "Cat" ? "Mèo" : type)).join(", ")
+        //             : petType === "Dog"
+        //                 ? "Chó"
+        //                 : petType === "Cat"
+        //                     ? "Mèo"
+        //                     : petType;
 
-                return <div className="text-center">{translatedPetType}</div>;
-            }
-        },
-        {
-            accessorKey: "quantity",
-            header: ({ column }) => (
-                <div className="text-center">
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Số lượng
-                        <ArrowUpDown />
-                    </Button>
-                </div>
-            ),
-            cell: ({ row }) => <div className="lowercase text-center">{row.getValue("quantity")}</div>,
-        },
-        {
-            accessorKey: "price",
-            header: () => <div className="text-right">Giá tiền</div>,
-            cell: ({ row }) => {
-                const amount = parseFloat(row.getValue("price"));
-                return <div className="text-right font-medium">{amount.toLocaleString()}₫</div>;
-            },
-        },
-        {
-            accessorKey: "expiry_date",
-            header: () => <div className="text-center">Ngày hết hạn</div>,
-            cell: ({ row }) => {
-                const rawDate = row.getValue("expiry_date");
-                if (!rawDate) return <div className="text-center">Không có ngày</div>;
+        //         return <div className="text-center">{translatedPetType}</div>;
+        //     }
+        // },
+        // {
+        //     accessorKey: "quantity",
+        //     header: ({ column }) => (
+        //         <div className="text-center">
+        //             <Button
+        //                 variant="ghost"
+        //                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        //             >
+        //                 Số lượng
+        //                 <ArrowUpDown />
+        //             </Button>
+        //         </div>
+        //     ),
+        //     cell: ({ row }) => <div className="lowercase text-center">{row.getValue("quantity")}</div>,
+        // },
+        // {
+        //     accessorKey: "price",
+        //     header: () => <div className="text-right">Giá tiền</div>,
+        //     cell: ({ row }) => {
+        //         const amount = parseFloat(row.getValue("price"));
+        //         return <div className="text-right font-medium">{amount.toLocaleString()}₫</div>;
+        //     },
+        // },
+        // {
+        //     accessorKey: "expiry_date",
+        //     header: () => <div className="text-center">Ngày hết hạn</div>,
+        //     cell: ({ row }) => {
+        //         const rawDate = row.getValue("expiry_date");
+        //         if (!rawDate) return <div className="text-center">Không có ngày</div>;
 
 
 
-                const date = new Date(rawDate);
-                const formattedDate = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
+        //         const date = new Date(rawDate);
+        //         const formattedDate = `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getFullYear()}`;
 
-                return <div className="text-center">{formattedDate}</div>;
-            },
-        },
+        //         return <div className="text-center">{formattedDate}</div>;
+        //     },
+        // },
         {
             id: "actions",
             header: () => <div className="text-center font-semibold">...</div>,
@@ -183,7 +194,7 @@ export default function MedicineManagerment() {
                     <button>
                         <Pen className="size-6 p-1 mr-1 " onClick={() => {
                             setOpenEdit(true);
-                            setSelectedMedicine(row.original);
+                            setSelectedNew(row.original);
                         }} />
 
                     </button>
@@ -219,7 +230,7 @@ export default function MedicineManagerment() {
     return (
 
         <div className="w-full">
-            <SheetDemo open={openEdit} onOpenChange={setOpenEdit} medicine={selectedMedicine} onsuccess={fetchData} />
+            <EditNew open={openEdit} onOpenChange={setOpenEdit} post={selectedNew} onsuccess={fetchData} />
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Tìm kiếm sản phẩm..."
@@ -229,11 +240,9 @@ export default function MedicineManagerment() {
                 />
                 <div className="text-center ml-auto">
                     <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
-                        Tạo thuốc mới
+                        Tạo bài viết mới
                     </Button>
-
-                    <AddMedicineDialog open={open} onOpenChange={setOpen} onSuccess={fetchData} />
-
+                    <CreateNew open={open} onOpenChange={setOpen} onSuccess={fetchData} />
                 </div>
 
             </div>

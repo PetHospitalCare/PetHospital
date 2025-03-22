@@ -71,16 +71,16 @@ export function AppSidebar({
         items: [
           {
             title: "Sản phẩm",
-            url: "/Product_Managerment",
+            url: "/Product_Management",
 
           },
           {
             title: "Kho Thuốc",
-            url: "/Medicine_Managerment",
+            url: "/Medicine_Management",
           },
           {
             title: "Bảng Tin",
-            url: "#",
+            url: "/News_Management",
           },
           {
             title: "Bản Ghi Thú cưng",
@@ -95,7 +95,7 @@ export function AppSidebar({
         isActive: true,
         items: service.map((item) => ({
           title: item.name,
-          url: `/Service_Managerment/${item._id}`,
+          url: `/Service_Management/${item._id}`,
         })),
       },
     ],
@@ -117,7 +117,7 @@ export function AppSidebar({
       },
       {
         name: "Tài Khoản",
-        url: "/Account_Managerment",
+        url: "/Account_Management",
         icon: User,
       },
       
