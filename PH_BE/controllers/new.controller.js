@@ -77,40 +77,38 @@ const CreateNew = async (req, res) => {
     }
 };
 
-//Chỉnh sửa bài viết
+//Chỉnh sửa bài viết 
 const EditNew = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.userId;
         const { title, content } = req.body;
         let imageData = {};
-
+        
         const news = await New.findById(id);
         if (!news) {
             return res.status(404).json({ message: "Bài viết không tồn tại" });
         }
-
-        if (req.files && req.files.image) {
+        
+        if (req.file) {
             // Xóa ảnh cũ nếu có
             if (news.images && news.images.publicId) {
                 await cloudinary.uploader.destroy(news.images.publicId);
             }
             
-            const file = req.files.image;
-
             imageData = {
-                url: file.path,
-                publicId: file.filename 
+                url: req.file.path,
+                publicId: req.file.filename
             };
         }
-
+        
         const updatedNews = await New.findByIdAndUpdate(id, {
             title,
             content,
-            ...(Object.keys(imageData).length && { images: imageData }),
+            ...(Object.keys(imageData).length > 0 && { images: imageData }),
             updatedBy: userId
         }, { new: true });
-
+        
         return res.status(200).json({
             message: "Cập nhật bài viết thành công",
             news: updatedNews

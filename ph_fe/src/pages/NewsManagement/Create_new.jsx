@@ -27,6 +27,11 @@ const CreateNew = ({ open, onOpenChange, onSuccess }) => {
     const handleImageChange = (e) => {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
+            // Kiểm tra dung lượng file (tối đa 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("Dung lượng ảnh vượt quá 5MB, vui lòng chọn ảnh nhỏ hơn.");
+                return;
+            }
             setImage(file);
             setImagePreview(URL.createObjectURL(file));
         }
@@ -40,7 +45,7 @@ const CreateNew = ({ open, onOpenChange, onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        
+
         const formData = new FormData();
         formData.append('title', title);
         formData.append('content', content);
