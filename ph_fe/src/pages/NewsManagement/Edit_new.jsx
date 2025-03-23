@@ -35,6 +35,12 @@ const EditNew = ({ open, onOpenChange, post, onsuccess }) => {
     const handleImageChange = (e) => {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
+            // Kiểm tra dung lượng file (tối đa 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("Dung lượng ảnh vượt quá 5MB, vui lòng chọn ảnh nhỏ hơn.");
+                return;
+            }
+
             setImage(file);
             setImagePreview(URL.createObjectURL(file));
         }
@@ -51,17 +57,19 @@ const EditNew = ({ open, onOpenChange, post, onsuccess }) => {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('content', content);
+
         if (image) {
-            // Make sure the field name matches what your backend expects
             formData.append('image', image);
         }
+
         try {
-            const response = await NewServices.updateNew(post._id,formData);
+            const response = await NewServices.updateNew(post._id, formData);
             onsuccess(); // Callback khi cập nhật bài viết thành công
             onOpenChange(false); // Đóng dialog
             toast.success("Chỉnh sửa bài viết thành công");
         } catch (error) {
             console.error('Error updating post:', error);
+            toast.error("Có lỗi xảy ra khi cập nhật bài viết");
         } finally {
             setIsSubmitting(false);
         }
