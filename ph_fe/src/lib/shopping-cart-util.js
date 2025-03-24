@@ -12,7 +12,7 @@ export function useAddToCart() {
             callAPIUpdateCart(tempUserId, productInput, contextFunction);
             // call api insert to cart and get response
         } else {
-            // update localStorage cart
+            updateLocalStorageShoppingCart(productInput, 'add', contextFunction);
         }
     };
 }
@@ -24,13 +24,13 @@ async function callAPIUpdateCart(userIdInput, productInput, contextFunction) {
     }
 
     const response = await ShoppingCartService.updateShoppingCartByUserId(userIdInput, data);
-    updateLocalStorageShoppingCart(response.data.savedShoppingCart, 'replace')
-    contextFunction(response.data.savedShoppingCart.items.reduce((acc, item) => acc + item.quantity, 0));
+    updateLocalStorageShoppingCart(response.data.savedShoppingCart, 'replace', null)
+    contextFunction(response.data.savedShoppingCart.items.reduce((acc, item) => acc + (item.quantity || 0), 0));
 
     // console.log('response: ', response.data.savedShoppingCart.items);
 }
 
-function updateLocalStorageShoppingCart(productInput, order) {
+function updateLocalStorageShoppingCart(productInput, order, contextFunction) {
     let localStorageShoppingCart = localStorage.getItem("cart") || null;
 
     if (order === 'add') {
@@ -54,11 +54,11 @@ function updateLocalStorageShoppingCart(productInput, order) {
                     productInput,
                 ],
                 "totalPrice": 0,
-                "createdAt": "2025-03-11T12:00:00.000Z",
-                "updatedAt": "2025-03-11T12:00:00.000Z",
+                "createdAt": new Date().toISOString(),
+                "updatedAt": new Date().toISOString(),
                 "status": 0,
                 "shipFee": 20000.0,
-                "address": "Hanoi"
+                "address": ""
             }
         }
     }
@@ -67,6 +67,9 @@ function updateLocalStorageShoppingCart(productInput, order) {
         localStorageShoppingCart = productInput;
     }
 
+    if (contextFunction !== undefined && contextFunction !== null) {
+        contextFunction(localStorageShoppingCart.items.reduce((acc, item) => acc + (item.quantity || 0), 0));
+    }
+
     localStorage.setItem("cart", JSON.stringify(localStorageShoppingCart));
-    localStorage.setItem("cartCount", localStorageShoppingCart?.items?.reduce((acc, item) => acc + (item.quantity || 0), 0));
 }

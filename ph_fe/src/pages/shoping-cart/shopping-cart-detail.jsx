@@ -31,7 +31,13 @@ export default function ShoppingCartDetail() {
                 setCart(response.data?.shoppingCart)
             }
         } else {
+            // console.log(521565656)
             // get and set card data by localStorage
+            const localStorageShoppingCart = localStorage.getItem("cart") || null;
+
+            if (localStorageShoppingCart) {
+                setCart(JSON.parse(localStorageShoppingCart))
+            }
         }
     }
 
