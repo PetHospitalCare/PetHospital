@@ -19,10 +19,11 @@ const accountSchema = new mongoose.Schema(
         email: {
             type: String,
             required: true,
+            unique: true
         },
         phone: {
             type: String,
-            required: true,
+
         },
         address: {
             type: String,
@@ -33,7 +34,7 @@ const accountSchema = new mongoose.Schema(
         role: {
             type: [String],
             enum: ["customer", "doctor", "admin", "staff"],
-            required: true
+
         }
     },
     { timestamps: true }

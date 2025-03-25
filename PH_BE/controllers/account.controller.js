@@ -7,9 +7,9 @@ const cloudinary = require('cloudinary').v2;
 
 // Cấu hình Cloudinary
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_KEY,
-    api_secret: process.env.CLOUDINARY_SECRET
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
 });
 // Signup
 const signup = async (req, res) => {
@@ -72,8 +72,26 @@ const getallAccount = async (req, res) => {
 const createNewAccount = async (req, res) => {
   try {
     const { username, password, email, phone, role } = req.body;
+    const existingAccount = await Account.findOne({
+      $or: [
+        { email: email },
+        { phone: phone }
+      ]
+    });
+
+    if (existingAccount) {
+      return res.status(409).json({
+        success: false,
+        message: existingAccount.email === email
+          ? "Email đã được sử dụng"
+          : "Số điện thoại đã được sử dụng"
+      });
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create new account
     const newAccount = new Account({
       username,
       password: hashedPassword,
@@ -81,14 +99,25 @@ const createNewAccount = async (req, res) => {
       phone,
       role
     });
-    const savedAccount = await newAccount.save();
 
-    res.status(201).json({ success: true, savedAccount });
+    const savedAccount = await newAccount.save();
+    res.status(201).json({
+      success: true,
+      message: "Tạo tài khoản thành công",
+      account: {
+        _id: savedAccount._id,
+        username: savedAccount.username,
+        email: savedAccount.email,
+        role: savedAccount.role
+      }
+    });
+
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({ error: "Email or phone number already exists" });
-    }
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Create account error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi khi tạo tài khoản"
+    });
   }
 };
 const deleteAccount = async (req, res) => {
@@ -140,18 +169,18 @@ const getAllDoctor = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   try {
-      const userId = req.userId; // Lấy userId từ middleware verifyToken
+    const userId = req.userId; // Lấy userId từ middleware verifyToken
 
-      const user = await Account.findById(userId).select("-password"); // Loại bỏ mật khẩu khi trả về
+    const user = await Account.findById(userId).select("-password"); // Loại bỏ mật khẩu khi trả về
 
-      if (!user) {
-          return res.status(404).json({ success: false, message: "Không tìm thấy người dùng." });
-      }
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy người dùng." });
+    }
 
-      res.status(200).json({ success: true, account: user });
+    res.status(200).json({ success: true, account: user });
   } catch (error) {
-      console.error("Lỗi khi lấy thông tin người dùng:", error);
-      res.status(500).json({ success: false, message: "Lỗi server" });
+    console.error("Lỗi khi lấy thông tin người dùng:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
 
@@ -164,20 +193,20 @@ const updateUserAccount = async (req, res) => {
     // Cập nhật thông tin tài khoản
     const updatedAccount = await Account.findByIdAndUpdate(
       id,
-      { 
-        username, 
-        phone, 
-        gender, 
-        address, 
-        dateOfBirth: new Date(dateOfBirth) 
+      {
+        username,
+        phone,
+        gender,
+        address,
+        dateOfBirth: new Date(dateOfBirth)
       },
       { new: true, runValidators: true }
     ).select("-password");
 
-    return res.status(200).json({ 
-      success: true, 
-      message: "Cập nhật thông tin thành công", 
-      account: updatedAccount 
+    return res.status(200).json({
+      success: true,
+      message: "Cập nhật thông tin thành công",
+      account: updatedAccount
     });
   } catch (error) {
     console.error("Lỗi khi cập nhật tài khoản:", error);
@@ -190,14 +219,14 @@ const uploadAvatar = async (req, res) => {
   try {
     const uploadMiddleware = uploadCloud.single('image');
 
-    uploadMiddleware(req, res, async function(err) {
+    uploadMiddleware(req, res, async function (err) {
 
       // Không có file được upload
       if (!req.file) {
         return res.status(400).json({ success: false, message: "Vui lòng chọn file ảnh" });
       }
 
-      const id  = req.userId;
+      const id = req.userId;
       const user = await Account.findById(id);
 
       // Nếu người dùng đã có ảnh đại diện, xóa ảnh cũ trên Cloudinary
@@ -208,12 +237,12 @@ const uploadAvatar = async (req, res) => {
       // Lấy thông tin từ file đã upload
       const url = req.file.path;
       const publicId = req.file.filename;
-      
+
       // Cập nhật thông tin ảnh đại diện trong database
       const updatedUser = await Account.findByIdAndUpdate(
         id,
-        { 
-          url: url, 
+        {
+          url: url,
           publicId: publicId
         },
         { new: true }
@@ -232,4 +261,4 @@ const uploadAvatar = async (req, res) => {
     res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
-module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor, getCurrentUser, updateUserAccount,uploadAvatar };
+module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor, getCurrentUser, updateUserAccount, uploadAvatar };

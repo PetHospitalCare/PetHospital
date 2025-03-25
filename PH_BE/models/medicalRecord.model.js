@@ -9,12 +9,13 @@ const MedicalRecordSchema = new mongoose.Schema(
             result: { type: mongoose.Schema.Types.Mixed },
             note: { type: String },
         }],
+        symptom: { type: String },
         diagnosis: { type: String },
         result: { type: mongoose.Schema.Types.Mixed },
         prescription: [
             {
-                medicine: String,
-                dosage: String,
+                medicine: { type: mongoose.Schema.Types.ObjectId, ref: "Medicine" },
+                quantity: Number,
                 instructions: String
             }
         ], // Đơn thuốc

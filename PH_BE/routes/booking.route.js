@@ -11,6 +11,7 @@ BookingRouter.put("/update/:id", BookingController.UpdateBooking);
 
 BookingRouter.get("/get-by-id/:id", BookingController.getBookingbyId);
 
-BookingRouter.get("/get-booking-by-user",verifyToken, BookingController.getBookingByUser);
+BookingRouter.get("/get-booking-by-user", verifyToken, BookingController.getBookingByUser);
+BookingRouter.get("/cancel/:id", BookingController.CancelBookingById);
 
 module.exports = BookingRouter;

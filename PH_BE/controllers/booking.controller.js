@@ -113,6 +113,33 @@ const getBookingByUser = async (req, res) => {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
     }
 };
+const CancelBookingById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedBooking = await Booking.findByIdAndUpdate(
+            id,
+            { status: "cancel" },
+            { new: true }
+        );
 
-module.exports = { CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, getBookingByUser, getBookingbyId };
+        if (!updatedBooking) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy lịch hẹn"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Hủy lịch hẹn thành công",
+            data: updatedBooking
+        });
+
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+    }
+};
+
+module.exports = { CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, getBookingByUser, getBookingbyId, CancelBookingById };
 

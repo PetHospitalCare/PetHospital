@@ -1,7 +1,7 @@
 const db = require("../models");
 const MedicalRecord = db.medicalRecord;
 const cloudinary = require('cloudinary').v2;
-
+const Booking = db.booking
 // Cấu hình Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -11,7 +11,7 @@ cloudinary.config({
 const getMedicalbyBookingId = async (req, res) => {
     try {
         const { id } = req.params;
-        const medical = await MedicalRecord.findOne({ booking_id: id }).populate("services.service_id");
+        const medical = await MedicalRecord.findOne({ booking_id: id }).populate("services.service_id").populate("prescription.medicine");;
         res.status(200).json({ success: true, data: medical });
     } catch (err) {
         console.error("Error in getMedicalbyBookingId:", err);
@@ -21,12 +21,10 @@ const getMedicalbyBookingId = async (req, res) => {
 
 const createMedicalRecord = async (req, res) => {
     try {
-        //Parse medical record data from JSON string
-
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { booking_id, services, diagnosis, result, prescription, note } = medicalData;
-
-        //Handle uploaded files
+        const { booking_id, services, diagnosis, result, prescription, note, symptom } = medicalData;
+        await Booking.findOneAndUpdate({ _id: booking_id }, { status: "complete" });
+        // Handle uploaded files
         const files = req.files;
         const fileServices = Array.isArray(req.body.fileServices)
             ? req.body.fileServices
@@ -35,15 +33,35 @@ const createMedicalRecord = async (req, res) => {
         // Map files to services
         const servicesWithFiles = services.map(service => {
             if (files && fileServices.includes(service.sub_service_id)) {
-                const file = files[fileServices.indexOf(service.sub_service_id)];
+                const uploadedFiles = files.filter(
+                    file => fileServices[fileServices.indexOf(service.sub_service_id)] === service.sub_service_id
+                );
+
+                const result = {
+                    ...service.result
+                };
+
+                // Handle Excel file
+                const excelFile = uploadedFiles.find(f => f.mimetype.includes('spreadsheet') || f.mimetype.includes('excel'));
+                if (excelFile) {
+                    result.fileUrl = excelFile.path;
+                    result.fileName = excelFile.originalname;
+                    result.fileType = excelFile.mimetype;
+                }
+
+                // Handle images
+                const images = uploadedFiles.filter(f => f.mimetype.startsWith('image/'));
+                if (images.length > 0) {
+                    result.images = images.map(image => ({
+                        url: image.path,
+                        publicId: image.filename,
+                        name: image.originalname
+                    }));
+                }
+
                 return {
                     ...service,
-                    result: {
-                        ...service.result,
-                        fileUrl: file.path, // Cloudinary URL
-                        fileName: file.originalname,
-                        fileType: file.mimetype
-                    }
+                    result
                 };
             }
             return service;
@@ -53,6 +71,7 @@ const createMedicalRecord = async (req, res) => {
             booking_id,
             services: servicesWithFiles,
             diagnosis,
+            symptom,
             result,
             prescription,
             note,
@@ -71,11 +90,18 @@ const updateMedicalRecord = async (req, res) => {
     try {
         const { id } = req.params;
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { services, diagnosis, result, prescription, note } = medicalData;
+        const { services, diagnosis, result, prescription, note, symptom } = medicalData;
 
         const medicalRecord = await MedicalRecord.findOne({ booking_id: id });
         if (!medicalRecord) {
             return res.status(404).json({ error: "Medical record not found" });
+        }
+        if (prescription) {
+            prescription.forEach(item => {
+                if (!item.medicine || !item.quantity) {
+                    throw new Error('Thiếu thông tin thuốc hoặc số lượng');
+                }
+            });
         }
 
         // Handle uploaded files
@@ -87,26 +113,52 @@ const updateMedicalRecord = async (req, res) => {
         // Map files to services and handle old file deletion
         const servicesWithFiles = await Promise.all(services.map(async service => {
             if (files && fileServices.includes(service.sub_service_id)) {
-                const file = files[fileServices.indexOf(service.sub_service_id)];
+                const uploadedFiles = files.filter(
+                    file => fileServices[fileServices.indexOf(service.sub_service_id)] === service.sub_service_id
+                );
 
-                // Delete old file from Cloudinary if exists
-                if (service.result?.fileUrl) {
-                    const publicId = service.result.fileUrl.split('/upload/')[1] // Lấy phần sau "/upload/"
-                        .split('/') // Tách thành mảng dựa trên dấu "/"
-                        .slice(1) // Bỏ phần "v1742222290" (version)
-                        .join('/') // Nối lại thành đường dẫn
-                        .split('.')[0]; // Bỏ phần mở rộng file
-                    await cloudinary.uploader.destroy(publicId).catch(() => { });
+                const result = {
+                    ...service.result
+                };
+
+                // Handle Excel file
+                const excelFile = uploadedFiles.find(f => f.mimetype.includes('spreadsheet') || f.mimetype.includes('excel'));
+                if (excelFile) {
+                    // Delete old Excel file if exists
+                    if (service.result?.fileUrl) {
+                        const publicId = service.result.fileUrl.split('/upload/')[1]
+                            .split('/')
+                            .slice(1)
+                            .join('/')
+                            .split('.')[0];
+                        await cloudinary.uploader.destroy(publicId).catch(() => { });
+                    }
+
+                    result.fileUrl = excelFile.path;
+                    result.fileName = excelFile.originalname;
+                    result.fileType = excelFile.mimetype;
+                }
+
+                // Handle images
+                const images = uploadedFiles.filter(f => f.mimetype.startsWith('image/'));
+                if (images.length > 0) {
+                    // Keep existing images and add new ones
+                    const existingImages = service.result?.images || [];
+
+                    // Add new images to the array
+                    const newImages = images.map(image => ({
+                        url: image.path,
+                        publicId: image.filename,
+                        name: image.originalname
+                    }));
+
+                    // Combine existing and new images
+                    result.images = [...existingImages, ...newImages];
                 }
 
                 return {
                     ...service,
-                    result: {
-                        ...service.result,
-                        fileUrl: file.path,
-                        fileName: file.originalname,
-                        fileType: file.mimetype
-                    }
+                    result
                 };
             }
             return service;
@@ -115,7 +167,12 @@ const updateMedicalRecord = async (req, res) => {
         medicalRecord.services = servicesWithFiles;
         medicalRecord.diagnosis = diagnosis;
         medicalRecord.result = result;
-        medicalRecord.prescription = prescription;
+        medicalRecord.prescription = prescription.map(item => ({
+            medicine: item.medicine, // This is the medicine ObjectId
+            quantity: Number(item.quantity),
+            instructions: item.instructions || ""
+        }));
+        medicalRecord.symptom = symptom;
         medicalRecord.note = note;
 
         await medicalRecord.save();
