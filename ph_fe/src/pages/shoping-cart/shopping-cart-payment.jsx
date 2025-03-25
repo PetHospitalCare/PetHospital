@@ -13,10 +13,12 @@ export default function ShoppingCartPayment() {
 
     const handlePayment = async () => {
         event.preventDefault();
-        console.log(11212)
+        // console.log(11212)
         if (user && user._id && cart) {
-            const response = await ShoppingCartService.paymentShoppingCartByUserId(user._id, cart);
-            console.log('response: ', response)
+            await ShoppingCartService.paymentShoppingCartByUserId(user._id, cart);
+            // console.log('response: ', response)
+        } else {
+            await ShoppingCartService.paymentShoppingCartByUserId('contact_infor', cart);
         }
     }
 

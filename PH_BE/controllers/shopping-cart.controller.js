@@ -32,10 +32,12 @@ const updateShoppingCartByUserId = async (req, res) => {
     try {
         const { userId } = req.params;
         const data = req.body;
+        let isDeleteAll = false;
+        let savedShoppingCart;
 
         let shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
 
-        if (!shoppingCart) {
+        if (!shoppingCart && data.order === 'add') {
             // Nếu chưa có giỏ hàng, tạo mới
             shoppingCart = new ShoppingCart({
                 userId,
@@ -47,28 +49,60 @@ const updateShoppingCartByUserId = async (req, res) => {
             });
         }
 
-        if (data.order === 'add') {
+        if ((data.order === 'add' || data.order === 'subtract') && shoppingCart) {
             const existingItem = shoppingCart.items.find(
                 (item) => item.productId === data.product.productId
             );
 
-            if (existingItem) {
-                // Nếu sản phẩm đã tồn tại, tăng số lượng
-                existingItem.quantity += data.product.quantity;
-            } else {
-                // Nếu chưa có, thêm sản phẩm mới
-                shoppingCart.items.push(data.product);
+            if (data.order === 'add') {
+                if (existingItem) {
+                    // Nếu sản phẩm đã tồn tại, tăng số lượng
+                    existingItem.quantity += data.product.quantity;
+                } else {
+                    // Nếu chưa có, thêm sản phẩm mới
+                    shoppingCart.items.push(data.product);
+                }
+            } else if (data.order === 'subtract') {
+                if (existingItem) {
+                    // Nếu sản phẩm đã tồn tại, giảm số lượng
+                    existingItem.quantity -= data.product.quantity;
+
+                    if (existingItem.quantity <= 0) {
+                        const index = shoppingCart.items.findIndex(item => item.productId === existingItem.productId);
+
+                        if (index > -1) {
+                            shoppingCart.items.splice(index, 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (data.order === 'delete') {
+            if (shoppingCart) {
+                const index = shoppingCart.items.findIndex(item => item.productId === data.product.productId);
+                if (index > -1) {
+                    shoppingCart.items.splice(index, 1);
+                }
             }
         }
 
         // Cập nhật lại tổng giá tiền
-        shoppingCart.totalPrice = shoppingCart.items.reduce(
-            (sum, item) => sum + item.quantity * item.price,
-            0
-        );
+        if (shoppingCart && shoppingCart?.items?.length > 0) {
+            shoppingCart.totalPrice = shoppingCart.items.reduce(
+                (sum, item) => sum + item.quantity * item.price,
+                0
+            );
+        } else {
+            isDeleteAll = true;
+        }
 
         // Lưu lại vào database
-        const savedShoppingCart = await shoppingCart.save();
+        if (!isDeleteAll) {
+            savedShoppingCart = await shoppingCart.save();
+        } else {
+            savedShoppingCart = await shoppingCart.deleteOne({ userId: String(userId) });
+        }
 
         return res.status(200).json({
             success: true,
@@ -87,28 +121,36 @@ const payment = async (req, res) => {
     try {
         const { userId } = req.params;
         const data = req.body;
+        let payment;
 
-        let shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
+        if (userId && userId !== 'contact_infor') {
+            let shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
 
-        if (!shoppingCart) {
-            return res.status(500).json({
-                message: "Lỗi hệ thống Back-end"
+            if (!shoppingCart) {
+                return res.status(500).json({
+                    message: "Lỗi hệ thống Back-end"
+                });
+            }
+
+
+            payment = new Payment({
+                userId: shoppingCart.userId,
+                contactInfo: '',
+                items: shoppingCart.items,
+                totalPrice: shoppingCart.totalPrice,
+                shipFee: shoppingCart.shipFee,
+                address: shoppingCart.address
+            });
+        } else if (userId && userId === 'contact_infor') {
+            payment = new Payment({
+                userId: '',
+                contactInfo: userId,
+                items: data.items,
+                totalPrice: data.totalPrice,
+                shipFee: data.shipFee,
+                address: data.address
             });
         }
-
-        // if (data.order === 'add') {
-        //
-        // }
-        //
-        // const savedShoppingCart = await shoppingCart.save();
-
-        const payment = new Payment({
-            userId: shoppingCart.userId,
-            items: shoppingCart.items,
-            totalPrice: shoppingCart.totalPrice,
-            shipFee: shoppingCart.shipFee,
-            address: shoppingCart.address
-        });
 
         const savedPayment = await payment.save();
 
