@@ -25,6 +25,7 @@ import { SurgeryForm } from "./forms/surgery-form"
 import { ConclusionForm } from "./forms/conclusion-form"
 import { serviceNameToType } from "./services"
 import { Loader2 } from "lucide-react";
+
 export default function MedicalExaminationDialog({ open, onOpenChange, appointment }) {
     const [selectedSubServices, setSelectedSubServices] = useState([]);
     const [servicesOpen, setServicesOpen] = useState(false);
@@ -36,6 +37,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         diagnosis: "",
         treatment: "",
         followUp: "",
+        prescription: [],
         notes: "",
     });
     const [services, setServices] = useState([]);
@@ -52,6 +54,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         setConclusion({
             generalHealth: "",
             diagnosis: "",
+            prescription: [],
             treatment: "",
             followUp: "",
             notes: "",
@@ -81,6 +84,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                             url: data?.data?.booking?.pet_id?.url,
                             gender: data?.data?.booking?.pet_id?.species,
                             ownerName: data?.data?.booking?.guest_name,
+                            email: data?.data?.booking?.guest_email,
                             phone: data?.data?.booking?.guest_phone,
                             note: data?.data?.booking?.note,
                         });
@@ -89,7 +93,9 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     // Load medical record
                     const recordData = await MeidicalServices.getMedicalByBookingId(appointment?.id);
                     if (recordData.data.data) {
-                        const { services, diagnosis, result, note } = recordData?.data.data;
+                        console.log("record: ", recordData.data.data)
+                        const { services, diagnosis, result, note, createdAt, updatedAt, symptom, prescription } = recordData?.data.data;
+
                         setSelectedSubServices(services?.map(service => ({
                             name: service?.service_id.subServices?.find(sub =>
                                 sub?._id === service?.sub_service_id)?.name,
@@ -105,11 +111,15 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         }, {}));
 
                         setConclusion({
+                            createdAt,
+                            updatedAt,
                             generalHealth: result?.generalHealth,
                             diagnosis,
+                            symptom,
                             treatment: result?.treatment,
                             followUp: result?.followUp,
                             notes: note,
+                            prescription,
                         });
 
                         setIsEditing(true);
@@ -183,18 +193,17 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-
             const formDataToSubmit = new FormData();
 
             const medicalRecordData = {
                 booking_id: appointment?.id,
                 services: selectedSubServices.map(subService => {
                     const serviceData = formData[subService?.id] || {};
-                    const { fileData, ...resultData } = serviceData;
+                    // Không loại bỏ fileData và images từ resultData
                     return {
                         service_id: subService?.parentId,
                         sub_service_id: subService?.id,
-                        result: resultData,
+                        result: serviceData, // Giữ nguyên object result
                     };
                 }),
                 diagnosis: conclusion?.diagnosis || "",
@@ -203,30 +212,50 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     treatment: conclusion?.treatment || "",
                     followUp: conclusion?.followUp || "",
                 },
-                prescription: [],
+                symptom: conclusion?.symptom || "",
+                prescription: conclusion.prescription.map(item => ({
+                    medicine: item.medicine_id, // Medicine ID reference
+                    quantity: Number(item.quantity),
+                    instructions: item.instructions
+                })),
                 note: conclusion?.notes || "",
             };
 
-            // Add the medical record data as a string
+            // Thêm medical record data
             formDataToSubmit.append('medicalRecord', JSON.stringify(medicalRecordData));
 
-            // Add files if they exist
+            // Xử lý files
             selectedSubServices.forEach(subService => {
                 const serviceData = formData[subService?.id] || {};
+
+                // Xử lý ảnh
+                if (serviceData.images?.length > 0) {
+                    serviceData.images.forEach((image, index) => {
+                        formDataToSubmit.append('files', image);
+                        formDataToSubmit.append('fileServices', subService?.id);
+                    });
+                }
+
+                // Xử lý file Excel nếu có
                 if (serviceData.fileData?.file) {
                     formDataToSubmit.append('files', serviceData.fileData.file);
                     formDataToSubmit.append('fileServices', subService?.id);
                 }
             });
 
+            // Gọi API tương ứng
             if (isEditing) {
                 await MeidicalServices.UpdateMedical(appointment?.id, formDataToSubmit);
             } else {
                 await MeidicalServices.CreateNewMedical(formDataToSubmit);
             }
-
+            for (let pair of formDataToSubmit.entries()) {
+                console.log('FormData entry:', pair[0], pair[1]);
+            }
+            console.log("Medical:", medicalRecordData)
             toast.success(isEditing ? "Cập nhật kết quả khám thành công!" : "Lưu kết quả khám thành công!");
             onOpenChange(false);
+
         } catch (error) {
             console.error("Failed to save medical record:", error);
             toast.error("Có lỗi xảy ra khi lưu kết quả khám!");
@@ -271,6 +300,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         formData={serviceData}
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
+                        petInfo={petInfo}
                     />
                 );
             case "labTest":
@@ -280,6 +310,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         formData={serviceData}
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
+                        petInfo={petInfo}
                     />
                 );
             case "petCare":
@@ -289,6 +320,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         formData={serviceData}
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
+                        petInfo={petInfo}
                     />
                 );
             case "boarding":
@@ -307,6 +339,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         formData={serviceData}
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
+                        petInfo={petInfo}
                     />
                 );
             case "imaging":
@@ -316,6 +349,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         formData={serviceData}
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
+                        petInfo={petInfo}
                     />
                 );
             case "checkup":
@@ -325,6 +359,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         formData={serviceData}
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
+                        petInfo={petInfo}
                     />
                 );
             default:
@@ -354,7 +389,17 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
                 <DialogHeader className="px-6 pt-6 pb-2">
                     <DialogTitle>Kết quả khám</DialogTitle>
-                    <div className="text-sm text-muted-foreground">{format(new Date(), "HH:mm 'Ngày' dd-MM-yyyy")}</div>
+                    {conclusion?.createdAt ? (
+                        <>
+
+                            <div className="text-sm text-muted-foreground">Cập nhật: {format(new Date(conclusion?.updatedAt), 'HH:mm:ss dd/MM/yyyy')}</div>
+                        </>
+                    ) : (
+                        <div className="text-sm text-muted-foreground">Chưa tạo phiếu khám</div>
+                    )}
+                    {/* <div className="text-sm text-muted-foreground">Ngày tạo:{format(new Date(conclusion?.createdAt), "HH:mm 'Ngày' dd-MM-yyyy")}</div>
+                     */}
+                    {/* <div className="text-sm text-muted-foreground">{conclusion?.createdAt}</div> */}
                 </DialogHeader>
                 {isLoading ? (
                     <div className="flex items-center justify-center h-[50vh]">
@@ -450,7 +495,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                                 <TabsList className="grid grid-cols-2">
                                     <TabsTrigger value="examination">Khám bệnh</TabsTrigger>
-                                    <TabsTrigger value="conclusion">Kết luận</TabsTrigger>
+                                    <TabsTrigger value="conclusion">Thuốc</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="examination" className="mt-4 flex-1 overflow-hidden">
                                     <ScrollArea className="h-[calc(90vh-240px)]">
@@ -476,10 +521,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                                 <Button variant="outline" onClick={() => setOpen(false)}>
                                     Hủy
                                 </Button>
-                                <Button variant="secondary">
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Thêm đơn thuốc
-                                </Button>
                                 <Button onClick={handleSubmit} disabled={isSubmitting}>
                                     {isSubmitting ? (
                                         <>
@@ -489,7 +530,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                                     ) : (
                                         <>
                                             <Check className="w-4 h-4 mr-2" />
-                                            "Lưu"
+                                            Lưu
                                         </>
                                     )}
 

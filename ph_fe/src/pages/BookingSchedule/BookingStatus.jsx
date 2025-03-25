@@ -97,15 +97,16 @@ export default function BookingStatus({ status, setCount }) {
     }, []);
 
     const handleDelete = async (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa booking này?")) {
-            try {
-                await axios.delete(`http://localhost:5000/bookings/${id}`);
-                setData((prevData) => prevData.filter((booking) => booking._id !== id));
-                alert("Xóa booking thành công!");
-            } catch (error) {
-                console.error("Lỗi khi xóa booking:", error);
-                alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+        try {
+            const response = await BookingServices.CancelBooking(id);
+            if (response.data.success) {
+                toast.success("Hủy lịch hẹn thành công");
+                // Refresh your booking list here
+                fetchBookings();
             }
+        } catch (error) {
+            console.error("Delete booking error:", error);
+            toast.error(error.response?.data?.message || "Lỗi khi hủy lịch hẹn");
         }
     };
     const getSubServiceName = (serviceId, subServiceId) => {
@@ -211,16 +212,20 @@ export default function BookingStatus({ status, setCount }) {
                             />
                         </button>
                     }
-                    <button>
-                        <Pen className="size-6 p-1 mr-1 " onClick={() => {
-                            setIsEditDialogOpen(true);
-                            setSelectedBooking(row.original)
-                        }} />
+                    {status !== "cancel" && (
+                        <>
+                            <button>
+                                <Pen className="size-6 p-1 mr-1 " onClick={() => {
+                                    setIsEditDialogOpen(true);
+                                    setSelectedBooking(row.original)
+                                }} />
 
-                    </button>
-                    <button onClick={() => handleDelete(row.original._id)}>
-                        <Trash2 className="size-6 p-1 text-red-500" />
-                    </button>
+                            </button>
+                            <button onClick={() => handleDelete(row.original._id)}>
+                                <Trash2 className="size-6 p-1 text-red-500" />
+                            </button>
+                        </>
+                    )}
                 </div>
             ),
         },

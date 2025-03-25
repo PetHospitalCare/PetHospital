@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
 import { UserService } from "@/services/UserService";
+import { toast } from "sonner";
 
 export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -71,12 +72,16 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
                 phone: formData.phone,
                 role: formData.roles
             });
-            alert("Tạo tài khoản thành công!");
-            onSuccess();
-            onOpenChange(false);
+            if (response.status === 201) {
+                toast.success("Tạo tài khoản thành công!");
+                onSuccess();
+                onOpenChange(false);
+            } else {
+                toast.error(response.data.error);
+            }
         } catch (error) {
             console.error("Lỗi tạo tài khoản:", error.response?.data || error.message);
-            alert(error.response?.data?.error || "Tạo tài khoản thất bại");
+            toast.error(error.response?.data?.error || "Tạo tài khoản thất bại");
         }
     };
 
