@@ -50,7 +50,7 @@ export default function ProductDetail() {
             price: product.price,
             imageUrl: product.images?.[0]?.url,
             name: product.name
-        }, setDataCartContext);
+        }, setDataCartContext, 'add');
     }
 
     return (
