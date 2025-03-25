@@ -111,8 +111,8 @@ export default function UserProfile() {
                 username: formData.username,
                 phone: formData.phone,
                 gender: formData.gender,
-                address: formData.address,
-                dateOfBirth: formData.dateOfBirth,
+                address: formData.address ? formData.address : "",
+                dateOfBirth: formData.dateOfBirth || null,
             };
 
             // Gửi API cập nhật
