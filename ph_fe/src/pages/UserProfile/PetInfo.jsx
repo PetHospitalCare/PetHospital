@@ -165,39 +165,44 @@ export default function PetInfo() {
     };
 
     return (
-        <div className="p-6 border rounded shadow-md bg-white">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="font-bold text-3xl">THÔNG TIN THÚ CƯNG</h1>
+        <div className="p-6 border rounded-lg shadow-lg bg-white">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="font-bold text-3xl text-gray-800">Thông Tin Thú Cưng</h1>
                 <Button
-                    className="rounded p-5 text-base bg-[#3F2E2E]"
+                    className="rounded px-4 py-2 text-base bg-[#3F2E2E] text-white hover:bg-[#533b3b] transition-all"
                     onClick={() => setOpen(true)}
                 >
                     Thêm mới
                 </Button>
                 <PetModal open={open} onOpenChange={setOpen} onSuccess={fetchPetData} />
             </div>
-            <hr />
-            <div className="max-h-[500px] overflow-y-auto p-2">
+            <hr className="mb-4" />
+            <div className="max-h-[500px] overflow-y-auto space-y-4">
                 {pets.length > 0 ? (
                     pets.map((pet) => (
-                        <div key={pet._id} className="border rounded mb-4 overflow-hidden">
-                            <div className="bg-[#533b3b] text-white p-4 flex justify-between items-center cursor-pointer" onClick={() => toggleDropdown(pet._id)}>
-                                <h1 className="text-2xl font-semibold">{pet.name}</h1>
+                        <div
+                            key={pet._id}
+                            className="border rounded-lg shadow-md overflow-hidden bg-gray-50 hover:shadow-lg transition-shadow"
+                        >
+                            <div
+                                className="bg-[#3F2E2E] text-white p-4 flex justify-between items-center cursor-pointer"
+                                onClick={() => toggleDropdown(pet._id)}
+                            >
+                                <h1 className="text-xl font-semibold">{pet.name}</h1>
                                 {openPets.includes(pet._id) ? <ChevronUp /> : <ChevronDown />}
                             </div>
                             {openPets.includes(pet._id) && (
-                                <div className="p-4 bg-white border-t">
-                                    <div className="flex gap-4">
-                                        <div className="w-24 h-24 bg-gray-200 rounded-md flex items-center justify-center relative group">
+                                <div className="p-4 bg-white">
+                                    <div className="flex gap-6">
+                                        <div className="w-24 h-24 bg-gray-200 rounded-md flex items-center justify-center relative group shadow-sm">
                                             <img
                                                 src={pet.url ? pet.url : "/dogCat.png"}
                                                 alt={pet.name}
                                                 className="w-full h-full object-cover rounded-md"
                                             />
-                                            {/* Overlay with pencil icon on hover */}
                                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 rounded-md flex items-center justify-center">
                                                 <Button
-                                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-black hover:bg-gray-200"
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-black hover:bg-gray-200 rounded-full p-2"
                                                     onClick={() => {
                                                         setCurrentPetId(pet._id);
                                                         setUploadDialogOpen(true);
@@ -209,7 +214,6 @@ export default function PetInfo() {
                                         </div>
                                         <div className="flex-1">
                                             {editPetId === pet._id ? (
-                                                // Form chỉnh sửa thông tin thú cưng
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div>
                                                         <Label className="text-gray-600">Tên thú cưng</Label>
@@ -283,8 +287,7 @@ export default function PetInfo() {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                // Hiển thị thông tin thú cưng
-                                                <div className="grid grid-cols-2 gap-2">
+                                                <div className="grid grid-cols-2 gap-4">
                                                     <div>
                                                         <p className="text-gray-700">Loài động vật: {pet.type === "dog" ? "Chó" : "Mèo"}</p>
                                                         <p className="text-gray-700">Giống: {pet.species}</p>
@@ -296,17 +299,19 @@ export default function PetInfo() {
                                                         <p className="text-gray-700">Cân nặng: {pet.weight} kg</p>
                                                     </div>
                                                     <div className="col-span-2">
-                                                        <p className="text-gray-700">Ngày sinh: {pet.dateOfBirth ? new Date(pet.dateOfBirth).toLocaleDateString('vi-VN') : "Không xác định"}</p>
+                                                        <p className="text-gray-700">
+                                                            Ngày sinh: {pet.dateOfBirth ? new Date(pet.dateOfBirth).toLocaleDateString('vi-VN') : "Không xác định"}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
-                                    <div className="mt-3 flex space-x-2">
+                                    <div className="mt-4 flex space-x-2">
                                         {editPetId === pet._id ? (
                                             <>
                                                 <Button
-                                                    className="bg-[#3F2E2E] text-white"
+                                                    className="bg-[#3F2E2E] text-white hover:bg-[#533b3b] transition-all"
                                                     onClick={() => handleSavePet(pet._id)}
                                                     disabled={isLoading}
                                                 >
@@ -320,15 +325,13 @@ export default function PetInfo() {
                                                 </Button>
                                             </>
                                         ) : (
-                                            <>
-                                                <Button
-                                                    className="bg-[#3F2E2E] text-white"
-                                                    onClick={() => handleEditPet(pet)}
-                                                >
-                                                    <Pencil className="mr-2 h-4 w-4" />
-                                                    Chỉnh sửa
-                                                </Button>
-                                            </>
+                                            <Button
+                                                className="bg-[#3F2E2E] text-white hover:bg-[#533b3b] transition-all"
+                                                onClick={() => handleEditPet(pet)}
+                                            >
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                Chỉnh sửa
+                                            </Button>
                                         )}
                                     </div>
                                 </div>
@@ -336,66 +339,66 @@ export default function PetInfo() {
                         </div>
                     ))
                 ) : (
-                    <p>Chưa có thú cưng nào. Hãy thêm thú cưng của bạn.</p>
+                    <p className="text-gray-600">Chưa có thú cưng nào. Hãy thêm thú cưng của bạn.</p>
                 )}
-                {/* Dialog cho upload ảnh */}
-                <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Cập nhật ảnh thú cưng</DialogTitle>
-                            <DialogDescription>
-                                Chọn ảnh từ thiết bị của bạn để cập nhật ảnh cho thú cưng
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex flex-col items-center space-y-4">
-                            {imagePreview && (
-                                <div className="w-40 h-40 overflow-hidden rounded-md">
-                                    <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                            )}
-                            <div className="flex items-center space-x-2">
-                                <Label
-                                    htmlFor="avatar-upload"
-                                    className="cursor-pointer flex items-center justify-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
-                                >
-                                    <Upload className="mr-2 h-4 w-4" />
-                                    <span>Chọn ảnh</span>
-                                </Label>
-                                <Input
-                                    id="avatar-upload"
-                                    type="file"
-                                    className="hidden"
-                                    accept="image/*"
-                                    onChange={handleFileChange} 
+            </div>
+            {/* Dialog cho upload ảnh */}
+            <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Cập nhật ảnh thú cưng</DialogTitle>
+                        <DialogDescription>
+                            Chọn ảnh từ thiết bị của bạn để cập nhật ảnh cho thú cưng
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col items-center space-y-4">
+                        {imagePreview && (
+                            <div className="w-40 h-40 overflow-hidden rounded-md">
+                                <img
+                                    src={imagePreview}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
-                            <div className="flex justify-end space-x-2 w-full">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        setUploadDialogOpen(false);
-                                        setImageFile(null);
-                                        setImagePreview(null);
-                                    }}
-                                >
-                                    Hủy
-                                </Button>
-                                <Button
-                                    onClick={handleImageUpload}
-                                    disabled={!imageFile || isLoading}
-                                    className="bg-[#3F2E2E]"
-                                >
-                                    {isLoading ? "Đang tải lên..." : "Lưu"}
-                                </Button>
-                            </div>
+                        )}
+                        <div className="flex items-center space-x-2">
+                            <Label
+                                htmlFor="avatar-upload"
+                                className="cursor-pointer flex items-center justify-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+                            >
+                                <Upload className="mr-2 h-4 w-4" />
+                                <span>Chọn ảnh</span>
+                            </Label>
+                            <Input
+                                id="avatar-upload"
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleFileChange} 
+                            />
                         </div>
-                    </DialogContent>
-                </Dialog>
-            </div>
+                        <div className="flex justify-end space-x-2 w-full">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setUploadDialogOpen(false);
+                                    setImageFile(null);
+                                    setImagePreview(null);
+                                }}
+                            >
+                                Hủy
+                            </Button>
+                            <Button
+                                onClick={handleImageUpload}
+                                disabled={!imageFile || isLoading}
+                                className="bg-[#3F2E2E]"
+                            >
+                                {isLoading ? "Đang tải lên..." : "Lưu"}
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
