@@ -91,17 +91,23 @@ export default function PetInfo() {
 
     // Lưu thông tin thú cưng
     const handleSavePet = async (petId) => {
+        // Kiểm tra các trường bắt buộc
+        if (!petFormData.name.trim() || !petFormData.type.trim() || !petFormData.species.trim()) {
+            toast.error("Vui lòng điền đầy đủ các trường bắt buộc: Tên, Loài động vật, và Giống.");
+            return;
+        }
+    
         setIsLoading(true);
         try {
             const updatedPet = {
                 name: petFormData.name,
                 type: petFormData.type,
-                gender: parseInt(petFormData.gender),
+                gender: petFormData.gender ? parseInt(petFormData.gender) : null, // Không bắt buộc
                 species: petFormData.species,
-                weight: parseFloat(petFormData.weight),
-                dateOfBirth: petFormData.dateOfBirth
+                weight: petFormData.weight ? parseFloat(petFormData.weight) : null, // Không bắt buộc
+                dateOfBirth: petFormData.dateOfBirth || null, // Không bắt buộc
             };
-
+    
             // Gọi API cập nhật thú cưng
             const response = await PetService.updatePet(petId, updatedPet);
             console.log("Sending data to backend:", petId, updatedPet);
