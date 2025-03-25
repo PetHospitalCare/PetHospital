@@ -3,6 +3,7 @@ import { UserContext } from "@/contexts/UserContext.jsx";
 import { ShoppingCartService } from "@/services/ShoppingCartService.js";
 import { useAddToCart } from "@/lib/shopping-cart-util.js";
 import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
+import { toast } from "sonner";
 
 export default function ShoppingCartPayment() {
     const [cart, setCart] = useState(null);
@@ -26,7 +27,13 @@ export default function ShoppingCartPayment() {
                 contactInfo = 'contact_infor';
             }
 
-            await ShoppingCartService.paymentShoppingCartByUserId(contactInfo, cart);
+            const response = await ShoppingCartService.paymentShoppingCartByUserId(contactInfo, cart);
+
+            if (response && response.status === 200 && response.data.paymentUrl) {
+                window.location.href = response.data.paymentUrl;
+            } else {
+                toast.error("Có lỗi xảy ra!");
+            }
         }
     }
 
