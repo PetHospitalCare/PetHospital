@@ -139,55 +139,44 @@ export default function UserProfile() {
     };
 
     return (
-        <div className="container mx-auto pt-24">
-            <div className="grid grid-cols-2 gap-4">
+        <div className="container mx-auto pt-24 px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Thông tin cá nhân */}
-                <div className="p-6 border rounded shadow-md relative bg-white">
-                    <h1 className="font-bold text-3xl mb-4">THÔNG TIN CÁ NHÂN</h1>
-                    <hr />
+                <div className="p-6 border rounded-lg shadow-lg bg-white">
+                    <h1 className="font-bold text-3xl mb-6 text-gray-800">Thông Tin Cá Nhân</h1>
+                    <hr className="mb-4" />
                     {user ? (
                         <>
-                            <div className="flex mt-3 gap-4">
-                                <div className="w-32 h-32 bg-gray-200 rounded-md flex items-center justify-center relative group">
+                            <div className="flex items-center gap-6 mb-6">
+                                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center relative group overflow-hidden shadow-md">
                                     <img
                                         src={user?.url ? user.url : "/profile.png"}
                                         alt="Avatar"
-                                        className="w-full h-full object-cover rounded-md"
+                                        className="w-full h-full object-cover"
                                     />
-                                    {/* Overlay with pencil icon on hover */}
-                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 rounded-md flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
                                         <Button
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-black hover:bg-gray-200"
+                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-black hover:bg-gray-200 rounded-full p-2"
                                             onClick={() => setUploadDialogOpen(true)}
                                         >
                                             <Pencil size={20} />
                                         </Button>
                                     </div>
                                 </div>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col w-full">
                                     <input
                                         type="text"
                                         name="username"
                                         value={formData.username}
                                         onChange={handleChange}
-                                        className="border-b-2 font-bold border-gray-400 focus:outline-none focus:border-blue-500  text-2xl w-full"
+                                        className="border-b-2 font-bold border-gray-400 focus:outline-none focus:border-gray-300 text-2xl w-full"
+                                        placeholder="Tên người dùng"
                                     />
                                 </div>
                             </div>
 
-                            <div className="mt-4">
-                                <Label className="text-gray-600 text-lg">Số điện thoại</Label>
-                                <input
-                                    type="text"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
-                                />
-                            </div>
-                            <hr />
-                            <div className="flex justify-between">
-                                <div className="mt-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
                                     <Label className="text-gray-600 text-lg">Ngày sinh</Label>
                                     <input
                                         type="date"
@@ -197,9 +186,9 @@ export default function UserProfile() {
                                         className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
                                     />
                                 </div>
-
-                                <div className="mt-3 flex items-center">
-                                    <div className="ml-4 flex items-center space-x-4">
+                                <div>
+                                    <Label className="text-gray-600 text-lg">Giới tính</Label>
+                                    <div className="flex items-center space-x-4 mt-2">
                                         <Label className="flex items-center space-x-2">
                                             <Input
                                                 type="radio"
@@ -224,7 +213,18 @@ export default function UserProfile() {
                                 </div>
                             </div>
 
-                            <div className="mt-3">
+                            <div className="mt-4">
+                                <Label className="text-gray-600 text-lg">Số điện thoại</Label>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
+                                    placeholder="Nhập số điện thoại"
+                                />
+                            </div>
+                            <div className="mt-4">
                                 <Label className="text-gray-600 text-lg">Email</Label>
                                 <input
                                     type="text"
@@ -235,8 +235,7 @@ export default function UserProfile() {
                                     disabled
                                 />
                             </div>
-
-                            <div className="mt-3">
+                            <div className="mt-4">
                                 <Label className="text-gray-600 text-lg">Địa chỉ</Label>
                                 <input
                                     type="text"
@@ -244,12 +243,13 @@ export default function UserProfile() {
                                     value={formData.address}
                                     onChange={handleChange}
                                     className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
+                                    placeholder="Nhập địa chỉ"
                                 />
                             </div>
 
-                            <div className="mt-5 text-right">
+                            <div className="mt-6 text-right">
                                 <Button
-                                    className="rounded p-3 text-base bg-[#533b3b]"
+                                    className="rounded p-3 text-base bg-[#3F2E2E] text-white bg-[#3F2E2E] transition-all"
                                     onClick={handleSave}
                                     disabled={isLoading}
                                 >
@@ -272,7 +272,7 @@ export default function UserProfile() {
                             </DialogHeader>
                             <div className="flex flex-col items-center space-y-4">
                                 {imagePreview && (
-                                    <div className="w-40 h-40 overflow-hidden rounded-md">
+                                    <div className="w-40 h-40 overflow-hidden rounded-md shadow-md">
                                         <img
                                             src={imagePreview}
                                             alt="Preview"
@@ -310,7 +310,7 @@ export default function UserProfile() {
                                     <Button
                                         onClick={handleImageUpload}
                                         disabled={!imageFile || isLoading}
-                                        className="bg-[#3F2E2E]"
+                                        className="bg-[#3F2E2E] text-white hover:bg-[#3F2E2E] transition-all"
                                     >
                                         {isLoading ? "Đang tải lên..." : "Lưu"}
                                     </Button>
@@ -320,8 +320,8 @@ export default function UserProfile() {
                     </Dialog>
                 </div>
                 {/* Thông tin thú cưng */}
-                <PetInfo/>
-            </div >
-        </div >
+                <PetInfo />
+            </div>
+        </div>
     );
 }
