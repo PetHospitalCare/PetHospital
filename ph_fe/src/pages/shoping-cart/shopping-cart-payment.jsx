@@ -1,24 +1,32 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/contexts/UserContext.jsx";
 import { ShoppingCartService } from "@/services/ShoppingCartService.js";
+import { useAddToCart } from "@/lib/shopping-cart-util.js";
+import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
 
 export default function ShoppingCartPayment() {
     const [cart, setCart] = useState(null);
     const { user } = useContext(UserContext);
+    const addToCart = useAddToCart();
+    const { cartCount, setDataCartContext } = useContext(ShoppingCartContext);
 
     useEffect(() => {
         makeData()
-    }, []);
+    }, [user, cartCount]);
 
 
     const handlePayment = async () => {
         event.preventDefault();
-        // console.log(11212)
-        if (user && user._id && cart) {
-            await ShoppingCartService.paymentShoppingCartByUserId(user._id, cart);
-            // console.log('response: ', response)
-        } else {
-            await ShoppingCartService.paymentShoppingCartByUserId('contact_infor', cart);
+        if (cart) {
+            let contactInfo;
+
+            if (user && user._id) {
+                contactInfo = user._id;
+            } else {
+                contactInfo = 'contact_infor';
+            }
+
+            await ShoppingCartService.paymentShoppingCartByUserId(contactInfo, cart);
         }
     }
 
@@ -27,7 +35,19 @@ export default function ShoppingCartPayment() {
 
         if (cartLocal) {
             setCart(JSON.parse(cartLocal));
+        } else {
+            setCart(null);
         }
+    }
+
+    const addToCardFunction = (product, order) => {
+        addToCart({
+            productId: product.productId,
+            quantity: 1,
+            price: product.price,
+            imageUrl: product.imageUrl,
+            name: product.name
+        }, setDataCartContext, order);
     }
 
     return (
@@ -45,17 +65,6 @@ export default function ShoppingCartPayment() {
                         <input type="email" placeholder="Địa chỉ email"
                             className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500"
                             disabled value={user && user.email} />
-                        <input type="text" placeholder="Tên thẻ"
-                            className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
-                        <input type="text" placeholder="Số thẻ"
-                            className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
-
-                        <div className="flex gap-4">
-                            <input type="text" placeholder="Thời gian hiệu lực (MM/YY)"
-                                className="w-1/2 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
-                            <input type="text" placeholder="CVC"
-                                className="w-1/2 border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" />
-                        </div>
 
                         <input type="text" placeholder="Địa chỉ"
                             className="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500"
@@ -97,9 +106,13 @@ export default function ShoppingCartPayment() {
                                         <p className="text-sm">Số lượng: {item.quantity}</p>
                                     </div>
                                     <div className="text-right text-sm text-gray-500">
-                                        <a className="text-blue-500">Chỉnh sửa</a> | <a
-                                            className="text-red-500">Loại
-                                            bỏ</a>
+                                        <a className="text-blue-500 cursor-pointer">Chỉnh sửa</a> | <a
+                                            onClick={() => addToCardFunction(item, 'delete')}
+                                            className="text-red-500 cursor-pointer"
+                                        >
+                                            Loại bỏ
+                                        </a>
+
                                     </div>
                                 </div>
                             )))}
