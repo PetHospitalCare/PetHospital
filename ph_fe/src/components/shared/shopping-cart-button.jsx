@@ -26,7 +26,7 @@ export default function ShoppingCartButton() {
             if (response.data.success) {
 
                 if (response.data?.shoppingCart?.items) {
-                    setShoppingCartCount(response.data?.shoppingCart?.items.reduce((acc, item) => acc + item.quantity, 0));
+                    setShoppingCartCount(response.data?.shoppingCart?.items?.length || 0);
                 } else {
                     setShoppingCartCount(0);
                 }

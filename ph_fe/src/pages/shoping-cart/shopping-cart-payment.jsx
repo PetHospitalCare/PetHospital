@@ -10,10 +10,11 @@ export default function ShoppingCartPayment() {
     const { user } = useContext(UserContext);
     const addToCart = useAddToCart();
     const { cartCount, setDataCartContext } = useContext(ShoppingCartContext);
+    const { isChangeCard, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
 
     useEffect(() => {
         makeData()
-    }, [user, cartCount]);
+    }, [user, cartCount, isChangeCard]);
 
 
     const handlePayment = async () => {
@@ -54,7 +55,7 @@ export default function ShoppingCartPayment() {
             price: product.price,
             imageUrl: product.imageUrl,
             name: product.name
-        }, setDataCartContext, order);
+        }, setDataCartContext, setDataIsChangeCartContext, order, true);
     }
 
     return (

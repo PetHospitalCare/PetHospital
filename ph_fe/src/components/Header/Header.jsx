@@ -3,6 +3,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import {Link} from "react-router-dom"
 import {useEffect, useState, useContext, useRef} from "react";
+import ShoppingCartButton from "@/components/shared/shopping-cart-button.jsx";
 import {
     Dialog,
     DialogPanel,
@@ -228,7 +229,7 @@ export default function Header() {
                         Contact
                     </Link>
                 </PopoverGroup>
-                <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-end border:">
+                <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-center border:">
                     {user ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)
                         :
                         <Link 
@@ -239,7 +240,7 @@ export default function Header() {
                         </Link>
                         }
                 </div>
-
+                <ShoppingCartButton/>
             </nav>
             <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
                 <div className="fixed inset-0 z-10" />

@@ -1,25 +1,34 @@
 import { useUserId } from "@/lib/common-util.js";
 import { ShoppingCartService } from "@/services/ShoppingCartService.js";
+import { toast } from "sonner";
+
+let isShowToast = true;
 
 export function useAddToCart() {
     const userId = useUserId();
 
-    return (productInput, contextFunction, order) => {
+    return (productInput, contextFunction, contextFunction2, order, isShowToastInput) => {
         // add, subtract, delete, replace
+
+        if (isShowToastInput !== undefined && isShowToastInput !== null && !isShowToastInput) {
+            isShowToast = false;
+        } else {
+            isShowToast = true;
+        }
 
         const tempUserId = userId || null;
 
         if (tempUserId) {
             // console.log("Adding to cart:", productInput, "User ID:", tempUserId);
-            callAPIUpdateCart(tempUserId, productInput, contextFunction, order);
+            callAPIUpdateCart(tempUserId, productInput, contextFunction, contextFunction2, order);
             // call api insert to cart and get response
         } else {
-            updateLocalStorageShoppingCart(productInput, order, contextFunction);
+            updateLocalStorageShoppingCart(productInput, order, contextFunction, contextFunction2);
         }
     };
 }
 
-async function callAPIUpdateCart(userIdInput, productInput, contextFunction, order) {
+async function callAPIUpdateCart(userIdInput, productInput, contextFunction, contextFunction2, order) {
     const data = {
         product: productInput,
         order: order || ''
@@ -27,16 +36,24 @@ async function callAPIUpdateCart(userIdInput, productInput, contextFunction, ord
 
     const response = await ShoppingCartService.updateShoppingCartByUserId(userIdInput, data);
 
-    updateLocalStorageShoppingCart(response.data.savedShoppingCart, 'replace', null);
+    updateLocalStorageShoppingCart(response.data.savedShoppingCart, 'replace', null, null);
 
     if (contextFunction && response?.data?.savedShoppingCart?.items?.length > 0) {
-        contextFunction(response.data.savedShoppingCart.items.reduce((acc, item) => acc + (item.quantity || 0), 0));
+        contextFunction(response.data.savedShoppingCart.items?.length || 0);
+
+        if (order === 'add' && isShowToast) {
+            toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
+        }
     } else if (contextFunction) {
         contextFunction(0);
     }
+
+    if (contextFunction2 !== undefined && contextFunction2 !== null) {
+        contextFunction2();
+    }
 }
 
-function updateLocalStorageShoppingCart(productInput, order, contextFunction) {
+function updateLocalStorageShoppingCart(productInput, order, contextFunction, contextFunction2) {
     let localStorageShoppingCart = localStorage.getItem("cart") || null;
 
     if (order === 'add' || order === 'subtract') {
@@ -54,6 +71,10 @@ function updateLocalStorageShoppingCart(productInput, order, contextFunction) {
                 } else {
                     // Nếu chưa có, thêm sản phẩm mới
                     localStorageShoppingCart.items.push(productInput);
+                }
+
+                if (isShowToast) {
+                    toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
                 }
             } else if (order === 'subtract') {
                 if (existingItem) {
@@ -107,17 +128,21 @@ function updateLocalStorageShoppingCart(productInput, order, contextFunction) {
         }
     }
 
+    if (localStorageShoppingCart && localStorageShoppingCart?.items?.length > 0) {
+        localStorage.setItem("cart", JSON.stringify(localStorageShoppingCart));
+    } else {
+        localStorage.removeItem("cart");
+    }
+
     if (contextFunction !== undefined && contextFunction !== null) {
         if (localStorageShoppingCart && localStorageShoppingCart?.items?.length > 0) {
-            contextFunction(localStorageShoppingCart.items.reduce((acc, item) => acc + (item.quantity || 0), 0));
+            contextFunction(localStorageShoppingCart?.items?.length || 0);
         } else {
             contextFunction(0);
         }
     }
 
-    if (localStorageShoppingCart && localStorageShoppingCart?.items?.length > 0) {
-        localStorage.setItem("cart", JSON.stringify(localStorageShoppingCart));
-    } else {
-        localStorage.removeItem("cart");
+    if (contextFunction2 !== undefined && contextFunction2 !== null) {
+        contextFunction2();
     }
 }
