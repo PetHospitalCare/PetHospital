@@ -15,7 +15,8 @@ const paymentSchema = new mongoose.Schema(
         items: [cartItemSchema],
         totalPrice: { type: Number, default: 0 },
         shipFee: { type: Number, default: 20000 },
-        address: { type: String }
+        address: { type: String },
+        status: { type: Number, default: 0 },
     },
     { timestamps: true }
 );
