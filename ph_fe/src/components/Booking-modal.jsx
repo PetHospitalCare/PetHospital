@@ -72,8 +72,7 @@ export default function BookingDialog({ open, onClose }) {
                 account_id: user?._id || "",
             }));
         }
-        console.log(user);
-    }, [user]);
+    }, [user, open]);
 
     useEffect(() => {
         if (pet.length > 0) {

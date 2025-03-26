@@ -267,12 +267,16 @@ export default function BookingStatus({ status, setCount }) {
                     onChange={(e) => table.getColumn("guest_name")?.setFilterValue(e.target.value)}
                     className="max-w-sm"
                 />
-                <div className="text-center ml-auto">
-                    <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white" >
-                        Thêm lịch mới
-                    </Button>
-                    <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
-                </div>
+                {status === "pending" && (
+                    <>
+                        <div className="text-center ml-auto">
+                            <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white" >
+                                Thêm lịch mới
+                            </Button>
+                            <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
+                        </div>
+                    </>
+                )}
             </div>
 
             <div className="rounded-md border">
