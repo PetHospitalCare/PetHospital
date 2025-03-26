@@ -53,8 +53,7 @@ const paymentVNPay = async (req, res) => {
             loggerFn: ignoreLogger,
         });
 
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        const now = new Date();
 
         const paymentUrl = vnpay.buildPaymentUrl({
             vnp_Amount: savedPayment.totalPrice + savedPayment.shipFee,
@@ -64,8 +63,8 @@ const paymentVNPay = async (req, res) => {
             vnp_OrderType: ProductCode.Other,
             vnp_ReturnUrl: 'http://localhost:5173/payment-result',
             vnp_Locale: VnpLocale.VN,
-            vnp_CreateDate: dateFormat(new Date()),
-            vnp_ExpireDate: dateFormat(tomorrow),
+            vnp_CreateDate: dateFormat(now),
+            vnp_ExpireDate:  dateFormat(new Date(now.getTime() + 15 * 60 * 1000))
         })
 
         if (shoppingCart) {
