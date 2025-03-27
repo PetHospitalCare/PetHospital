@@ -13,8 +13,6 @@ const getShoppingCartByUserId = async (req, res) => {
     try {
         const { userId } = req.params;
         const shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
-
-
         return res.status(200).json({
             success: true,
             message: 'Lấy dữ liệu giỏ hàng thành công',

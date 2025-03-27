@@ -10,11 +10,12 @@ export default function ShoppingCartDetail() {
     const [cart, setCart] = useState(null);
     const addToCart = useAddToCart();
     const { cartCount, setDataCartContext } = useContext(ShoppingCartContext);
+    const { isChangeCard, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         makeData();
-    }, [user, cartCount]);
+    }, [user, cartCount, isChangeCard]);
 
     // const makeData = () => {
     //     // if userId => setCard by user
@@ -52,7 +53,7 @@ export default function ShoppingCartDetail() {
             price: product.price,
             imageUrl: product.imageUrl,
             name: product.name
-        }, setDataCartContext, order);
+        }, setDataCartContext, setDataIsChangeCartContext, order, false);
     }
 
     const goToPayment = () => {

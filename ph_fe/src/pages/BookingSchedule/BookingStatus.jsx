@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import axios from "axios";
 import { Pen, Trash2, CalendarCheck } from "lucide-react";
+
 import {
     flexRender,
     getCoreRowModel,
@@ -29,7 +30,10 @@ import { UserService } from "@/services/UserService";
 import { toast } from "sonner";
 import EditBookingDialog from "./EditBookingSchedule"
 import BookingDialog from "@/components/Booking-modal";
+import { set } from "date-fns";
+import { MeidicalServices } from "@/services/MedicalService";
 export default function BookingStatus({ status, setCount }) {
+    const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
     const [sorting, setSorting] = useState([]);
@@ -42,6 +46,7 @@ export default function BookingStatus({ status, setCount }) {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [open, setOpen] = useState(false);
     const [doctor, setDoctor] = useState([]);
+    const [medicalRecord, setMedicalRecord] = useState([]);
     const statusMapping = {
         pending: { label: "Chờ xác nhận", color: "bg-yellow-500 text-white" },
         confirm: { label: "Chờ khám", color: "bg-blue-500 text-white" },
@@ -50,12 +55,25 @@ export default function BookingStatus({ status, setCount }) {
     };
     const fetchBookings = async () => {
         try {
-            const response = await BookingServices.GetAllBooking();
-            const pending = response?.data?.filter(booking => booking.status === status)
-            setData(pending);
-            if (status === "pending") {
-                setCount(pending.length);
+            if (status === "complete") {
+                const response = await MeidicalServices.getAllMedicalRecords();
+                const complete = response?.data?.data?.filter(record => record.booking_id?.status === status);
+                const bookings = complete.map(record => record.booking_id);
+                console.log(bookings)
+                setMedicalRecord(complete);
+                setData(bookings);
+                if (status === "pending") {
+                    setCount(complete.length);
+                }
+            } else {
+                const response = await BookingServices.GetAllBooking();
+                const pending = response?.data?.filter(booking => booking.status === status)
+                setData(pending);
+                if (status === "pending") {
+                    setCount(pending.length);
+                }
             }
+
 
 
         } catch (error) {
@@ -69,7 +87,7 @@ export default function BookingStatus({ status, setCount }) {
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu services:", error);
         }
-    }
+    };
     const getAllDoctor = async () => {
         try {
             const respon = await UserService.getAllDoctor();
@@ -79,9 +97,22 @@ export default function BookingStatus({ status, setCount }) {
         }
     };
     useEffect(() => {
-        fetchBookings();
-        getAllService();
-        getAllDoctor();
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                await Promise.all([
+                    fetchBookings(),
+                    getAllService(),
+                    getAllDoctor(),
+                ]);
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
     }, [status]);
     useEffect(() => {
         socket.on("newBooking", (newBooking) => {
@@ -147,11 +178,31 @@ export default function BookingStatus({ status, setCount }) {
             cell: ({ row }) => {
                 const serviceId = row.original.service_id;
                 const subServiceId = row.original.sub_service_id;
-                return (
-                    <div className="">
-                        {getSubServiceName(serviceId, subServiceId)}
-                    </div>
-                );
+                if (status === "complete") {
+                    // Find the medical record for this booking
+                    const record = medicalRecord.find(
+                        record => record.booking_id._id === row.original._id
+                    );
+
+                    if (record && record.services) {
+                        return (
+                            <div className="space-y-1">
+                                {record.services.map((service, index) => (
+                                    <div key={index} className="text-sm">
+                                        {getSubServiceName(service.service_id, service.sub_service_id)}
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    }
+                    return <div className="text-muted-foreground">Không có dịch vụ</div>;
+                } else {
+                    return (
+                        <div className="">
+                            {getSubServiceName(serviceId, subServiceId)}
+                        </div>
+                    );
+                }
             },
         },
         {
@@ -181,6 +232,24 @@ export default function BookingStatus({ status, setCount }) {
                 </div>
 
         },
+        ...(status === "complete"
+            ? [
+                {
+                    accessorKey: "paid",
+                    header: "Thanh toán",
+                    cell: ({ row }) => (
+                        <div className="font-medium"></div>
+                    )
+                },
+                {
+                    accessorKey: "price",
+                    header: "Tổng số tiền",
+                    cell: ({ row }) => (
+                        <div className="font-medium"></div>
+                    )
+                },
+            ]
+            : []),
         {
             id: "actions",
             header: "Hành động",
@@ -212,7 +281,7 @@ export default function BookingStatus({ status, setCount }) {
                             />
                         </button>
                     }
-                    {status !== "cancel" && (
+                    {status !== "cancel" && status !== "complete" && (
                         <>
                             <button>
                                 <Pen className="size-6 p-1 mr-1 " onClick={() => {
@@ -230,7 +299,6 @@ export default function BookingStatus({ status, setCount }) {
             ),
         },
     ];
-
     const table = useReactTable({
         data,
         columns,
@@ -267,16 +335,21 @@ export default function BookingStatus({ status, setCount }) {
                     onChange={(e) => table.getColumn("guest_name")?.setFilterValue(e.target.value)}
                     className="max-w-sm"
                 />
-                <div className="text-center ml-auto">
-                    <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white" >
-                        Thêm lịch mới
-                    </Button>
-                    <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
-                </div>
+                {status === "pending" && (
+                    <>
+                        <div className="text-center ml-auto">
+                            <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white" >
+                                Thêm lịch mới
+                            </Button>
+                            <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
+                        </div>
+                    </>
+                )}
             </div>
 
             <div className="rounded-md border">
                 <Table>
+
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -289,7 +362,18 @@ export default function BookingStatus({ status, setCount }) {
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows.length ? (
+                        {isLoading ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <div className="flex items-center justify-center h-[400px]">
+                                        <div className="text-center space-y-2">
+                                            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+                                            <p className="text-sm text-muted-foreground">Đang tải dữ liệu...</p>
+                                        </div>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
@@ -302,7 +386,7 @@ export default function BookingStatus({ status, setCount }) {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="text-center">
-                                    Không có lịch đặt.
+                                    Không có dữ liệu.
                                 </TableCell>
                             </TableRow>
                         )}

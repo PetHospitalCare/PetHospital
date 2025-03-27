@@ -182,5 +182,19 @@ const updateMedicalRecord = async (req, res) => {
         res.status(500).json({ error: "Failed to update medical record", details: err.message });
     }
 };
+const getAllMedicalRecords = async (req, res) => {
+    try {
+        const medicalRecords = await MedicalRecord.find().populate({
+            path: 'booking_id',
+            populate: [
 
-module.exports = { getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord };
+                { path: 'doctor_id' }
+            ]
+        }).select(`booking_id _id createdAt updatedAt services note `);
+        res.status(200).json({ success: true, data: medicalRecords });
+    } catch (err) {
+        console.error("Error in getAllMedicalRecords:", err);
+    }
+}
+
+module.exports = { getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord, getAllMedicalRecords };
