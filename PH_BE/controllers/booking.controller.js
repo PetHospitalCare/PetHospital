@@ -211,7 +211,7 @@ const receivehook = async (req, res) => {
                 new: true, // Trả về document sau khi update
             }
         )
-        if (!updatedBooking) {
+        if (!updatedBooking ) {
             console.log("Booking not found for orderCode:", orderCode);
 
         }
