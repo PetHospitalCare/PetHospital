@@ -14,8 +14,22 @@ import "yet-another-react-lightbox/plugins/thumbnails.css"
 import { jsPDF } from "jspdf"
 import { format } from "date-fns"
 import { font } from "./font"
-export function ImagingForm({ formData, onChange, subService, petInfo }) {
-  const [images, setImages] = useState(formData.images || []);
+import { cn } from "@/lib/utils";
+export function ImagingForm({ formData, onChange, subService, petInfo, isReadOnly }) {
+  const [images, setImages] = useState(() => {
+    if (formData.images && Array.isArray(formData.images)) {
+      // Filter out empty objects and map valid images
+      return formData.images
+        .filter(image => image && (image.url || image.file))
+        .map(image => ({
+          url: image.url || (image.file ? URL.createObjectURL(image.file) : ''),
+          name: image.name || 'Image',
+          publicId: image.publicId || null,
+          file: image instanceof File ? image : null
+        }));
+    }
+    return [];
+  });
   const [index, setIndex] = useState(-1);
   const [pdfUrl, setPdfUrl] = useState(null);
   const handleImageUpload = (e) => {
@@ -60,11 +74,14 @@ export function ImagingForm({ formData, onChange, subService, petInfo }) {
   useEffect(() => {
     return () => {
       images.forEach(image => {
-        if (image.url) URL.revokeObjectURL(image.url);
+        if (image.url && image.file) {
+          URL.revokeObjectURL(image.url);
+        }
       });
     };
-  }, []);
 
+  }, []);
+  console.log(images)
   const loadImage = (url) => {
     return new Promise((resolve, reject) => {
       const img = new Image()
@@ -315,13 +332,25 @@ export function ImagingForm({ formData, onChange, subService, petInfo }) {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label>Hình ảnh chụp X-quang/siêu âm</Label>
-          <Input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="cursor-pointer"
-          />
+          <div className={cn(
+            "relative",
+            isReadOnly && "opacity-50 cursor-not-allowed"
+          )}>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className={cn(
+                "cursor-pointer",
+                isReadOnly && "pointer-events-none"
+              )}
+              disabled={isReadOnly}
+            />
+            {isReadOnly && (
+              <div className="absolute inset-0" />
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">
             Định dạng: JPG, PNG. Tối đa 5MB mỗi ảnh
           </p>
@@ -339,17 +368,20 @@ export function ImagingForm({ formData, onChange, subService, petInfo }) {
                     alt={image.name}
                     className="object-cover w-full h-full transition-transform group-hover:scale-105"
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white/80 hover:bg-red-500 hover:text-white transition-all"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveImage(idx);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+                  {!isReadOnly && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white/80 hover:bg-red-500 hover:text-white transition-all"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveImage(idx);
+                      }}
+
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
@@ -363,6 +395,7 @@ export function ImagingForm({ formData, onChange, subService, petInfo }) {
             value={formData.description || ""}
             onChange={(e) => onChange("description", e.target.value)}
             rows={4}
+            disabled={isReadOnly}
           />
         </div>
 
@@ -371,6 +404,7 @@ export function ImagingForm({ formData, onChange, subService, petInfo }) {
           <Textarea
             id="results"
             value={formData.results || ""}
+            disabled={isReadOnly}
             onChange={(e) => onChange("results", e.target.value)}
           />
         </div>

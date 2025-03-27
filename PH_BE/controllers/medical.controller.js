@@ -22,8 +22,8 @@ const getMedicalbyBookingId = async (req, res) => {
 const createMedicalRecord = async (req, res) => {
     try {
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { booking_id, services, diagnosis, result, prescription, note, symptom } = medicalData;
-        await Booking.findOneAndUpdate({ _id: booking_id }, { status: "complete" });
+        const { booking_id, services, diagnosis, result, prescription, note, symptom, totalPrice } = medicalData;
+        await Booking.findOneAndUpdate({ _id: booking_id }, { status: "complete", price: totalPrice });
         // Handle uploaded files
         const files = req.files;
         const fileServices = Array.isArray(req.body.fileServices)
@@ -90,18 +90,11 @@ const updateMedicalRecord = async (req, res) => {
     try {
         const { id } = req.params;
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { services, diagnosis, result, prescription, note, symptom } = medicalData;
-
+        const { booking_id, services, diagnosis, result, prescription, note, symptom, totalPrice } = medicalData;
+        await Booking.findOneAndUpdate({ _id: booking_id }, { price: totalPrice });
         const medicalRecord = await MedicalRecord.findOne({ booking_id: id });
         if (!medicalRecord) {
             return res.status(404).json({ error: "Medical record not found" });
-        }
-        if (prescription) {
-            prescription.forEach(item => {
-                if (!item.medicine || !item.quantity) {
-                    throw new Error('Thiếu thông tin thuốc hoặc số lượng');
-                }
-            });
         }
 
         // Handle uploaded files

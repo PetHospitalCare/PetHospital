@@ -14,12 +14,30 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { MedicineService } from "@/services/MedicineService"
 
-export function ConclusionForm({ conclusion, onChange }) {
+export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePriceChange }) {
   const [medicines, setMedicines] = useState([])
   const [loading, setLoading] = useState(false)
+  const [totalMedicinePrice, setTotalMedicinePrice] = useState(0) // Add this state
 
+  // Add calculateTotalPrice function
+  const calculateTotalPrice = (prescriptions) => {
+    if (!prescriptions || !medicines.length) return 0;
+
+    const total = prescriptions.reduce((sum, item) => {
+      const medicine = medicines.find(m => m._id === item.medicine_id);
+      const quantity = parseInt(item.quantity) || 0;
+      const price = medicine?.price || 0;
+      return sum + (price * quantity);
+    }, 0);
+
+    setTotalMedicinePrice(total);
+    onMedicinePriceChange(total);
+    return total;
+  };
   useEffect(() => {
-    loadMedicines()
+    if (medicines.length === 0) {
+      loadMedicines();
+    }
     console.log("Form edit:", conclusion)
   }, [])
 
@@ -38,24 +56,26 @@ export function ConclusionForm({ conclusion, onChange }) {
   }
   // Add new useEffect to format existing prescription data
   useEffect(() => {
-    console.log("Existing prescriptions:", conclusion)
-    if (conclusion?.prescription?.length > 0 && medicines.length > 0) {
-      const formattedPrescriptions = conclusion.prescription.map(item => {
-        console.log("item:", item)
-        const medicineDetails = medicines.find(m => m._id === item.medicine?._id || item.medicine)
-        console.log("medicineDetails:", medicineDetails)
-        return {
-          medicine_id: item.medicine?._id,
-          medicine: item.medicine?.name,
-          quantity: item.quantity || "",
-          instructions: item.instructions || "",
-          unit: item.medicine?.unit || ""
-        }
-      })
-      console.log("Formatted prescriptions:", formattedPrescriptions)
-      onChange("prescription", formattedPrescriptions)
+    if (!conclusion?.prescription || medicines.length === 0) return;
+
+    const formattedPrescriptions = conclusion.prescription.map(item => {
+      const medicineDetails = medicines.find(m => m._id === (item.medicine_id || item.medicine?._id));
+      return {
+        medicine_id: medicineDetails?._id || item.medicine_id,
+        medicine: medicineDetails?.name || item.medicine,
+        quantity: item.quantity || "",
+        instructions: item.instructions || "",
+        unit: medicineDetails?.unit || item.unit || ""
+      };
+    });
+
+    onChange("prescription", formattedPrescriptions);
+  }, [medicines]);
+  useEffect(() => {
+    if (medicines.length > 0 && conclusion?.prescription) {
+      calculateTotalPrice(conclusion.prescription);
     }
-  }, [medicines])
+  }, [medicines]);
 
   const handleAddPrescription = () => {
     const newPrescription = {
@@ -81,6 +101,7 @@ export function ConclusionForm({ conclusion, onChange }) {
       instructions: ""
     }
     onChange("prescription", updatedPrescriptions)
+    calculateTotalPrice(updatedPrescriptions);
   }
 
   const handleRemovePrescription = (index) => {
@@ -94,6 +115,7 @@ export function ConclusionForm({ conclusion, onChange }) {
       [field]: value
     }
     onChange("prescription", updatedPrescriptions)
+    calculateTotalPrice(updatedPrescriptions); // Add this line
   }
 
   return (
@@ -103,30 +125,36 @@ export function ConclusionForm({ conclusion, onChange }) {
       </CardHeader>
 
       <CardContent className="space-y-4">
+
         <div className="flex justify-between items-center">
           <Label className="text-base font-medium">Danh sách thuốc</Label>
-          <Button onClick={handleAddPrescription} size="sm" variant="outline">
-            <Plus className="w-4 h-4 mr-2" />
-            Thêm thuốc
-          </Button>
+          {!isReadOnly && (
+            <Button onClick={handleAddPrescription} size="sm" variant="outline" >
+              <Plus className="w-4 h-4 mr-2" />
+              Thêm thuốc
+            </Button>
+          )}
         </div>
 
         {(conclusion.prescription || []).map((item, index) => (
           <div key={index} className="grid grid-cols-12 gap-4 p-4 border rounded-lg relative">
-            <Button
-              onClick={() => handleRemovePrescription(index)}
-              variant="ghost"
-              size="icon"
-              className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            {!isReadOnly && (
+              <Button
+                onClick={() => handleRemovePrescription(index)}
+                variant="ghost"
+                size="icon"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
 
             <div className="col-span-6">
               <Label>Tên thuốc</Label>
               <Select
                 value={item.medicine_id}
                 onValueChange={(value) => handleSelectMedicine(index, value)}
+                disabled={isReadOnly}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Chọn thuốc...">
@@ -162,6 +190,7 @@ export function ConclusionForm({ conclusion, onChange }) {
                 value={item.quantity}
                 onChange={(e) => handleUpdatePrescription(index, "quantity", e.target.value)}
                 placeholder="VD: 10"
+                disabled={isReadOnly}
               />
             </div>
             {/* <div className="col-span-3">
@@ -188,6 +217,7 @@ export function ConclusionForm({ conclusion, onChange }) {
                 value={item.instructions}
                 onChange={(e) => handleUpdatePrescription(index, "instructions", e.target.value)}
                 placeholder="VD: Uống sau ăn"
+                disabled={isReadOnly}
               />
             </div>
 
