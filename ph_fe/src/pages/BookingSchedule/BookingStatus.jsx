@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import {
     Table,
     TableBody,
@@ -10,7 +11,8 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import axios from "axios";
-import { Pen, Trash2, CalendarCheck } from "lucide-react";
+import { Pen, Trash2, CalendarCheck, FileText, Wallet } from "lucide-react";
+
 import {
     flexRender,
     getCoreRowModel,
@@ -29,7 +31,13 @@ import { UserService } from "@/services/UserService";
 import { toast } from "sonner";
 import EditBookingDialog from "./EditBookingSchedule"
 import BookingDialog from "@/components/Booking-modal";
+import MedicalExaminationDialog from "../MedicalExamination/Medicalexamination";
+import PaymentDialog from "./payment.jsx";
+import { MeidicalServices } from "@/services/MedicalService";
 export default function BookingStatus({ status, setCount }) {
+    const [isLoading, setIsLoading] = useState(true);
+    const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
     const [sorting, setSorting] = useState([]);
@@ -42,20 +50,40 @@ export default function BookingStatus({ status, setCount }) {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [open, setOpen] = useState(false);
     const [doctor, setDoctor] = useState([]);
+    const [medicalRecord, setMedicalRecord] = useState([]);
+    const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+    const [selectedPaymentBooking, setSelectedPaymentBooking] = useState(null);
+
     const statusMapping = {
         pending: { label: "Chờ xác nhận", color: "bg-yellow-500 text-white" },
         confirm: { label: "Chờ khám", color: "bg-blue-500 text-white" },
         complete: { label: "Đã khám", color: "bg-green-500 text-white" },
         cancel: { label: "Đã hủy", color: "bg-red-500 text-white" },
     };
+    const handlePaymentClick = (booking) => {
+        setSelectedPaymentBooking(booking);
+        setIsPaymentDialogOpen(true);
+    };
     const fetchBookings = async () => {
         try {
-            const response = await BookingServices.GetAllBooking();
-            const pending = response?.data?.filter(booking => booking.status === status)
-            setData(pending);
-            if (status === "pending") {
-                setCount(pending.length);
+            if (status === "complete") {
+                const response = await MeidicalServices.getAllMedicalRecords();
+                const complete = response?.data?.data?.filter(record => record.booking_id?.status === status);
+                const bookings = complete.map(record => record.booking_id);
+                setMedicalRecord(complete);
+                setData(bookings);
+                if (status === "pending") {
+                    setCount(complete.length);
+                }
+            } else {
+                const response = await BookingServices.getAllBookingByStatus(status);
+                //const pending = response?.data?.filter(booking => booking.status === status)
+                setData(response?.data);
+                if (status === "pending") {
+                    setCount(response?.data.length);
+                }
             }
+
 
 
         } catch (error) {
@@ -69,7 +97,7 @@ export default function BookingStatus({ status, setCount }) {
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu services:", error);
         }
-    }
+    };
     const getAllDoctor = async () => {
         try {
             const respon = await UserService.getAllDoctor();
@@ -79,9 +107,22 @@ export default function BookingStatus({ status, setCount }) {
         }
     };
     useEffect(() => {
-        fetchBookings();
-        getAllService();
-        getAllDoctor();
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                await Promise.all([
+                    fetchBookings(),
+                    getAllService(),
+                    getAllDoctor(),
+                ]);
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
     }, [status]);
     useEffect(() => {
         socket.on("newBooking", (newBooking) => {
@@ -97,15 +138,16 @@ export default function BookingStatus({ status, setCount }) {
     }, []);
 
     const handleDelete = async (id) => {
-        if (window.confirm("Bạn có chắc chắn muốn xóa booking này?")) {
-            try {
-                await axios.delete(`http://localhost:5000/bookings/${id}`);
-                setData((prevData) => prevData.filter((booking) => booking._id !== id));
-                alert("Xóa booking thành công!");
-            } catch (error) {
-                console.error("Lỗi khi xóa booking:", error);
-                alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+        try {
+            const response = await BookingServices.CancelBooking(id);
+            if (response.data.success) {
+                toast.success("Hủy lịch hẹn thành công");
+                // Refresh your booking list here
+                fetchBookings();
             }
+        } catch (error) {
+            console.error("Delete booking error:", error);
+            toast.error(error.response?.data?.message || "Lỗi khi hủy lịch hẹn");
         }
     };
     const getSubServiceName = (serviceId, subServiceId) => {
@@ -115,6 +157,18 @@ export default function BookingStatus({ status, setCount }) {
         const subService = service.subServices.find(sub => sub._id === subServiceId);
         return subService ? subService.name : "Không tìm thấy";
     };
+    const handleViewRecord = (booking) => {
+        setSelectedAppointment({
+            id: booking._id,
+            doctor: booking?.doctor_id?.username || "Không có bác sĩ",
+            title: getSubServiceName(booking.service_id, booking.sub_service_id),
+            owner: booking?.guest_name || "Không có tên",
+            startHour: booking.hour,
+            date: new Date(booking.date)
+        });
+        setIsViewDialogOpen(true);
+    };
+    console.log(data)
 
     const columns = [
         {
@@ -146,11 +200,30 @@ export default function BookingStatus({ status, setCount }) {
             cell: ({ row }) => {
                 const serviceId = row.original.service_id;
                 const subServiceId = row.original.sub_service_id;
-                return (
-                    <div className="">
-                        {getSubServiceName(serviceId, subServiceId)}
-                    </div>
-                );
+                if (status === "complete") {
+                    // Find the medical record for this booking
+                    const record = medicalRecord.find(
+                        record => record.booking_id._id === row.original._id
+                    );
+                    if (record && record.services) {
+                        return (
+                            <div className="space-y-1">
+                                {record.services.map((service, index) => (
+                                    <div key={index} className="text-sm">
+                                        {getSubServiceName(service.service_id, service.sub_service_id)}
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    }
+                    return <div className="text-muted-foreground">Không có dịch vụ</div>;
+                } else {
+                    return (
+                        <div className="">
+                            {getSubServiceName(serviceId, subServiceId)}
+                        </div>
+                    );
+                }
             },
         },
         {
@@ -180,6 +253,33 @@ export default function BookingStatus({ status, setCount }) {
                 </div>
 
         },
+        ...(status === "complete"
+            ? [
+                {
+                    accessorKey: "payment",
+                    header: "Thanh toán",
+                    cell: ({ row }) => {
+                        // Find the medical record for this booking
+                        const record = medicalRecord.find(
+                            record => record.booking_id._id === row.original._id
+                        );
+                        return (
+                            <div className="font-medium">
+                                {record?.booking_id?.payment?.status ? "Đã thanh toán" : "Chưa thanh toán"}
+                            </div>
+                        );
+                    }
+                },
+                {
+                    accessorKey: "price",
+                    header: "Tổng số tiền",
+                    cell: ({ row }) => {
+                        const amount = parseFloat(row.getValue("price"));
+                        return <div className="font-medium">{amount.toLocaleString()}₫</div>;
+                    },
+                },
+            ]
+            : []),
         {
             id: "actions",
             header: "Hành động",
@@ -211,21 +311,50 @@ export default function BookingStatus({ status, setCount }) {
                             />
                         </button>
                     }
-                    <button>
-                        <Pen className="size-6 p-1 mr-1 " onClick={() => {
-                            setIsEditDialogOpen(true);
-                            setSelectedBooking(row.original)
-                        }} />
+                    {status !== "cancel" && status !== "complete" && (
+                        <>
+                            <button>
+                                <Pen className="size-6 p-1 mr-1 " onClick={() => {
+                                    setIsEditDialogOpen(true);
+                                    setSelectedBooking(row.original)
+                                }} />
 
-                    </button>
-                    <button onClick={() => handleDelete(row.original._id)}>
-                        <Trash2 className="size-6 p-1 text-red-500" />
-                    </button>
+                            </button>
+                            <button onClick={() => handleDelete(row.original._id)}>
+                                <Trash2 className="size-6 p-1 text-red-500" />
+                            </button>
+                        </>
+                    )}
+                    {status === "complete" && (
+                        <>
+                            <Button
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handlePaymentClick(row.original)}
+                                disabled={row.original.payment?.status === true}
+                            >
+                                <Wallet
+                                    className={cn(
+                                        "h-4 w-4",
+                                        row.original.payment === "true"
+                                            ? "text-green-500"
+                                            : "text-orange-500"
+                                    )}
+                                />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleViewRecord(row.original)}
+                            >
+                                <FileText className="h-4 w-4 text-blue-500" />
+                            </Button>
+                        </>
+                    )}
                 </div>
             ),
         },
     ];
-
     const table = useReactTable({
         data,
         columns,
@@ -262,16 +391,21 @@ export default function BookingStatus({ status, setCount }) {
                     onChange={(e) => table.getColumn("guest_name")?.setFilterValue(e.target.value)}
                     className="max-w-sm"
                 />
-                <div className="text-center ml-auto">
-                    <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white" >
-                        Thêm lịch mới
-                    </Button>
-                    <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
-                </div>
+                {status === "pending" && (
+                    <>
+                        <div className="text-center ml-auto">
+                            <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white" >
+                                Thêm lịch mới
+                            </Button>
+                            <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
+                        </div>
+                    </>
+                )}
             </div>
 
             <div className="rounded-md border">
                 <Table>
+
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -284,7 +418,18 @@ export default function BookingStatus({ status, setCount }) {
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows.length ? (
+                        {isLoading ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <div className="flex items-center justify-center h-[400px]">
+                                        <div className="text-center space-y-2">
+                                            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+                                            <p className="text-sm text-muted-foreground">Đang tải dữ liệu...</p>
+                                        </div>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
@@ -297,7 +442,7 @@ export default function BookingStatus({ status, setCount }) {
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="text-center">
-                                    Không có lịch đặt.
+                                    Không có dữ liệu.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -322,7 +467,20 @@ export default function BookingStatus({ status, setCount }) {
                     Next
                 </Button>
             </div>
-        </div>
+            <MedicalExaminationDialog
+                open={isViewDialogOpen}
+                onOpenChange={setIsViewDialogOpen}
+                appointment={selectedAppointment}
+                isReadOnly={true} // Add this prop
+            />
+            <PaymentDialog
+                open={isPaymentDialogOpen}
+                onOpenChange={setIsPaymentDialogOpen}
+                booking={selectedPaymentBooking}
+                onPaymentComplete={fetchBookings}
+            />
+
+        </div >
 
     );
 }

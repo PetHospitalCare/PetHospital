@@ -41,7 +41,6 @@ export default function MedicineManagerment() {
     const fetchData = async () => {
         try {
             const response = await MedicineService.getAllMedicine()
-            console.log(response.data.medicines)
             if (response.data.success) {
                 setData(response.data.medicines);
             }

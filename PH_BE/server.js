@@ -4,13 +4,16 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const db = require("./models");
+
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const http = require("http");
 
 
 
-const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute } = require("./routes");
+
+const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute, NewRouter, PaymentRouter } = require("./routes");
+
 
 
 
@@ -32,6 +35,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
+
 app.use(bodyParser.json({ limit: "64mb" }));
 app.use(bodyParser.urlencoded({ limit: "64mb", extended: true }));
 // Define route dưới đây //
@@ -45,12 +49,11 @@ app.use("/account", AccountRouter);
 app.use("/medicine", MedicineRouter);
 app.use("/pet-record", PetRecordRouter);
 app.use("/booking", BookingRouter);
-
 app.use("/medical", MedicalRoute);
-
 app.use("/pet", PetRouter);
 app.use("/shopping-cart", ShoppingCartRouter);
-
+app.use("/new", NewRouter);
+app.use("/payment", PaymentRouter);
 
 io.on("connection", (socket) => {
     console.log("An user connect: ", socket.id);

@@ -72,7 +72,7 @@ export default function BookingDialog({ open, onClose }) {
                 account_id: user?._id || "",
             }));
         }
-    }, [user]);
+    }, [user, open]);
 
     useEffect(() => {
         if (pet.length > 0) {
@@ -99,7 +99,7 @@ export default function BookingDialog({ open, onClose }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!formData.name || !formData.phone || !formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId || !formData.pet_id) {
+        if (!formData.name || !formData.phone || !formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId || (!formData.pet_id && !formData.type)) {
             toast.error("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
@@ -166,6 +166,7 @@ export default function BookingDialog({ open, onClose }) {
                             onChange={handleChange}
                             required
                             className="bg-white border-gray-300 rounded-lg"
+
                         />
                     </div>
                     <div>

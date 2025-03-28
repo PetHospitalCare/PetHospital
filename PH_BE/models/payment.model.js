@@ -10,11 +10,13 @@ const cartItemSchema = new mongoose.Schema({
 
 const paymentSchema = new mongoose.Schema(
     {
-        userId: { type: String, required: true },
+        userId: { type: String },
+        contactInfo: { type: String },
         items: [cartItemSchema],
         totalPrice: { type: Number, default: 0 },
         shipFee: { type: Number, default: 20000 },
-        address: { type: String }
+        address: { type: String },
+        status: { type: Number, default: 0 },
     },
     { timestamps: true }
 );

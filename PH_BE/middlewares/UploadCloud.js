@@ -10,15 +10,16 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary,
-    allowedFormats: ['jpg', 'png'],
+    allowedFormats: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'xls', 'xlsx'],
     params: {
-        folder: 'SDN301m'
+        folder: 'SDN301m',
+        resource_type: 'auto' // Cho phép Cloudinary tự động xác định loại file
     }
 });
 
 const uploadCloud = multer({
     storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB in bytes
+    limits: { fileSize: 10 * 1024 * 1024 } // 5MB in bytes
 });
 
 module.exports = uploadCloud;

@@ -8,9 +8,13 @@ const Pet = require("./pet.model");
 const Booking = require("./booking.model");
 const Medicine = require("./medicine.model");
 
+const ShoppingCart = require("./shopping-cart.model");
+const New = require("./new.model")
+
+
 const MedicalRecord = require("./medicalRecord.model");
 
-const ShoppingCart = require("./shopping-cart.model");
+
 const Payment = require("./payment.model");
 
 
@@ -29,7 +33,10 @@ db.medicine = Medicine
 db.medicalRecord = MedicalRecord
 
 db.shoppingcart = ShoppingCart
+db.new = New
+
 db.payment = Payment
+
 
 
 

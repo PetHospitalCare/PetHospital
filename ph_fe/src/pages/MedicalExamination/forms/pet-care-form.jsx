@@ -4,11 +4,11 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-export function PetCareForm({ formData, onChange }) {
+export function PetCareForm({ formData, onChange, subService }) {
     return (
         <Card className="mb-4">
             <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Chăm sóc thú cưng</CardTitle>
+                <CardTitle className="text-lg">  {subService.parentName}: {subService.name}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">

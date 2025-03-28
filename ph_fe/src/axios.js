@@ -2,7 +2,7 @@ import axios from "axios"
 
 const instance = axios.create({
     baseURL: "http://localhost:9999",
-    withCredentials: true
+    withCredentials: true,
 });
 
 instance.defaults.withCredentials = true;

@@ -156,18 +156,13 @@ export default function Calendar() {
                                     };
 
                                     const eventStartMinutes = getMinutes(event.startHour);
-                                    const startIdx = HOURS.reduce((prevIdx, h, idx) => {
-                                        return getMinutes(h) <= eventStartMinutes ? idx : prevIdx;
-                                    }, 0);
-
-                                    const endIdx = startIdx + event.duration / 30;
+                                    const currentSlotMinutes = getMinutes(hour);
 
                                     return (
                                         eventDate >= weekStart &&
                                         eventDate < new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000) &&
                                         eventDate.getDay() === (index + 1) % 7 &&
-                                        rowIndex >= startIdx &&
-                                        rowIndex < endIdx
+                                        eventStartMinutes === currentSlotMinutes // Only show in starting time slot
                                     );
                                 });
 
@@ -202,7 +197,7 @@ export default function Calendar() {
                                                     style={{
                                                         flex: `1 1 ${100 / filteredAppointments.length}%`,
                                                         minWidth: "48px",
-                                                        gridRow: `span ${event.duration / 30}`,
+
                                                     }}
                                                 // onClick={() => {
                                                 //     setSelectedAppointment(event);

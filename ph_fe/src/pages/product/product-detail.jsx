@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { ProductService } from "@/services/ProductService.js";
-import ShoppingCartButton from "@/components/shared/shopping-cart-button.jsx";
 import { useAddToCart } from "@/lib/shopping-cart-util.js";
 import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
 
@@ -9,11 +8,12 @@ export default function ProductDetail() {
     const [quantity, setQuantity] = useState(1);
     const addToCart = useAddToCart();
     const { setDataCartContext } = useContext(ShoppingCartContext);
+    const { setDataIsChangeCartContext } = useContext(ShoppingCartContext);
+    const [tempQuantity, setTempQuantity] = useState(quantity);
 
     useEffect(() => {
         fetchData();
     }, []);
-
 
     const fetchData = async () => {
         try {
@@ -31,12 +31,34 @@ export default function ProductDetail() {
         }
     };
 
+    const handleInputChange = (e) => {
+        setTempQuantity(e.target.value); // Cho phép nhập/xóa
+    };
+
+    const validateQuantity = () => {
+        let value = parseInt(tempQuantity, 10);
+
+        if (isNaN(value) || value < 1) value = 1; // Giới hạn tối thiểu
+        if (value > 99) value = 99; // Giới hạn tối đa
+
+        setQuantity(value); // Cập nhật state chính thức
+        setTempQuantity(value); // Cập nhật lại input
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            validateQuantity();
+        }
+    };
+
     const handleDecrease = () => {
         setQuantity(prev => Math.max(1, prev - 1));
+        setTempQuantity(prev => Math.max(1, prev - 1));
     };
 
     const handleIncrease = () => {
         setQuantity(prev => prev + 1);
+        setTempQuantity(prev => prev + 1);
     };
 
     const setMainImage = (url) => {
@@ -50,7 +72,7 @@ export default function ProductDetail() {
             price: product.price,
             imageUrl: product.images?.[0]?.url,
             name: product.name
-        }, setDataCartContext);
+        }, setDataCartContext, setDataIsChangeCartContext, 'add', true);
     }
 
     return (
@@ -83,42 +105,51 @@ export default function ProductDetail() {
                         <div className="w-full md:w-1/2 px-4">
                             <div className="flex justify-between items-center">
                                 <h2 className="text-3xl font-bold mb-2">{product.name}</h2>
-                                <ShoppingCartButton />
+                                {/*<ShoppingCartButton/>*/}
                             </div>
 
                             <p className="text-gray-600 mb-4">Mã sản phẩm: 8850477016903</p>
                             <div className="mb-4">
                                 <span className="text-2xl font-bold mr-2">{product.price} VNĐ</span>
                                 <span
-                                    className="text-gray-500 line-through">{Math.round(product.price * 1.1)} VNĐ</span>
-                            </div>
-                            <div className="mb-6 flex items-center space-x-2">
-                                <button
-                                    onClick={handleDecrease}
-                                    className="w-10 h-8 flex items-center justify-center bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300"
-                                >
-                                    −
-                                </button>
-
-                                <input
-                                    type="number"
-                                    value={quantity}
-                                    readOnly
-                                    className="w-12 h-8 text-center rounded-md border border-gray-300 shadow-sm focus:outline-none"
-                                />
-
-                                <button
-                                    onClick={handleIncrease}
-                                    className="w-10 h-8 flex items-center justify-center bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300"
-                                >
-                                    +
-                                </button>
+                                    className="text-gray-500 line-through">{Math.round(product.price * 1.2)} VNĐ</span>
                             </div>
 
-                            <div className="flex space-x-4 mb-6">
+                            {/* Số lượng + Nút thêm vào giỏ hàng */}
+                            <div className="mb-6 flex items-center space-x-4">
+                                {/* Bộ chọn số lượng */}
+                                <div className="flex items-center space-x-2">
+                                    <button
+                                        onClick={handleDecrease}
+                                        className="w-10 h-8 flex items-center justify-center bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300"
+                                    >
+                                        −
+                                    </button>
+
+                                    <input
+                                        type="number"
+                                        value={tempQuantity}
+                                        min="1"
+                                        max="99"
+                                        onChange={handleInputChange}
+                                        onBlur={validateQuantity}
+                                        onKeyDown={handleKeyDown}
+                                        className="w-12 h-8 text-center rounded-md border border-gray-300 shadow-sm focus:outline-none"
+                                    />
+
+                                    <button
+                                        onClick={handleIncrease}
+                                        className="w-10 h-8 flex items-center justify-center bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+
+                                {/* Nút Thêm vào giỏ hàng */}
                                 <button
-                                    className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                    onClick={() => addToCardFunction()}>
+                                    className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    onClick={() => addToCardFunction()}
+                                >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         strokeWidth="1.5" stroke="currentColor" className="size-6">
                                         <path strokeLinecap="round" strokeLinejoin="round"
