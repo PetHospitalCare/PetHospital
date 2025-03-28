@@ -15,6 +15,31 @@ const bookingSchema = new mongoose.Schema(
         guest_phone: { type: String, default: null },
         guest_email: { type: String, default: null },
         doctor_id: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
+        price: { type: Number },
+        payment: {
+            order_code: {
+                type: Number,
+                unique: true,
+                default: function () {
+                    return parseInt(
+                        Date.now().toString().slice(-7) +
+                        Math.floor(100 + Math.random() * 900)
+                    );
+                }
+            },
+            status: { type: Boolean, default: false },
+            method: {
+                type: String,
+                enum: ["cash", "transfer"],
+            },
+            qrcode: {
+                type: String
+            },
+            date: { type: Date }
+
+
+
+        }
     },
     { timestamps: true }
 );

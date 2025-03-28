@@ -111,7 +111,7 @@ export function AppSidebar({
         icon: CalendarCheck,
       },
       {
-        name: "Quản lí lịch hẹn",
+        name: "Quản lí lịch hẹn & Hồ sơ",
         url: "/Booking_Management",
         icon: PieChart,
       },
@@ -120,7 +120,7 @@ export function AppSidebar({
         url: "/Account_Management",
         icon: User,
       },
-      
+
     ],
   }
 

@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const MedicalRecordSchema = new mongoose.Schema(
     {
+        
         booking_id: { type: mongoose.Schema.Types.ObjectId, ref: "Booking" },
         services: [{
             service_id: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },

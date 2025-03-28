@@ -25,13 +25,15 @@ import { SurgeryForm } from "./forms/surgery-form"
 import { ConclusionForm } from "./forms/conclusion-form"
 import { serviceNameToType } from "./services"
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default function MedicalExaminationDialog({ open, onOpenChange, appointment }) {
+export default function MedicalExaminationDialog({ open, onOpenChange, appointment, isReadOnly = false }) {
     const [selectedSubServices, setSelectedSubServices] = useState([]);
     const [servicesOpen, setServicesOpen] = useState(false);
     const [formData, setFormData] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState("examination");
+    const [totalPrice, setTotalPrice] = useState(0);
     const [conclusion, setConclusion] = useState({
         generalHealth: "",
         diagnosis: "",
@@ -40,6 +42,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         prescription: [],
         notes: "",
     });
+    const [medicineTotalPrice, setMedicineTotalPrice] = useState(0);
     const [services, setServices] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
@@ -189,6 +192,20 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             [field]: value,
         }));
     };
+    useEffect(() => {
+        if (selectedSubServices.length > 0 && services.length > 0) {
+            const total = selectedSubServices.reduce((sum, subService) => {
+                const parentService = services.find(s => s._id === subService.parentId);
+                const servicePrice = parentService?.subServices?.find(
+                    sub => sub._id === subService.id
+                )?.price?.[petInfo?.type] || 0;
+                return sum + servicePrice;
+            }, 0);
+            setTotalPrice(total);
+        } else {
+            setTotalPrice(0);
+        }
+    }, [selectedSubServices, services, petInfo?.type]);
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -219,6 +236,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     instructions: item.instructions
                 })),
                 note: conclusion?.notes || "",
+                totalPrice: totalPrice + medicineTotalPrice,
             };
 
             // Thêm medical record data
@@ -252,6 +270,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             for (let pair of formDataToSubmit.entries()) {
                 console.log('FormData entry:', pair[0], pair[1]);
             }
+
             console.log("Medical:", medicalRecordData)
             toast.success(isEditing ? "Cập nhật kết quả khám thành công!" : "Lưu kết quả khám thành công!");
             onOpenChange(false);
@@ -301,6 +320,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
                         petInfo={petInfo}
+                        isReadOnly={isReadOnly}
                     />
                 );
             case "labTest":
@@ -311,6 +331,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
                         petInfo={petInfo}
+                        isReadOnly={isReadOnly}
                     />
                 );
             case "petCare":
@@ -321,6 +342,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
                         petInfo={petInfo}
+                        isReadOnly={isReadOnly}
                     />
                 );
             case "boarding":
@@ -330,6 +352,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         formData={serviceData}
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
+                        isReadOnly={isReadOnly}
                     />
                 );
             case "surgery":
@@ -340,6 +363,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
                         petInfo={petInfo}
+                        isReadOnly={isReadOnly}
                     />
                 );
             case "imaging":
@@ -350,6 +374,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
                         petInfo={petInfo}
+                        isReadOnly={isReadOnly}
                     />
                 );
             case "checkup":
@@ -360,6 +385,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         onChange={(field, value) => handleInputChange(subService?.id, field, value)}
                         subService={subService}
                         petInfo={petInfo}
+                        isReadOnly={isReadOnly}
                     />
                 );
             default:
@@ -419,7 +445,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
 
                             <div className="space-y-2">
                                 <label>Dịch vụ sử dụng</label>
-                                <Popover open={servicesOpen} onOpenChange={setServicesOpen}>
+                                <Popover open={!isReadOnly && servicesOpen} onOpenChange={setServicesOpen}>
                                     <PopoverTrigger asChild>
                                         <Button variant="outline" className="w-full justify-between">
                                             {selectedSubServices?.length > 0
@@ -477,13 +503,15 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                                         {selectedSubServices?.map((subService) => (
                                             <Badge key={subService?.id} variant="secondary" className="text-xs flex items-center">
                                                 {subService?.name}
-                                                <button
-                                                    onClick={() => handleSubServiceToggle({ _id: subService?.id })}
-                                                    className="ml-1 hover:text-destructive"
-                                                    aria-label={`Remove ${subService?.name}`}
-                                                >
-                                                    <X size={12} />
-                                                </button>
+                                                {!isReadOnly && (
+                                                    <button
+                                                        onClick={() => handleSubServiceToggle({ _id: subService?.id })}
+                                                        className="ml-1 hover:text-destructive"
+                                                        aria-label={`Remove ${subService?.name}`}
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                )}
                                             </Badge>
                                         ))}
                                     </div>
@@ -512,29 +540,39 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                                 </TabsContent>
                                 <TabsContent value="conclusion" className="mt-4 flex-1 overflow-hidden">
                                     <ScrollArea className="h-[calc(90vh-240px)]">
-                                        <ConclusionForm conclusion={conclusion} onChange={handleConclusionChange} />
+                                        <ConclusionForm onMedicinePriceChange={setMedicineTotalPrice}
+                                            conclusion={conclusion} isReadOnly={isReadOnly} onChange={handleConclusionChange} />
                                     </ScrollArea>
                                 </TabsContent>
                             </Tabs>
 
                             <div className="flex justify-end gap-2 pt-4 mt-auto">
-                                <Button variant="outline" onClick={() => setOpen(false)}>
-                                    Hủy
-                                </Button>
-                                <Button onClick={handleSubmit} disabled={isSubmitting}>
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="animate-spin mr-2" />
-                                            Đang xử lý...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Check className="w-4 h-4 mr-2" />
-                                            Lưu
-                                        </>
-                                    )}
-
-                                </Button>
+                                {isReadOnly ? (
+                                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                                        <X className="w-4 h-4 mr-2" />
+                                        Đóng
+                                    </Button>
+                                ) : (
+                                    <>
+                                        <Button variant="outline" onClick={() => onOpenChange(false)}>
+                                            <X className="w-4 h-4 mr-2" />
+                                            Hủy
+                                        </Button>
+                                        <Button onClick={handleSubmit} disabled={isSubmitting}>
+                                            {isSubmitting ? (
+                                                <>
+                                                    <Loader2 className="animate-spin mr-2" />
+                                                    Đang xử lý...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Check className="w-4 h-4 mr-2" />
+                                                    Lưu
+                                                </>
+                                            )}
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

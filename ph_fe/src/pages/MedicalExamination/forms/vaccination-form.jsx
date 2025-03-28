@@ -8,7 +8,7 @@ import { useState } from "react"
 import { jsPDF } from "jspdf"
 import { font } from "./font"
 import { format } from "date-fns"
-export function VaccinationForm({ petInfo, formData, onChange, subService }) {
+export function VaccinationForm({ petInfo, formData, onChange, subService, isReadOnly }) {
     if (!subService) return null
     const [pdfUrl, setPdfUrl] = useState(null);
     const loadImage = (url) => {
@@ -176,6 +176,7 @@ export function VaccinationForm({ petInfo, formData, onChange, subService }) {
                             id="batchNumber"
                             value={formData.name || ""}
                             onChange={(e) => onChange("name", e.target.value)}
+                            disabled={isReadOnly}
                         />
                     </div>
                     <div className="space-y-2">
@@ -183,6 +184,7 @@ export function VaccinationForm({ petInfo, formData, onChange, subService }) {
                         <Input
                             id="batchNumber"
                             value={formData.batchNumber || ""}
+                            disabled={isReadOnly}
                             onChange={(e) => onChange("batchNumber", e.target.value)}
                         />
                     </div>
@@ -195,6 +197,7 @@ export function VaccinationForm({ petInfo, formData, onChange, subService }) {
                         type="date"
                         value={formData.nextDate || ""}
                         onChange={(e) => onChange("nextDate", e.target.value)}
+                        disabled={isReadOnly}
                     />
                 </div>
 
@@ -204,6 +207,7 @@ export function VaccinationForm({ petInfo, formData, onChange, subService }) {
                         id="vaccineNotes"
                         value={formData.notes || ""}
                         onChange={(e) => onChange("notes", e.target.value)}
+                        disabled={isReadOnly}
                     />
                 </div>
 
