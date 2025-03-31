@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import * as XLSX from 'xlsx';
 import ServiceResultDetail from "./Medical_result_detail";
+import { getSubServiceName } from './utils.jsx';
 
 export default function MedicalResult({ medical }) {
     const [selectedServiceIndex, setSelectedServiceIndex] = useState(0);
 
-    // Set first service as default when data is loaded
+    // Để service đầu tiên được chọn khi medical có dữ liệu
     useEffect(() => {
         if (medical?.services?.length > 0) {
             setSelectedServiceIndex(0);
@@ -15,17 +16,6 @@ export default function MedicalResult({ medical }) {
     if (!medical || !medical.services || medical.services.length === 0) {
         return <div className="py-6 text-center text-gray-500">Không có dữ liệu khám bệnh</div>;
     }
-
-    // Function to get subservice name
-    const getSubServiceName = (service) => {
-        if (!service.sub_service_id) return 'N/A';
-
-        const subService = service.service_id?.subServices?.find(
-            sub => sub._id === service.sub_service_id
-        );
-
-        return subService?.name || 'N/A';
-    };
 
     return (
         <div className="mt-1">
@@ -37,13 +27,21 @@ export default function MedicalResult({ medical }) {
                         <div
                             key={index}
                             onClick={() => setSelectedServiceIndex(index)}
-                            className={`p-4 border-b last:border-b-0 cursor-pointer transition-all hover:bg-gray-100 
-                ${selectedServiceIndex === index ? 'bg-[#3F2E2E] text-white' : 'bg-white text-gray-800'}`}
+                            className={`p-4 border-b last:border-b-0 cursor-pointer transition-all 
+                ${selectedServiceIndex === index
+                                    ? 'bg-[#3F2E2E] text-white '
+                                    : 'bg-white text-gray-800 hover:bg-gray-100'}`}
                         >
-                            <p className={`font-medium ${selectedServiceIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                            <p className={`font-medium 
+                ${selectedServiceIndex === index
+                                    ? 'text-white group-hover:text-black '
+                                    : 'text-gray-800'}`}>
                                 {service.service_id?.name || "Không có tên"}
                             </p>
-                            <p className={`text-sm mt-1 ${selectedServiceIndex === index ? 'text-gray-200' : 'text-gray-600'}`}>
+                            <p className={`text-sm mt-1 
+                ${selectedServiceIndex === index
+                                    ? 'text-gray-200 group-hover:text-gray-800 '
+                                    : 'text-gray-600'}`}>
                                 {getSubServiceName(service)}
                             </p>
                         </div>

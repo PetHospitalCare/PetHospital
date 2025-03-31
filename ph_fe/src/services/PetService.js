@@ -12,9 +12,14 @@ const uploadPetAvatar = (id, data) => {
     return axios.post(`/pet/upload-pet-avatar/${id}`,data);
 }
 
+const deletePetByUser = (id) => {
+    return axios.delete(`/pet/delete-pet-by-user/${id}`);
+}
+
 export const PetService = {
     getPetByUser,
     createPetByUser,
     updatePet,
-    uploadPetAvatar
+    uploadPetAvatar,
+    deletePetByUser
 };

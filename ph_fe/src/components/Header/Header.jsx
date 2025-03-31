@@ -170,7 +170,7 @@ export default function Header() {
                     <Link to="/" className="text-sm/6 font-semibold text-gray-900">
                         About us
                     </Link>
-                    <Link to="/" className="text-sm/6 font-semibold text-gray-900">
+                    <Link to="/Our-services" className="text-sm/6 font-semibold text-gray-900">
                         Our Services
                     </Link>
                     {/*<Link to="/product" className="text-sm/6 font-semibold text-gray-900">*/}
@@ -180,7 +180,7 @@ export default function Header() {
                     <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}
                          onClick={() => setIsOpen(!isOpen)}>
                         <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">
-                            Product
+                            Danh sách sản phẩm
                             <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400"/>
                         </div>
 

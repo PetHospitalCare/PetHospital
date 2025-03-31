@@ -2,6 +2,7 @@
 import React from 'react';
 import { getServiceIcon, getSubServiceName } from './utils.jsx';
 import ExcelDataViewer from './Excel_Data_Viewer.jsx';
+import Zoom from "react-medium-image-zoom";
 
 export default function ServiceResultDetail({ service }) {
     if (!service) return <div className="text-center py-10 text-gray-500">Không có dữ liệu dịch vụ</div>;
@@ -72,11 +73,13 @@ export default function ServiceResultDetail({ service }) {
                             <div className="flex flex-wrap gap-3">
                                 {result.images.map((img, idx) => (
                                     <div key={idx} className="relative">
-                                        <img
-                                            src={img.url}
-                                            alt={img.name || "Medical image"}
-                                            className="w-28 h-28 object-cover rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
-                                        />
+                                        <Zoom>
+                                            <img
+                                                src={img.url}
+                                                alt={img.name || "Medical image"}
+                                                className="w-28 h-28 object-cover rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
+                                            />
+                                        </Zoom>
                                         <p className="text-xs text-center mt-1 text-gray-600">{img.name || `Ảnh ${idx + 1}`}</p>
                                     </div>
                                 ))}

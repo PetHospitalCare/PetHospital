@@ -1,4 +1,4 @@
-// Get subservice name
+// lấy tên dịch vụ
 export const getSubServiceName = (service) => {
     if (!service.sub_service_id) return service.service_id?.name || 'Không có tên';
 
@@ -8,7 +8,7 @@ export const getSubServiceName = (service) => {
 
     return subService?.name || service.service_id?.name || 'Không có tên';
 };
-// Helper function to get service icon
+// Function lấy icon dịch vụ dựa vào tên dịch vụ
 export const getServiceIcon = (serviceName) => {
     switch (serviceName) {
         case "Tiêm chủng":
