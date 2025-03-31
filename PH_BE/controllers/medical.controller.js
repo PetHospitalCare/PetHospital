@@ -180,7 +180,7 @@ const getAllMedicalRecords = async (req, res) => {
         const medicalRecords = await MedicalRecord.find().populate({
             path: 'booking_id',
             populate: [
-
+                { path: 'pet_id' },
                 { path: 'doctor_id' }
             ]
         }).select(`booking_id _id createdAt updatedAt services note `);

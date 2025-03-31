@@ -19,13 +19,15 @@ import { Toaster } from "@/components/ui/sonner"
 import "./index.css"
 
 import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext.jsx";
-
+import { ChatProvider } from './contexts/ChatProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
     <UserProvider>
         <ShoppingCartProvider>
-            <Toaster richColors position="top-right" expand={true} closeButton />
-            <App />
+            <ChatProvider>
+                <Toaster richColors position="top-right" expand={true} closeButton />
+                <App />
+            </ChatProvider>
         </ShoppingCartProvider>
     </UserProvider>
 )

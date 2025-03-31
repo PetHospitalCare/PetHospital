@@ -143,7 +143,7 @@ export default function PaymentDialog({ open, onOpenChange, booking, onPaymentCo
                                     </div>
                                     <div className="grid grid-cols-3 gap-1">
                                         <p className="font-medium">Chủ tài khoản:</p>
-                                        <p className="col-span-2">PET HOSPITAL</p>
+                                        <p className="col-span-2">VU HONG MINH</p>
                                     </div>
                                     <div className="grid grid-cols-3 gap-1">
                                         <p className="font-medium">Nội dung CK:</p>
