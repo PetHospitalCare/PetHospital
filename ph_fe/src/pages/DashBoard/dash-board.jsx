@@ -119,7 +119,7 @@ export default function Dashboard() {
                     <StatCard
                         title="Tài khoản"
                         value={stats.summary.totalCustomers}
-                        subValue={`${stats.details.customers.byRole.customer || 0} khách hàng mới, ${stats.details.customers.byRole.admin || 0} quản lý, ${stats.details.customers.byRole.staff || 0} nhân viên, ${stats.details.customers.byRole.doctor || 0} bác sĩ`}
+                        subValue={`${stats?.details?.customers?.byRole.customer || 0} khách hàng mới, ${stats?.details?.customers?.byRole?.admin || 0} quản lý, ${stats?.details?.customers?.byRole?.staff || 0} nhân viên, ${stats?.details?.customers?.byRole?.doctor || 0} bác sĩ`}
                         icon="service"
                     />
                 </div>

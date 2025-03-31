@@ -1,0 +1,214 @@
+import { useState, useEffect, useContext, useRef } from 'react';
+import { ChatContext } from '../../contexts/ChatProvider';
+import { UserContext } from '@/contexts/UserContext';
+import { Send, ChevronRight, User, Users, MessageSquare } from 'lucide-react';
+
+export const StaffChat = () => {
+    const { user } = useContext(UserContext);
+    const {
+        currentConversation,
+        messages,
+        joinConversation,
+        sendMessage
+    } = useContext(ChatContext);
+
+    const [conversations, setConversations] = useState([]);
+    const [filteredMessages, setFilteredMessages] = useState([]); // Thêm state mới
+    const [message, setMessage] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const messagesEndRef = useRef(null);
+
+    // Load all conversations
+    useEffect(() => {
+        const fetchConversations = async () => {
+            try {
+                const res = await fetch('http://localhost:9999/message/staff');
+                if (!res.ok) throw new Error('Failed to fetch conversations');
+                const data = await res.json();
+                setConversations(data);
+            } catch (error) {
+                console.error('Error fetching conversations:', error);
+            }
+        };
+
+        fetchConversations();
+    }, []);
+
+    // Filter messages by current conversation
+    useEffect(() => {
+        if (currentConversation) {
+            const filtered = messages.filter(msg =>
+                msg.conversationId === currentConversation
+            );
+            setFilteredMessages(filtered);
+        } else {
+            setFilteredMessages([]);
+        }
+    }, [messages, currentConversation]);
+
+    // Auto scroll to bottom when messages change
+    useEffect(() => {
+        scrollToBottom();
+    }, [filteredMessages]);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleSend = () => {
+        if (message.trim() && currentConversation) {
+            sendMessage(message);
+            setMessage('');
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
+
+    // Filter conversations by search term
+    const filteredConversations = conversations.filter(conv =>
+        conv.customerId.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    return (
+        <div className="flex h-screen bg-gray-50">
+            {/* Conversation sidebar */}
+            <div className="w-80 border-r border-gray-200 bg-white flex flex-col">
+                <div className="p-4 border-b border-gray-200">
+                    <h2 className="text-xl font-semibold flex items-center">
+                        <MessageSquare className="mr-2" size={20} />
+                        Conversations
+                    </h2>
+                    <div className="mt-3 relative">
+                        <input
+                            type="text"
+                            placeholder="Search customers..."
+                            className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <User className="absolute left-2 top-2.5 text-gray-400" size={18} />
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto">
+                    {filteredConversations.length === 0 ? (
+                        <div className="p-4 text-center text-gray-500">
+                            {searchTerm ? 'No matching conversations' : 'No active conversations'}
+                        </div>
+                    ) : (
+                        filteredConversations.map(conv => (
+                            <div
+                                key={conv._id}
+                                className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${currentConversation === conv._id ? 'bg-indigo-50' : ''
+                                    }`}
+                                onClick={() => joinConversation(conv._id)}
+                            >
+                                <div>
+                                    <h4 className="font-medium flex items-center">
+                                        {conv.customerId.username}
+                                        {currentConversation === conv._id && (
+                                            <span className="ml-2 w-2 h-2 rounded-full bg-green-500"></span>
+                                        )}
+                                    </h4>
+                                    <p className="text-sm text-gray-500 mt-1 flex items-center">
+                                        <Users className="mr-1" size={14} />
+                                        {conv.staffParticipants.length} staff participating
+                                    </p>
+                                </div>
+                                <ChevronRight size={18} className="text-gray-400" />
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {/* Chat area */}
+            <div className="flex-1 flex flex-col">
+                {currentConversation ? (
+                    <>
+                        {/* Chat header */}
+                        <div className="p-4 border-b border-gray-200 bg-white flex items-center">
+                            <div className="flex-1">
+                                <h3 className="font-semibold">
+                                    {conversations.find(c => c._id === currentConversation)?.customerId.username || 'Chat'}
+                                </h3>
+                                <p className="text-sm text-gray-500">
+                                    {conversations.find(c => c._id === currentConversation)?.staffParticipants.length || 0} staff online
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Messages */}
+                        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+                            {filteredMessages.length === 0 ? (
+                                <div className="h-full flex items-center justify-center text-gray-500">
+                                    No messages yet. Start the conversation!
+                                </div>
+                            ) : (
+                                filteredMessages.map((msg, index) => (
+                                    <div
+                                        key={msg._id || index}
+                                        className={`mb-3 flex ${msg.sender === user._id ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        <div
+                                            className={`max-w-xs px-4 py-2 rounded-lg ${msg.sender === user._id
+                                                ? 'bg-indigo-500 text-white rounded-br-none'
+                                                : 'bg-white text-gray-800 rounded-bl-none shadow-sm'}`}
+                                        >
+                                            <p className="text-sm">{msg.content}</p>
+                                            <p className="text-xs mt-1 opacity-70 text-right">
+                                                {new Date(msg.createdAt).toLocaleTimeString([], {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Message input */}
+                        <div className="p-4 border-t border-gray-200 bg-white">
+                            <div className="flex items-center">
+                                <input
+                                    type="text"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    placeholder="Type a message..."
+                                    className="flex-1 border border-gray-300 rounded-l-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                />
+                                <button
+                                    onClick={handleSend}
+                                    disabled={!message.trim()}
+                                    className={`px-4 py-2 rounded-r-full ${message.trim()
+                                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        }`}
+                                >
+                                    <Send size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="h-full flex items-center justify-center bg-gray-50">
+                        <div className="text-center p-6 max-w-md">
+                            <MessageSquare size={48} className="mx-auto text-gray-300 mb-4" />
+                            <h3 className="text-lg font-medium text-gray-700 mb-2">No conversation selected</h3>
+                            <p className="text-gray-500">
+                                Select a conversation from the sidebar to start chatting with customers
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};

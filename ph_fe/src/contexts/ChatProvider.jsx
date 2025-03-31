@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserContext } from "@/contexts/UserContext";
 import { socket } from "../App"
 const ChatContext = createContext(); // Thêm dòng này
-export const ChatProvider = ({ children }) => {
+const ChatProvider = ({ children }) => {
     const [currentConversation, setCurrentConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const { user } = useContext(UserContext);
@@ -11,7 +11,7 @@ export const ChatProvider = ({ children }) => {
         if (!socket) return;
 
         // Load messages
-        const res = await fetch(`/messages/${conversationId}`);
+        const res = await fetch(`http://localhost:9999/message/${conversationId}`);
         const data = await res.json();
         setMessages(data);
 
@@ -33,13 +33,18 @@ export const ChatProvider = ({ children }) => {
     }, [socket, currentConversation]);
 
     const sendMessage = (content) => {
+        console.log(content)
+        console.log(socket)
+        console.log(currentConversation)
         if (!socket || !currentConversation || !user) return;
-
+        console.log(content)
         const message = {
             conversationId: currentConversation,
             sender: user._id,
             content
         };
+        console.log()
+        console.log("đâs", message)
 
         socket.emit('send-message', message);
     };
@@ -56,4 +61,4 @@ export const ChatProvider = ({ children }) => {
     );
 };
 
-export const useChat = () => useContext(ChatContext);
+export { ChatContext, ChatProvider };

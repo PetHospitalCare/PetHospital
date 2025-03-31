@@ -28,7 +28,7 @@ export default function MedicalResult({ medical }) {
     };
 
     return (
-        <div className="mt-1 max-h-screen overflow-y-auto">
+        <div className="mt-1">
             <h2 className="text-xl font-bold mb-4 text-[#3F2E2E]">Kết quả khám bệnh - B.S {medical?.booking_id?.doctor_id?.username}</h2>
             <div className="grid grid-cols-12 gap-6 border rounded-lg overflow-hidden shadow-md">
                 {/* Column 1: Service Names (1/3 width) */}
