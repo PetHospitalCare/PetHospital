@@ -15,7 +15,7 @@ const CustomerChat = () => {
     } = useContext(ChatContext);
 
     const [message, setMessage] = useState('');
-    const [isMinimized, setIsMinimized] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(true);
     const [isOnline, setIsOnline] = useState(false);
     const messagesEndRef = useRef(null);
 
@@ -41,7 +41,6 @@ const CustomerChat = () => {
 
     const handleSend = () => {
         if (message.trim()) {
-            console.log(message)
             sendMessage(message);
             setMessage('');
         }

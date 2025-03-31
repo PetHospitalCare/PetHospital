@@ -1,22 +1,33 @@
 import { useState, useEffect, useContext, useRef } from 'react';
 import { ChatContext } from '../../contexts/ChatProvider';
 import { UserContext } from '@/contexts/UserContext';
-import { Send, ChevronRight, User, Users, MessageSquare } from 'lucide-react';
+import { Send, ChevronRight, User, Users, MessageSquare, Bell } from 'lucide-react';
+import { socket } from "../../App";
 
 export const StaffChat = () => {
     const { user } = useContext(UserContext);
     const {
         currentConversation,
         messages,
+        notifications,
         joinConversation,
-        sendMessage
+        sendMessage,
+        clearNotifications
     } = useContext(ChatContext);
 
     const [conversations, setConversations] = useState([]);
-    const [filteredMessages, setFilteredMessages] = useState([]); // Thêm state mới
+    const [filteredMessages, setFilteredMessages] = useState([]);
     const [message, setMessage] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [showNotifications, setShowNotifications] = useState(false);
     const messagesEndRef = useRef(null);
+
+    // Request notification permission on component mount
+    useEffect(() => {
+        if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+            Notification.requestPermission();
+        }
+    }, []);
 
     // Load all conversations
     useEffect(() => {
@@ -44,6 +55,51 @@ export const StaffChat = () => {
         } else {
             setFilteredMessages([]);
         }
+
+        socket.on('conversation-status-update', (conversation) => {
+            setConversations(prevConversations => {
+                return prevConversations.map(conv => {
+                    if (conv._id === conversation.conversationId) {
+                        return {
+                            ...conv,
+                            unread: conversation.unread,
+                            lastMessage: conversation.lastMessage,
+                            updatedAt: conversation.timestamp || conv.updatedAt
+                        };
+                    }
+                    return conv;
+                });
+            });
+        });
+        socket.on('new-conversation', (newConversation) => {
+            setConversations(prevConversations => {
+                // Kiểm tra xem cuộc hội thoại đã tồn tại chưa
+                const exists = prevConversations.some(conv => conv._id === newConversation._id);
+                if (!exists) {
+                    // Nếu chưa tồn tại, thêm vào danh sách và đánh dấu unread
+                    return [
+                        {
+                            ...newConversation,
+                            unread: true
+                        },
+                        ...prevConversations
+                    ];
+                }
+                return prevConversations;
+            });
+            // Hiển thị thông báo trên trình duyệt (nếu được cho phép)
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Cuộc hội thoại mới', {
+                    body: `Khách hàng ${newConversation.customerId.username} cần hỗ trợ`,
+                    icon: '/notification-icon.png'
+                });
+            }
+        });
+
+        return () => {
+            socket.off('conversation-status-update');
+            socket.off('new-conversation');
+        };
     }, [messages, currentConversation]);
 
     // Auto scroll to bottom when messages change
@@ -69,19 +125,42 @@ export const StaffChat = () => {
         }
     };
 
+    const handleJoinConversation = (conversationId) => {
+        joinConversation(conversationId);
+        clearNotifications(conversationId);
+        setShowNotifications(false);
+    };
+
     // Filter conversations by search term
-    const filteredConversations = conversations.filter(conv =>
-        conv.customerId.username.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredConversations = conversations
+        .filter(conv =>
+            conv.customerId.username.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            // First sort by unread status (unread conversations come first)
+            if (a.unread !== b.unread) {
+                return a.unread ? -1 : 1; // true values come before false values
+            }
+
+            // Then sort by updatedAt (most recent first)
+            return new Date(b.updatedAt) - new Date(a.updatedAt);
+        });
+
+    // Count unread notifications
+    const unreadCount = notifications.length;
+
     return (
         <div className="flex h-screen bg-gray-50">
             {/* Conversation sidebar */}
             <div className="w-80 border-r border-gray-200 bg-white flex flex-col">
                 <div className="p-4 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold flex items-center">
-                        <MessageSquare className="mr-2" size={20} />
-                        Conversations
-                    </h2>
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-xl font-semibold flex items-center">
+                            <MessageSquare className="mr-2" size={20} />
+                            Conversations
+                        </h2>
+
+                    </div>
                     <div className="mt-3 relative">
                         <input
                             type="text"
@@ -103,20 +182,22 @@ export const StaffChat = () => {
                         filteredConversations.map(conv => (
                             <div
                                 key={conv._id}
-                                className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${currentConversation === conv._id ? 'bg-indigo-50' : ''
-                                    }`}
-                                onClick={() => joinConversation(conv._id)}
+                                className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${currentConversation === conv._id ? 'bg-indigo-50' : ''}`}
+                                onClick={() => handleJoinConversation(conv._id)}
                             >
-                                <div>
+                                <div className="flex-1">
                                     <h4 className="font-medium flex items-center">
                                         {conv.customerId.username}
-                                        {currentConversation === conv._id && (
-                                            <span className="ml-2 w-2 h-2 rounded-full bg-green-500"></span>
+                                        {conv.unread && (
+                                            <span className="ml-2 w-2 h-2 rounded-full bg-red-500"></span>
                                         )}
                                     </h4>
-                                    <p className="text-sm text-gray-500 mt-1 flex items-center">
-                                        <Users className="mr-1" size={14} />
-                                        {conv.staffParticipants.length} staff participating
+                                    <p className="text-sm text-gray-500 mt-1 flex items-center truncate">
+                                        {conv.lastMessage ? (
+                                            <span className="truncate">Bạn có tin nhắn mới: {conv.lastMessage}</span>
+                                        ) : (
+                                            <Users className="mr-1" size={14} />
+                                        )}
                                     </p>
                                 </div>
                                 <ChevronRight size={18} className="text-gray-400" />
@@ -137,7 +218,7 @@ export const StaffChat = () => {
                                     {conversations.find(c => c._id === currentConversation)?.customerId.username || 'Chat'}
                                 </h3>
                                 <p className="text-sm text-gray-500">
-                                    {conversations.find(c => c._id === currentConversation)?.staffParticipants.length || 0} staff online
+
                                 </p>
                             </div>
                         </div>

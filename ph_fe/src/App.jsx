@@ -66,8 +66,6 @@ function App() {
           <Route path='/payment-result' element={<PaymentResult />} />
           <Route path='/medical-detail/:id' element={<MedicalDetail />} />
         </Route>
-        <Route path='test' element={<CustomerChat />} />
-        <Route path='staff' element={<StaffChat />} />
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route element={<AdminLayout />}> {/* Bọc toàn bộ route admin */}
