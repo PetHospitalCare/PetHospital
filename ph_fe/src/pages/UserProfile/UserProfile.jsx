@@ -139,7 +139,7 @@ export default function UserProfile() {
     };
 
     return (
-        <div className="container mx-auto pt-24 px-4">
+        <div className="container max-w-screen-lg mx-auto pt-24 px-4 lg:px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Thông tin cá nhân */}
                 <div className="p-6 border rounded-lg shadow-lg bg-white">
