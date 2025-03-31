@@ -14,6 +14,7 @@ import { ChevronUpDownIcon } from '@heroicons/react/16/solid';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { BookingServices } from "@/services/BookingService";
 import { toast } from "sonner";
+import { useNavigate } from 'react-router-dom';
 
 export default function BookingDialog({ open, onClose }) {
     const { user } = useContext(UserContext);
@@ -33,6 +34,7 @@ export default function BookingDialog({ open, onClose }) {
         note: ""
     });
     const [selected, setSelected] = useState(null);
+    const navigate = useNavigate();
 
     const fetchService = async () => {
         try {
@@ -110,7 +112,7 @@ export default function BookingDialog({ open, onClose }) {
                     description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
                     action: {
                         label: 'Xem chi tiết',
-                        onClick: () => console.log('Undo')
+                        onClick: () =>  navigate('/history-booking')
                     }
                 });
                 handleClose();

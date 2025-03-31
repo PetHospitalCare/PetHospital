@@ -74,11 +74,6 @@ export default function DropdownMenuDemo(user) {
                         </DropdownMenuItem>
                     </Link>
                     <DropdownMenuItem>
-                        <User />
-                        <span>Hồ sơ khám bệnh</span>
-
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
                         <ShoppingBasket />
                         <span>Đơn hàng</span>
 
