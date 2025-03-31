@@ -180,7 +180,7 @@ export default function Header() {
                     <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}
                          onClick={() => setIsOpen(!isOpen)}>
                         <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">
-                            Product
+                            Danh sách sản phẩm
                             <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400"/>
                         </div>
 
