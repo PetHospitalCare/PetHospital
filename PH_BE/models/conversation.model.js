@@ -18,7 +18,11 @@ const conversationSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    unread: {
+        type: Boolean,
+        default: true
+    },
 }, { timestamps: true });
 
 // Tự động tạo conversation khi khách hàng mới đăng ký
