@@ -141,4 +141,22 @@ const DeleteNew = async (req, res) => {
         return res.status(500).json({ message: "Lỗi hệ thống Back-end" });
     }
 };
-module.exports = { CreateNew, GetAllNews, EditNew, DeleteNew };
+
+const GetOneNew = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const news = await New.findById(id);
+        // Trả về danh sách sản phẩm
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy sản phẩm thành công',
+            news,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+module.exports = { CreateNew, GetAllNews, EditNew, DeleteNew, GetOneNew };

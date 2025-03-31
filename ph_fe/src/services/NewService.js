@@ -5,6 +5,10 @@ const GetAllNews = (data) => {
     return axios.get(`/new/get-all`);
 };
 
+const GetOneNew = (data) => {
+    return axios.get(`/new/get-one-new/${data}`);
+};
+
 //Tạo bài viết mới
 const CreateNew = (data) => {
     return axios.post(`/new/create-new`, data);
@@ -24,5 +28,6 @@ export const NewServices = {
     GetAllNews,
     CreateNew,
     updateNew,
-    deleteNew
+    deleteNew,
+    GetOneNew
 };

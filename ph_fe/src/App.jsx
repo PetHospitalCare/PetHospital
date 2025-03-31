@@ -37,8 +37,8 @@ import News_Management from './pages/NewsManagement/News_Management'
 
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 import PaymentResult from "@/pages/payments/payment-result.jsx";
-import Dashboard from './pages/DashBoard/dash-board'
 import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'
+import NewDetail from './pages/NewDetail/NewDetail'
 
 export const socket = io.connect("http://localhost:9999",);
 
@@ -52,6 +52,7 @@ function App() {
           <Route path='/SignUp' element={<SignUp />} />
           <Route path='/otp' element={<OTP_Input />} />
           <Route path='/change-email' element={<ChangeEmail />} />
+          <Route path='/new-detail/:id' element={<NewDetail />} />
           <Route path="/loading" element={<LoadingScreen />} />
           <Route path='/signup-success' element={<SignupSuccess />} />
           <Route path='/unauthorized' element={<Unauthorized />} />
@@ -76,8 +77,6 @@ function App() {
             <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
             <Route path='/Booking_Management' element={<ManageBooking />} />
             <Route path='/News_Management' element={<News_Management />} />
-            <Route path='/Dashboard' element={<Dashboard />} />
-
           </Route>
         </Route>
         <Route path="*" element={< Notfound />} />
