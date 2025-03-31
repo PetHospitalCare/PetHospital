@@ -33,14 +33,14 @@ export default function NewDetail() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex items-center justify-center py-8" style={{ backgroundColor: "#fef6e9" }}>
-        <div className="container mx-auto px-4 lg:px-16 xl:px-24">
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-start py-8" style={{ backgroundColor: "#fef6e9" }}>
+        <div className="container mx-auto px-4 lg:px-16 xl:px-24 pt-20">
             {loading ? (
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
                 </div>
             ) : data ? (
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-5xl mx-auto">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-5xl mx-auto h-[calc(100vh-4rem)] overflow-y-auto">
                     {data.images && data.images.url && (
                         <div className="w-full h-80 overflow-hidden">
                             <img 
