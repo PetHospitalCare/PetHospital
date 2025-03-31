@@ -81,12 +81,10 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link to="/profile">
                 <DropdownMenuItem>
                   <BadgeCheck />
                   Hồ hơ
                 </DropdownMenuItem>
-              </Link>
               <DropdownMenuItem>
                 <CreditCard />
                 Billing
