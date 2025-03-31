@@ -47,7 +47,7 @@ export default function HistoryBooking() {
             <hr className="h-1 bg-[#3F2E2E] border-none" />
 
             {/* Booking List */}
-            <div className="mt-8 space-y-6">
+            <div className="mt-8 space-y-6 mb-8">
                 {HBooking.map((booking) => (
                     <div
                         key={booking.id}

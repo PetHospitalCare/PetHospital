@@ -139,7 +139,7 @@ export default function UserProfile() {
     };
 
     return (
-        <div className="container max-w-screen-lg mx-auto pt-24 px-4 lg:px-4">
+        <div className="container max-w-screen-2xl mx-auto pt-24 px-8 lg:px-16">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Thông tin cá nhân */}
                 <div className="p-6 border rounded-lg shadow-lg bg-white">
@@ -249,7 +249,7 @@ export default function UserProfile() {
 
                             <div className="mt-6 text-right">
                                 <Button
-                                    className="rounded p-3 text-base bg-[#3F2E2E] text-white bg-[#3F2E2E] transition-all"
+                                    className="rounded p-3 text-base text-white bg-[#3F2E2E] transition-all"
                                     onClick={handleSave}
                                     disabled={isLoading}
                                 >

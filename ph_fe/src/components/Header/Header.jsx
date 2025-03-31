@@ -170,7 +170,7 @@ export default function Header() {
                     <Link to="/" className="text-sm/6 font-semibold text-gray-900">
                         About us
                     </Link>
-                    <Link to="/" className="text-sm/6 font-semibold text-gray-900">
+                    <Link to="/Our-services" className="text-sm/6 font-semibold text-gray-900">
                         Our Services
                     </Link>
                     {/*<Link to="/product" className="text-sm/6 font-semibold text-gray-900">*/}
