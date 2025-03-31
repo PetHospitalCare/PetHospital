@@ -16,8 +16,8 @@ const MedicalRecord = require("./medicalRecord.model");
 
 
 const Payment = require("./payment.model");
-
-
+const Conversation = require("./conversation.model");
+const Message = require("./message.model");
 mongoose.Promise = global.Promise;
 
 const db = {};
@@ -29,9 +29,9 @@ db.otp = OTP
 db.pet = Pet
 db.booking = Booking
 db.medicine = Medicine
-
+db.conversation = Conversation
 db.medicalRecord = MedicalRecord
-
+db.message = Message
 db.shoppingcart = ShoppingCart
 db.new = New
 

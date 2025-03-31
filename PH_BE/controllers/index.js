@@ -11,7 +11,8 @@ const PetController = require('./pet.controller');
 const ShoppingCartController = require('./shopping-cart.controller');
 const NewController = require("./new.controller")
 const PaymentController = require("./payment.controller");
-
+const DashBoardController = require("./dashboard.controller")
+const MessageController = require("./message.controller")
 module.exports = {
     ProductController,
     CategoryController,
@@ -25,5 +26,7 @@ module.exports = {
     PetController,
     ShoppingCartController,
     NewController,
-    PaymentController
+    PaymentController,
+    DashBoardController,
+    MessageController
 };

@@ -10,6 +10,8 @@ const PetRouter = require('./pet.route');
 const ShoppingCartRouter = require('./shopping-cart.route');
 const NewRouter = require("./new.route")
 const PaymentRouter = require('./payment.route');
+const DashboardRouter = require('./dashboard.route');
+const MessageRoute = require('./message.route');
 
 module.exports = {
     ProductRouter,
@@ -23,5 +25,7 @@ module.exports = {
     ShoppingCartRouter,
     NewRouter,
     MedicalRoute,
-    PaymentRouter
+    PaymentRouter,
+    DashboardRouter,
+    MessageRoute
 };

@@ -102,7 +102,7 @@ export function AppSidebar({
     projects: [
       {
         name: "Thông số & Doanh thu",
-        url: "#",
+        url: "/Dashboard",
         icon: Map,
       },
       {

@@ -37,6 +37,7 @@ import News_Management from './pages/NewsManagement/News_Management'
 
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 import PaymentResult from "@/pages/payments/payment-result.jsx";
+import Dashboard from './pages/DashBoard/dash-board'
 import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'
 
 export const socket = io.connect("http://localhost:9999",);
@@ -75,6 +76,8 @@ function App() {
             <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
             <Route path='/Booking_Management' element={<ManageBooking />} />
             <Route path='/News_Management' element={<News_Management />} />
+            <Route path='/Dashboard' element={<Dashboard />} />
+
           </Route>
         </Route>
         <Route path="*" element={< Notfound />} />

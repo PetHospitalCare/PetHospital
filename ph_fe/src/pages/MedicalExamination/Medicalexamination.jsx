@@ -156,7 +156,10 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         Array.isArray(service?.subServices) &&
                         service?.subServices?.some((sub) => sub?._id === subService?._id),
                 );
-
+                // Find the actual subService from parent to get the name
+                const actualSubService = parentService?.subServices?.find(
+                    sub => sub?._id === subService?._id
+                );
                 if (!parentService) {
                     console.error("Parent service not found for sub-service:", subService);
                     return prev;
@@ -166,9 +169,9 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     ...prev,
                     {
                         id: subService?._id,
-                        name: subService?.name,
                         parentName: parentService?.name || "",
                         parentId: parentService?._id || "",
+                        name: actualSubService?.name,
                         parentType: serviceNameToType[parentService?.name] || "",
                     },
                 ];
@@ -310,7 +313,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
 
     const renderServiceForm = (subService) => {
         const serviceData = formData[subService?.id] || {};
-        console.log(formData)
+        console.log("sub: ", subService)
         switch (subService?.parentType) {
             case "vaccination":
                 return (
@@ -335,6 +338,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     />
                 );
             case "petCare":
+                console.log("PetCare formData:", formData[subService?.id]); // Add this debug log
                 return (
                     <PetCareForm
                         key={subService?.id}

@@ -12,8 +12,9 @@ const http = require("http");
 
 
 
-const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute, NewRouter, PaymentRouter } = require("./routes");
-
+const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute, NewRouter, PaymentRouter
+    , DashboardRouter, MessageRoute
+} = require("./routes");
 
 
 
@@ -54,17 +55,19 @@ app.use("/pet", PetRouter);
 app.use("/shopping-cart", ShoppingCartRouter);
 app.use("/new", NewRouter);
 app.use("/payment", PaymentRouter);
+app.use("/dashboard", DashboardRouter)
+app.use("/message", MessageRoute)
+// io.on("connection", (socket) => {
+//     console.log("An user connect: ", socket.id);
 
-io.on("connection", (socket) => {
-    console.log("An user connect: ", socket.id);
 
-    socket.on("disconnect", () => {
-        console.log("🔥: A user disconnected");
-    });
-});
+//     socket.on("disconnect", () => {
+//         console.log("🔥: A user disconnected");
+//     });
+// });
 
 exports.io = io;
-
+require("./sockets")(io);
 server.listen(process.env.PORT || 9999, process.env.HOST_NAME || "localhost", () => {
     console.log(`Server in running at: http://${process.env.HOST_NAME}:${process.env.PORT}`);
     db.connect();
