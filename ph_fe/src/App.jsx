@@ -38,6 +38,7 @@ import News_Management from './pages/NewsManagement/News_Management'
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 import PaymentResult from "@/pages/payments/payment-result.jsx";
 import Dashboard from './pages/DashBoard/dash-board'
+import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'
 
 export const socket = io.connect("http://localhost:9999",);
 
@@ -61,6 +62,7 @@ function App() {
           <Route path='/shopping-cart-detail' element={<ShoppingCartDetail />} />
           <Route path='/shopping-cart-payment' element={<ShoppingCartPayment />} />
           <Route path='/payment-result' element={<PaymentResult />} />
+          <Route path='/medical-detail/:id' element={<MedicalDetail />} />
         </Route>
 
         {/* Trang dành cho admin */}

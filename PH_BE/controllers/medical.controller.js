@@ -190,4 +190,48 @@ const getAllMedicalRecords = async (req, res) => {
     }
 }
 
-module.exports = { getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord, getAllMedicalRecords };
+const getOneMedicalByUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        let medicalRecords = await MedicalRecord.findOne({ booking_id: id })
+            .populate({
+                path: 'booking_id',
+                populate: [
+                    { path: 'doctor_id' },
+                    {
+                        path: 'pet_id',
+                        populate: { path: 'account_id' }
+                    }
+                ]
+            })
+            .populate({
+                path: 'services.service_id',
+            })
+            .populate("prescription.medicine")
+            .select(`booking_id _id createdAt updatedAt services note `);
+
+        // **Lọc subServices**
+        if (medicalRecords) {
+            medicalRecords = medicalRecords.toObject(); // Convert to plain object
+            medicalRecords.services = medicalRecords.services.map(service => {
+                const filteredSubServices = service.service_id?.subServices.filter(sub =>
+                    service.sub_service_id?.equals(sub._id)
+                );
+                return {
+                    ...service,
+                    service_id: {
+                        ...service.service_id,
+                        subServices: filteredSubServices, // Chỉ giữ subServices đã chọn
+                    }
+                };
+            });
+        }
+
+        res.status(200).json({ success: true, data: medicalRecords });
+    } catch (err) {
+        console.error("Error in getOneMedicalByUser:", err);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+module.exports = { getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord, getAllMedicalRecords, getOneMedicalByUser };
