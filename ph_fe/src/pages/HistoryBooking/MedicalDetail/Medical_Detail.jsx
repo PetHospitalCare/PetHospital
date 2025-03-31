@@ -54,20 +54,24 @@ export default function MedicalDetail() {
 
                 {/* Thông tin thú cưng */}
                 <div className="flex-1 px-6">
-                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8">
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6">
                         Tên: {medical?.booking_id?.pet_id?.name}
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6">
-                        <div>
-                            <p className="text-gray-900 text-lg md:text-xl mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                            <p className="text-gray-900 text-lg md:text-xl">
                                 <span className="font-semibold">Chủ sở hữu:</span> {medical?.booking_id?.pet_id?.account_id?.username}
                             </p>
                             <p className="text-gray-900 text-lg md:text-xl">
                                 <span className="font-semibold">Cân nặng:</span> {medical?.booking_id?.pet_id?.weight} kg
                             </p>
+                            <p className="text-gray-900 text-lg md:text-xl">
+                                <span className="font-semibold">Thời gian khám:</span>
+                                {`${String(new Date(medical?.booking_id?.date).getDate() + 1).padStart(2, "0")}/${String(new Date(medical?.booking_id?.date).getMonth() + 1).padStart(2, "0")}/${String(new Date(medical?.booking_id?.date).getFullYear())} - ${medical?.booking_id?.hour}`}
+                            </p>
                         </div>
-                        <div>
-                            <p className="text-gray-900 text-lg md:text-xl mb-6">
+                        <div className="space-y-4">
+                            <p className="text-gray-900 text-lg md:text-xl">
                                 <span className="font-semibold">Loài:</span> {medical?.booking_id?.pet_id?.type === "dog" ? "Chó" : "Mèo"}
                             </p>
                             <p className="text-gray-900 text-lg md:text-xl">
@@ -75,6 +79,7 @@ export default function MedicalDetail() {
                             </p>
                         </div>
                     </div>
+
                 </div>
             </div>
 

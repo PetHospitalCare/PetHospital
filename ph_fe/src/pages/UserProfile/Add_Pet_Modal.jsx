@@ -60,7 +60,7 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-[#FAF0D7] p-6 rounded-lg max-w-lg">
+            <DialogContent className="bg-[#fcf4df] p-6 rounded-lg max-w-lg">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">Thêm mới thú cưng</DialogTitle>
                 </DialogHeader>
@@ -87,7 +87,7 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
                         {/* Giống loài */}
                         <div className="col-span-1">
                             <Label htmlFor="species">Giống loài</Label>
-                            <Input type="text" id="species" name="species" placeholder="Loại" value={formData.species} onChange={handleChange} className="border p-2 rounded-md w-full" required />
+                            <Input type="text" id="species" name="species" placeholder="Giống.." value={formData.species} onChange={handleChange} className="border p-2 rounded-md w-full" required />
                             {errors.species && <p className="text-red-500 text-sm mt-1">{errors.species}</p>}
                         </div>
 

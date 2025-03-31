@@ -49,6 +49,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/SignUp' element={<SignUp />} />
+          <Route path='/Our-service' element={<SignUp />} />
           <Route path='/otp' element={<OTP_Input />} />
           <Route path='/change-email' element={<ChangeEmail />} />
           <Route path="/loading" element={<LoadingScreen />} />
