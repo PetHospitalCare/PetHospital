@@ -15,7 +15,6 @@ export default function MedicalDetail() {
             if (response.data.success) {
                 setMedical(response.data.data);
             }
-            console.log(medical);
         } catch (error) {
             console.error("Lỗi khi lấy lịch sử đặt lịch:", error);
         }

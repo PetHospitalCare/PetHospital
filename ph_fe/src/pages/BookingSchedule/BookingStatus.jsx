@@ -124,7 +124,6 @@ export default function BookingStatus({ status, setCount }) {
 
         loadData();
     }, [status]);
-    console.log(data)
     useEffect(() => {
         socket.on("newBooking", (newBooking) => {
             if (status === "pending") {
@@ -169,7 +168,6 @@ export default function BookingStatus({ status, setCount }) {
         });
         setIsViewDialogOpen(true);
     };
-    console.log(data)
 
     const columns = [
         {

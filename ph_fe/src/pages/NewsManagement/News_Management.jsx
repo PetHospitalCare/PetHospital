@@ -221,12 +221,12 @@ export default function News_Management() {
                     onChange={(e) => table.getColumn("title")?.setFilterValue(e.target.value)}
                     className="max-w-sm"
                 />
-                <Input
+                {/* <Input
                     placeholder="Tìm kiếm tên người tạo bài viết..."
                     value={(table.getColumn("username")?.getFilterValue()) ?? ""}
                     onChange={(e) => table.getColumn("username")?.setFilterValue(e.target.value)}
                     className="max-w-sm ml-2"
-                />
+                /> */}
                 <div className="text-center ml-auto">
                     <Button className="p-2 font-semibold text-white" onClick={() => setOpen(true)}>
                         Tạo bài viết mới

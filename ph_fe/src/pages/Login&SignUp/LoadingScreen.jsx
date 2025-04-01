@@ -12,7 +12,6 @@ export default function LoadingScreen() {
         const verifyOTP = async () => {
             try {
                     const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
-                    console.log(tempData)
     
                     await UserService.signUpService(tempData);
                     // Xóa dữ liệu tạm thời và điều hướng

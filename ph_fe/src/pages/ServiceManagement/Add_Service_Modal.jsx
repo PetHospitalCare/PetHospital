@@ -51,7 +51,6 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
             const response = await axios.post("http://localhost:9999/service/create", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            console.log("Response từ API:", response.data);
 
             if (response.data.message === "Tạo dịch vụ thành công") {
                 alert("Dịch vụ đã được thêm!");

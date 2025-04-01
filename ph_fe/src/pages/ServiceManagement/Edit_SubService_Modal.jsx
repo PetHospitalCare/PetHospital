@@ -50,7 +50,6 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
             if (!ServiceData?._id) {
                 throw new Error("Missing service or sub-service ID");
             }
-            console.log("test: ", updateData)
             const response = await axios.put(
                 `http://localhost:9999/service/${id}/sub-service/${ServiceData._id}`,
                 updateData

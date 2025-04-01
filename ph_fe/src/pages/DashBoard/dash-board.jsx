@@ -74,7 +74,6 @@ export default function Dashboard() {
 
         fetchDashboardData()
     }, [timeRange])
-    console.log(stats)
     return (
         <div className="flex min-h-screen w-full flex-col">
             <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">

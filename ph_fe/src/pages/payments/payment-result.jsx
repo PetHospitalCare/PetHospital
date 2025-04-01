@@ -15,7 +15,6 @@ export default function PaymentResult() {
     const getData = async () => {
         try {
             const queryParams = Object.fromEntries(searchParams.entries());
-            // console.log("VNPay Response:", queryParams);
 
             if (queryParams["vnp_ResponseCode"] && queryParams["vnp_TxnRef"]) {
                 const response = await PaymentService.updatePayment({

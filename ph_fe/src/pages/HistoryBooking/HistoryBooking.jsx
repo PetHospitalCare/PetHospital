@@ -23,7 +23,6 @@ export default function HistoryBooking() {
                     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
                 );
                 setHBooking(sortedBookings);
-                console.log(sortedBookings);
             }
         } catch (error) {
             console.error("Lỗi khi lấy lịch sử đặt lịch:", error);
