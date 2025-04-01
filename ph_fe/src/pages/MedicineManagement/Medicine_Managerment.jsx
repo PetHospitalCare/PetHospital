@@ -95,13 +95,13 @@ export default function MedicineManagerment() {
             accessorKey: "images",
             header: () => <div className="text-center">Ảnh</div>,
             cell: ({ row }) => {
-                const images = row.original.images; // Lấy danh sách ảnh từ API
+                const images = row?.original?.images; // Lấy danh sách ảnh từ API
                 return (
                     <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
                         {images.map((image, index) => (
-                            <Zoom>
+                            <Zoom key={index}>
                                 <img
-                                    src={image.url}
+                                    src={image?.url}
                                     alt={`Medicine ${index}`}
                                     className="h-28 w-28 object-cover rounded-md"
                                 />
