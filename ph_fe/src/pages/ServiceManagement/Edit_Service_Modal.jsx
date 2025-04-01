@@ -68,8 +68,6 @@ export default function Edit_Modal({ open, onClose, ServiceData, onUpdateService
                 formData,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
-            console.log(response.data)
-
             if (response.data.success) {
                 alert("Cập nhật dịch vụ thành công!");
                 onUpdateService({

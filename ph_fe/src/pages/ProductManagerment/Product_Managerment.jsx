@@ -80,7 +80,6 @@ export default function Product_Managerment() {
     }, []);
 
     const handleDelete = async (id) => {
-        console.log(id)
         if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
             try {
                 const response = await ProductService.deleteProduct(id)

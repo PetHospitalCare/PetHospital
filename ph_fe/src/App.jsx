@@ -41,6 +41,7 @@ import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'
 import NewDetail from './pages/NewDetail/NewDetail'
 import CustomerChat from './pages/Chat/CustomerChat'
 import { StaffChat } from './pages/Chat/StaffChat'
+import Dashboard from './pages/DashBoard/dash-board'
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {

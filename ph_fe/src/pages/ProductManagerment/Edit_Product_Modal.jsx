@@ -74,13 +74,9 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                 ? ProductData.type
                 : ProductData.type ? [ProductData.type] : [];
             setType(typeValue);
-            console.log("Set type from product data:", typeValue);  // Kiểm tra giá trị đã được set
-            console.log(frameworksList.filter(item => typeValue.includes(item.value)));
-
 
             // Reset images and prepare for potential image editing
             setImages(ProductData.imageUrl);
-            console.log(ProductData)
         }
     }, [ProductData, open]);
 
@@ -168,7 +164,6 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                                 placeholder="Chọn danh mục"
                                 onChange={(selected) => {
                                     setSelectedCategory(selected.value);
-                                    console.log(selected.value)
                                 }}
                                 onCreate={(label) => handleCreateCategory(label)}
                             />
@@ -191,7 +186,6 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                                 className="text-gray-400"
                                 options={frameworksList}
                                 onValueChange={(selected) => {
-                                    console.log("Selected types:", selected);
                                     setType(selected);
                                 }}
                                 value={type}

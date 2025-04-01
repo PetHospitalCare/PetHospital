@@ -79,7 +79,6 @@ export default function UserProfile() {
             // Tạo FormData để gửi file
             const formData = new FormData();
             formData.append("image", imageFile);
-            console.log(imageFile)
             // Gọi API upload ảnh (giả định bạn có API này trong UserService)
             const response = await UserService.uploadAvatar(formData);
 
