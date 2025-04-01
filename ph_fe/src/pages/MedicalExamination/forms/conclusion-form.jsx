@@ -38,7 +38,6 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
     if (medicines.length === 0) {
       loadMedicines();
     }
-    console.log("Form edit:", conclusion)
   }, [])
 
   const loadMedicines = async () => {

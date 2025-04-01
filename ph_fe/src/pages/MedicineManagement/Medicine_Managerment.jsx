@@ -56,7 +56,6 @@ export default function MedicineManagerment() {
         if (window.confirm("Bạn có chắc chắn muốn xóa thuốc này?")) {
             try {
                 const response = await MedicineService.deleteMedicine(id);
-                console.log(response)
                 setData((prevData) => prevData.filter((acc) => acc._id !== id));
                 toast.success("Xóa thuốc thành công!");
             } catch (error) {

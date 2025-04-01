@@ -53,7 +53,6 @@ export default function Calendar() {
                 };
             });
             setAppointments(formattedAppointments);
-            console.log(appointments)
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu booking:", error);
         }

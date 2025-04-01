@@ -81,7 +81,6 @@ export function ImagingForm({ formData, onChange, subService, petInfo, isReadOnl
     };
 
   }, []);
-  console.log(images)
   const loadImage = (url) => {
     return new Promise((resolve, reject) => {
       const img = new Image()

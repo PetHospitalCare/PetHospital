@@ -130,7 +130,6 @@ export default function PetInfo() {
 
             // Gọi API cập nhật thú cưng
             const response = await PetService.updatePet(petId, updatedPet);
-            console.log("Sending data to backend:", petId, updatedPet);
             if (response.status === 200) {
                 toast.success("Cập nhật thông tin thú cưng thành công");
                 fetchPetData(); // Tải lại dữ liệu thú cưng
