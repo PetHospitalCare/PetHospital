@@ -131,7 +131,7 @@ export default function Product_Managerment() {
                 return (
                     <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
                         {images.map((image, index) => (
-                            <Zoom>
+                            <Zoom key={index}>
                                 <img
                                     src={image.url}
                                     alt={`Product ${index}`}
