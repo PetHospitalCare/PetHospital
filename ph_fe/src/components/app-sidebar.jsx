@@ -12,7 +12,8 @@ import {
   SquareTerminal,
   HeartPulse,
   CalendarCheck,
-  User
+  User,
+  MessageSquare
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -119,6 +120,11 @@ export function AppSidebar({
         name: "Tài Khoản",
         url: "/Account_Management",
         icon: User,
+      },
+      {
+        name: "Trò chuyện",
+        url: "/chat",
+        icon: MessageSquare,
       },
 
     ],

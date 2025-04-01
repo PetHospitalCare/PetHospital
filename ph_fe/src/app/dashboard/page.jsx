@@ -51,7 +51,6 @@ export default function Page({ children }) {
       if (!newBooking || !newBooking.guest_name) {
         return;
       }
-      console.log("newBooking", newBooking);
       setNotifications((prevNotifications) => [
         {
           message: `${newBooking.guest_name} có đặt lịch hẹn mới!`,
@@ -61,9 +60,22 @@ export default function Page({ children }) {
       ]);
       setUnreadCount((prevCount) => prevCount + 1);
     });
+    socket.on('conversation-status-update', (conversation) => {
+      if (!conversation) return
+      console.log("Conservation: ", conversation)
+      setNotifications((prevNotifications) => [
+        {
+          message: `Bạn có tin nhắn mới!`,
+          time: conversation?.timestamp
+        },
+        ...prevNotifications,
+      ])
+      setUnreadCount((prevCount) => prevCount + 1);
+    });
 
     return () => {
       socket.off("newBooking");
+      socket.off("conversation-status-update");
     };
   }, []);
 
