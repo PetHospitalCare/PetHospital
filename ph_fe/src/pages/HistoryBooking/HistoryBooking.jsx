@@ -9,7 +9,7 @@ export default function HistoryBooking() {
     const statusMapping = {
         pending: "Chờ xác nhận",
         cancel: "Đã hủy",
-        confirm: "Đã xác nhận",
+        confirm: "Chờ khám",
         complete: "Đã hoàn thành",
     };
     const navigate = useNavigate();
