@@ -77,6 +77,8 @@ function App() {
             <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
             <Route path='/Booking_Management' element={<ManageBooking />} />
             <Route path='/News_Management' element={<News_Management />} />
+            <Route path='/Dashboard' element={<Dashboard />} />
+            <Route path='/chat' element={<StaffChat />} />
           </Route>
         </Route>
         <Route path="*" element={< Notfound />} />

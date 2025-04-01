@@ -187,16 +187,18 @@ export const StaffChat = () => {
                             >
                                 <div className="flex-1">
                                     <h4 className="font-medium flex items-center">
-                                        {conv.customerId.username}
+                                        Khách hàng - {conv.customerId.username}
                                         {conv.unread && (
                                             <span className="ml-2 w-2 h-2 rounded-full bg-red-500"></span>
                                         )}
                                     </h4>
                                     <p className="text-sm text-gray-500 mt-1 flex items-center truncate">
-                                        {conv.lastMessage ? (
-                                            <span className="truncate">Bạn có tin nhắn mới: {conv.lastMessage}</span>
-                                        ) : (
-                                            <Users className="mr-1" size={14} />
+                                        <Users className="mr-1" size={14} />
+                                        {conv.unread && (
+                                            <span className="truncate">Bạn có tin nhắn mới</span>
+                                        )}
+                                        {conv.lastMessage && (
+                                            <span className="truncate">: {conv.lastMessage}</span>
                                         )}
                                     </p>
                                 </div>
