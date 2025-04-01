@@ -23,7 +23,6 @@ const CustomerChat = () => {
     // Tự động join conversation khi load
     useEffect(() => {
         if (user?._id) {
-            console.log(user._id)
             fetch(`http://localhost:9999/message/customer/${user?._id}`)
                 .then(res => res.json())
                 .then(data => joinConversation(data._id));
