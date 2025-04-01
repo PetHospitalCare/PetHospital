@@ -77,7 +77,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     // Load appointment data
                     const data = await BookingServices.GetBookingbyId(appointment?.id);
                     if (data?.data?.success) {
-                        console.log("Appointment data:", data?.data?.booking)
                         setpetInfo({
                             name: data?.data?.booking?.pet_id?.name,
                             type: data?.data?.booking?.type,
@@ -96,7 +95,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     // Load medical record
                     const recordData = await MeidicalServices.getMedicalByBookingId(appointment?.id);
                     if (recordData.data.data) {
-                        console.log("record: ", recordData.data.data)
                         const { services, diagnosis, result, note, createdAt, updatedAt, symptom, prescription } = recordData?.data.data;
 
                         setSelectedSubServices(services?.map(service => ({
@@ -274,7 +272,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                 console.log('FormData entry:', pair[0], pair[1]);
             }
 
-            console.log("Medical:", medicalRecordData)
             toast.success(isEditing ? "Cập nhật kết quả khám thành công!" : "Lưu kết quả khám thành công!");
             onOpenChange(false);
 
@@ -313,7 +310,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
 
     const renderServiceForm = (subService) => {
         const serviceData = formData[subService?.id] || {};
-        console.log("sub: ", subService)
         switch (subService?.parentType) {
             case "vaccination":
                 return (
@@ -338,7 +334,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     />
                 );
             case "petCare":
-                console.log("PetCare formData:", formData[subService?.id]); // Add this debug log
                 return (
                     <PetCareForm
                         key={subService?.id}
