@@ -211,13 +211,12 @@ const receivehook = async (req, res) => {
                 new: true, // Trả về document sau khi update
             }
         )
-        if (!updatedBooking ) {
+        if (!updatedBooking) {
             console.log("Booking not found for orderCode:", orderCode);
 
         }
         const st = Booking.findOne({ "payment.order_code": orderCode })
-        console.log("test:", st)
-        console.log(updatedBooking);
+        console.log(data);
         server.io.emit("payment_success", updatedBooking)
         return res.status(200).json({
             // checkoutUrl: paymentLinkRes.qrCode,
