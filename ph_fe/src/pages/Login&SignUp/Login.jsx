@@ -59,7 +59,7 @@ export default function Login() {
                 <div>
                   <label className="block text-sm font-medium mb-2 text-left">Email</label>
                   <input
-                    type="email"
+                    type="text"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
