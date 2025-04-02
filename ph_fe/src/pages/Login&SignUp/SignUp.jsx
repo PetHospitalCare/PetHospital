@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 import { Button } from "@/components/ui/button";
 import StepProgressBar from "@/components/Step-progress-bar";
-import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { UserService } from "../../services/UserService";
 
@@ -17,6 +16,7 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
@@ -26,21 +26,26 @@ export default function SignUp() {
     const handleSignUp = async (e) => {
         e.preventDefault();
         setError("");
+        setIsLoading(true);
 
         if (!validateEmail(email)) {
-            setError("Email must be a valid @gmail.com address");
+            setError("Email phải là địa chỉ @gmail.com hợp lệ");
+            setIsLoading(false);
             return;
         }
         if (!validatePhone(phone)) {
-            setError("Phone number must be a valid number");
+            setError("Số điện thoại không hợp lệ");
+            setIsLoading(false);
             return;
         }
         if (!validatePassword(password)) {
-            setError("Password must be at least 8 characters long, contain at least one uppercase letter and one special character");
+            setError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa và 1 ký tự đặc biệt");
+            setIsLoading(false);
             return;
         }
         if (password !== confirmPassword) {
-            setError("Passwords do not match");
+            setError("Mật khẩu xác nhận không khớp");
+            setIsLoading(false);
             return;
         }
 
@@ -53,15 +58,17 @@ export default function SignUp() {
             const isPhoneExist = accounts.some(acc => acc.phone === phone);
 
             if (isEmailExist) {
-                setError("Email is already registered");
+                setError("Email đã được đăng ký");
+                setIsLoading(false);
                 return;
             }
             if (isPhoneExist) {
-                setError("Phone number is already registered");
+                setError("Số điện thoại đã được đăng ký");
+                setIsLoading(false);
                 return;
             }
-            
-            await UserService.sendOtp({email: email});
+
+            await UserService.sendOtp({ email: email });
 
             // save temporary in localStorage
             localStorage.setItem("tempSignupData", JSON.stringify({
@@ -75,7 +82,9 @@ export default function SignUp() {
 
             navigate("/otp", { state: { email } });
         } catch (err) {
-            setError("Failed to check existing accounts");
+            setError("Không thể kiểm tra tài khoản hiện có");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -94,7 +103,7 @@ export default function SignUp() {
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
         if (e.target.value !== password) {
-            setConfirmPasswordError("Passwords do not match");
+            setConfirmPasswordError("Mật khẩu xác nhận không khớp");
         } else {
             setConfirmPasswordError("");
         }
@@ -134,40 +143,40 @@ export default function SignUp() {
                         {/* Email */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Email<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="email" 
-                                value={email} 
+                            <Input
+                                type="email"
+                                value={email}
                                 placeholder="Nhập email"
-                                onChange={(e) => setEmail(e.target.value)} 
+                                onChange={(e) => setEmail(e.target.value)}
                                 required />
                         </div>
 
                         {/* Phone Number */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Số điện thoại<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="tel" 
-                                value={phone} 
-                                placeholder="Nhập số điện thoại" 
-                                onChange={(e) => setPhone(e.target.value)} 
+                            <Input
+                                type="tel"
+                                value={phone}
+                                placeholder="Nhập số điện thoại"
+                                onChange={(e) => setPhone(e.target.value)}
                                 required />
                         </div>
 
                         {/* Gender Selection */}
-                        <div className="flex">
+                        <div className="flex justify-between">
                             <Button
                                 type="button"
                                 value="male"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
-                                onClick ={(e) => setGender(e.target.value)}
+                                className={`w-2/5 p-3 rounded-lg font-medium ${gender === "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick={() => setGender("male")}
                             >
                                 Nam
                             </Button>
                             <Button
                                 type="button"
                                 value="female"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
-                                onClick ={(e) => setGender(e.target.value)}
+                                className={`w-2/5 p-3 rounded-lg font-medium ${gender === "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick={() => setGender("female")}
                             >
                                 Nữ
                             </Button>
@@ -176,22 +185,22 @@ export default function SignUp() {
                         {/* Password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Mật khẩu<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="password" 
-                                value={password} 
-                                placeholder="Nhập mật khẩu" 
-                                onChange={(e) => setPassword(e.target.value)} 
+                            <Input
+                                type="password"
+                                value={password}
+                                placeholder="Nhập mật khẩu"
+                                onChange={(e) => setPassword(e.target.value)}
                                 required />
                         </div>
 
                         {/* Confirm password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Xác nhận mật khẩu<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="password" 
-                                value={confirmPassword} 
-                                placeholder="Nhập lại mật khẩu" 
-                                onChange={handleConfirmPasswordChange} 
+                            <Input
+                                type="password"
+                                value={confirmPassword}
+                                placeholder="Nhập lại mật khẩu"
+                                onChange={handleConfirmPasswordChange}
                                 required />
                             {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
                         </div>
@@ -201,7 +210,13 @@ export default function SignUp() {
 
                         {/* Submit form button */}
                         <div className="text-center">
-                            <Button type="submit" className="w-2/5 bg-blue-400 text-white py-3 rounded font-medium hover:bg-blue-500 transition-colors">Tiếp theo</Button>
+                            <Button
+                                type="submit"
+                                className="w-2/5 bg-blue-400 text-white py-3 rounded font-medium hover:bg-blue-500 transition-colors"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Đang xử lý..." : "Tiếp theo"}
+                            </Button>
                         </div>
                     </form>
                 </div>
