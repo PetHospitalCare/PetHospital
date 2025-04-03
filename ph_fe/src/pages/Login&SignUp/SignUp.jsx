@@ -27,14 +27,14 @@ export default function SignUp() {
         e.preventDefault();
         setError("");
 
-        if (!validateEmail(email)) {
-            setError("Email must be a valid @gmail.com address");
-            return;
-        }
-        if (!validatePhone(phone)) {
-            setError("Phone number must be a valid number");
-            return;
-        }
+        // if (!validateEmail(email)) {
+        //     setError("Email must be a valid @gmail.com address");
+        //     return;
+        // }
+        // if (!validatePhone(phone)) {
+        //     setError("Phone number must be a valid number");
+        //     return;
+        // }
         if (!validatePassword(password)) {
             setError("Password must be at least 8 characters long, contain at least one uppercase letter and one special character");
             return;
@@ -60,8 +60,8 @@ export default function SignUp() {
                 setError("Phone number is already registered");
                 return;
             }
-            
-            await UserService.sendOtp({email: email});
+
+            await UserService.sendOtp({ email: email });
 
             // save temporary in localStorage
             localStorage.setItem("tempSignupData", JSON.stringify({
@@ -134,22 +134,22 @@ export default function SignUp() {
                         {/* Email */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Email<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="email" 
-                                value={email} 
+                            <Input
+                                type="email"
+                                value={email}
                                 placeholder="Nhập email"
-                                onChange={(e) => setEmail(e.target.value)} 
+                                onChange={(e) => setEmail(e.target.value)}
                                 required />
                         </div>
 
                         {/* Phone Number */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Số điện thoại<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="tel" 
-                                value={phone} 
-                                placeholder="Nhập số điện thoại" 
-                                onChange={(e) => setPhone(e.target.value)} 
+                            <Input
+                                type="tel"
+                                value={phone}
+                                placeholder="Nhập số điện thoại"
+                                onChange={(e) => setPhone(e.target.value)}
                                 required />
                         </div>
 
@@ -159,7 +159,7 @@ export default function SignUp() {
                                 type="button"
                                 value="male"
                                 className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
-                                onClick ={(e) => setGender(e.target.value)}
+                                onClick={(e) => setGender(e.target.value)}
                             >
                                 Nam
                             </Button>
@@ -167,7 +167,7 @@ export default function SignUp() {
                                 type="button"
                                 value="female"
                                 className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
-                                onClick ={(e) => setGender(e.target.value)}
+                                onClick={(e) => setGender(e.target.value)}
                             >
                                 Nữ
                             </Button>
@@ -176,22 +176,22 @@ export default function SignUp() {
                         {/* Password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Mật khẩu<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="password" 
-                                value={password} 
-                                placeholder="Nhập mật khẩu" 
-                                onChange={(e) => setPassword(e.target.value)} 
+                            <Input
+                                type="password"
+                                value={password}
+                                placeholder="Nhập mật khẩu"
+                                onChange={(e) => setPassword(e.target.value)}
                                 required />
                         </div>
 
                         {/* Confirm password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Xác nhận mật khẩu<span className="text-red-600">*</span></label>
-                            <Input 
-                                type="password" 
-                                value={confirmPassword} 
-                                placeholder="Nhập lại mật khẩu" 
-                                onChange={handleConfirmPasswordChange} 
+                            <Input
+                                type="password"
+                                value={confirmPassword}
+                                placeholder="Nhập lại mật khẩu"
+                                onChange={handleConfirmPasswordChange}
                                 required />
                             {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
                         </div>

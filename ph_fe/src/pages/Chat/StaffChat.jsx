@@ -55,7 +55,24 @@ export const StaffChat = () => {
         } else {
             setFilteredMessages([]);
         }
+    }, [messages, currentConversation]);
+    useEffect(() => {
+        const fetchConversations = async () => {
+            try {
+                const res = await fetch('http://localhost:9999/message/staff');
+                if (!res.ok) throw new Error('Failed to fetch conversations');
+                const data = await res.json();
+                setConversations(data);
+            } catch (error) {
+                console.error('Error fetching conversations:', error);
+            }
+        };
 
+        fetchConversations();
+    }, []);
+
+    // Filter messages by current conversation
+    useEffect(() => {
         socket.on('conversation-status-update', (conversation) => {
             setConversations(prevConversations => {
                 return prevConversations.map(conv => {
@@ -72,11 +89,12 @@ export const StaffChat = () => {
             });
         });
         socket.on('new-conversation', (newConversation) => {
+            console.log("New conversation received:", newConversation._id);
             setConversations(prevConversations => {
-                // Kiểm tra xem cuộc hội thoại đã tồn tại chưa
+                // Check if the conversation already exists
                 const exists = prevConversations.some(conv => conv._id === newConversation._id);
                 if (!exists) {
-                    // Nếu chưa tồn tại, thêm vào danh sách và đánh dấu unread
+                    // If it doesn't exist, add it to the list and mark as unread
                     return [
                         {
                             ...newConversation,
@@ -87,13 +105,6 @@ export const StaffChat = () => {
                 }
                 return prevConversations;
             });
-            // Hiển thị thông báo trên trình duyệt (nếu được cho phép)
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('Cuộc hội thoại mới', {
-                    body: `Khách hàng ${newConversation.customerId.username} cần hỗ trợ`,
-                    icon: '/notification-icon.png'
-                });
-            }
         });
 
         return () => {

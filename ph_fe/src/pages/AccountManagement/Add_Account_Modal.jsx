@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -23,6 +23,9 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
         phone: "",
         roles: []
     });
+    useEffect(() => {
+        setFormData({ username: "", password: "", email: "", phone: "", roles: [] });
+    }, [open]);
 
     const [errors, setErrors] = useState({});
 

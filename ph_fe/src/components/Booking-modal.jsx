@@ -15,11 +15,13 @@ import { CheckIcon } from '@heroicons/react/20/solid';
 import { BookingServices } from "@/services/BookingService";
 import { toast } from "sonner";
 import { useNavigate } from 'react-router-dom';
+import { UserService } from "@/services/UserService";
 
 export default function BookingDialog({ open, onClose }) {
     const { user } = useContext(UserContext);
     const [service, setService] = useState([]);
     const [pet, setPet] = useState([]);
+    const [userData, setUserData] = useState({});
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
@@ -58,20 +60,38 @@ export default function BookingDialog({ open, onClose }) {
             console.error("Lỗi khi lấy dữ liệu thú cưng:", error);
         }
     };
-
+    const fetchUserData = async () => {
+        try {
+            if (!user?._id) return;
+            const response = await UserService.getCurrentUser();
+            if (response.data.success) {
+                setUserData({
+                    _id: response.data.account._id,
+                    role: response.data.account.email,
+                    email: response.data.account.email,
+                    username: response.data.account.username,
+                    phone: response.data.account.phone
+                });
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
+            toast.error("Không thể tải thông tin người dùng");
+        }
+    };
     useEffect(() => {
         fetchService();
         fetchPet();
-    }, [user]);
+        fetchUserData();
+    }, [user, open]);
 
     useEffect(() => {
         if (user?.role?.includes("customer")) {
             setFormData((prev) => ({
                 ...prev,
-                name: user?.username || "",
-                phone: user?.phone || "",
-                email: user?.email || "",
-                account_id: user?._id || "",
+                name: userData?.username || "",
+                email: userData?.email || "",
+                account_id: userData?._id || "",
+                phone: userData?.phone || "",
             }));
         }
     }, [user, open]);
@@ -112,7 +132,7 @@ export default function BookingDialog({ open, onClose }) {
                     description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
                     action: {
                         label: 'Xem chi tiết',
-                        onClick: () =>  navigate('/history-booking')
+                        onClick: () => navigate('/history-booking')
                     }
                 });
                 handleClose();
