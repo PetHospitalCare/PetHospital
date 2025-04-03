@@ -32,6 +32,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
     });
     const [imageFiles, setImageFiles] = useState([]);
     const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
     const petTypes = ["Dog", "Cat"];
 
     const handleInputChange = (e) => {
@@ -46,34 +47,34 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                 : [...prevData.pet_type, type]
         }));
     };
-    //Hành động thêm ảnh và kiểm tra validate 
+
+    // Hành động thêm ảnh và kiểm tra validate
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
-        if (files.length + imageFiles.length > 9) {
-            alert("Bạn chỉ có thể tải lên tối đa 9 ảnh.");
+        if (files.length > 1 || imageFiles.length >= 1) {
+            toast.error("Chỉ được tải lên tối đa 1 ảnh.");
             return;
         }
-        setImageFiles(prev => [...prev, ...files]);
+        setImageFiles(files);
 
         // Preview images
         const newImages = files.map((file) => URL.createObjectURL(file));
         setFormData(prev => ({
             ...prev,
-            images: [...prev.images, ...newImages]
+            images: newImages
         }));
     };
 
-    //Xoá ảnh
-    const handleRemoveImage = (index) => {
+    // Xoá ảnh
+    const handleRemoveImage = () => {
         setFormData((prev) => ({
             ...prev,
-            images: prev.images.filter((_, i) => i !== index),
+            images: [],
         }));
-
-        setImageFiles((prev) => prev.filter((_, i) => i !== index));
+        setImageFiles([]);
     };
 
-    //Trường kiểm tra thông tin
+    // Trường kiểm tra thông tin
     const validateForm = () => {
         let newErrors = {};
         const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
@@ -92,9 +93,11 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
         return Object.keys(newErrors).length === 0;
     };
 
-    //Thực hiện add
+    // Thực hiện add
     const handleSubmit = async () => {
         if (!validateForm()) return;
+
+        setIsLoading(true); // Bắt đầu trạng thái loading
         const formDataToSend = new FormData();
 
         // Thêm các trường dữ liệu
@@ -105,7 +108,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                 formDataToSend.append(key, formData[key]);
             }
         });
-        // Thêm các file ảnh
+        // Thêm file ảnh
         imageFiles.forEach(file => {
             formDataToSend.append('imageUrl', file);
         });
@@ -118,6 +121,8 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
         } catch (error) {
             console.error("Lỗi thêm thuốc:", error.response?.data || error.message);
             toast.error(error.response?.data?.error || "Thêm thuốc thất bại");
+        } finally {
+            setIsLoading(false); // Kết thúc trạng thái loading
         }
     };
 
@@ -188,23 +193,24 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                         {errors.pet_type && <p className="text-red-500">{errors.pet_type}</p>}
                     </div>
                     <div className="col-span-2">
-                        <Label>Hình ảnh (Tối đa 9 ảnh)</Label>
-                        <Input type="file" name="imageUrl" multiple accept="image/*" onChange={handleImageChange} />
-                        <div className="grid grid-cols-3 gap-2 mt-2">
+                        <Label>Hình ảnh (Tối đa 1 ảnh)</Label>
+                        <Input type="file" name="imageUrl" accept="image/*" onChange={handleImageChange} />
+                        <div className="grid grid-cols-1 gap-2 mt-2">
                             {formData.images.map((img, index) => (
                                 <div key={index} className="relative">
                                     <img src={img} alt="preview" className="w-full h-24 object-cover" />
-                                    <Button size="icon" className="absolute top-1 right-1 bg-red-500" onClick={() => handleRemoveImage(index)}>
+                                    <Button size="icon" className="absolute top-1 right-1 bg-red-500" onClick={handleRemoveImage}>
                                         <Trash2 size={12} />
                                     </Button>
                                 </div>
-
                             ))}
                         </div>
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" onClick={handleSubmit}>Thêm thuốc</Button>
+                    <Button type="submit" onClick={handleSubmit} disabled={isLoading}>
+                        {isLoading ? "Đang xử lý..." : "Thêm thuốc"}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
