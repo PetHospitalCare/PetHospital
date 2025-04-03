@@ -47,7 +47,7 @@ export default function HistoryBooking() {
 
             {/* Booking List */}
             <div className="mt-8 space-y-6 mb-8">
-                {HBooking.lengt > 0 ? (
+                {HBooking.length > 0 ? (
                     HBooking.map((booking) => (
                         <div
                             key={booking.id}
@@ -110,7 +110,11 @@ export default function HistoryBooking() {
                         </div>
                     ))
                 ) : (
-                    <p className="text-gray-600">Hiện thú cưng của bạn chưa có lịch khám. Hãy đặt lịch khám cho thú cưng của bạn!</p>
+                    <div className="text-center py-10">
+                        <p className="text-gray-600 text-lg">
+                            Hiện thú cưng của bạn chưa có lịch khám. Hãy đặt lịch khám cho thú cưng của bạn!
+                        </p>
+                    </div>
                 )}
             </div>
         </div>

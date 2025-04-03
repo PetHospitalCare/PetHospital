@@ -209,7 +209,7 @@ const getOneMedicalByUser = async (req, res) => {
                 path: 'services.service_id',
             })
             .populate("prescription.medicine")
-            .select(`booking_id _id createdAt updatedAt services note `);
+            .select(`booking_id _id createdAt updatedAt services note prescription`);
 
         // **Lọc subServices**
         if (medicalRecords) {
