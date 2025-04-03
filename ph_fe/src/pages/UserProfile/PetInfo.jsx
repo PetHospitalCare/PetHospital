@@ -134,8 +134,6 @@ export default function PetInfo() {
                 toast.success("Cập nhật thông tin thú cưng thành công");
                 fetchPetData(); // Tải lại dữ liệu thú cưng
                 setEditPetId(null); // Tắt chế độ chỉnh sửa
-            } else {
-                toast.error("Không thể cập nhật thông tin thú cưng");
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật thú cưng:", error);
