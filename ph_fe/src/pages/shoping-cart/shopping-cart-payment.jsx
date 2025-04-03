@@ -10,11 +10,11 @@ export default function ShoppingCartPayment() {
     const { user } = useContext(UserContext);
     const addToCart = useAddToCart();
     const { cartCount, setDataCartContext } = useContext(ShoppingCartContext);
-    const { isChangeCard, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
+    const { isChangeCart, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
 
     useEffect(() => {
         makeData()
-    }, [user, cartCount, isChangeCard]);
+    }, [user, cartCount, isChangeCart]);
 
 
     const handlePayment = async () => {

@@ -17,6 +17,7 @@ const UserProvider = ({ children }) => {
     const logoutContext = () => {
         setUser(null);
         Cookies.remove("access_token");
+        localStorage.removeItem("cart");
     };
     const fetchUserData = async () => {
         try {

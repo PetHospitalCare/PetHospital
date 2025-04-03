@@ -13,11 +13,11 @@ import {
     User,
     UserPlus,
     Users,
-    CalendarCheck , 
-    Contact ,
-    ShoppingBasket 
+    CalendarCheck,
+    Contact,
+    ShoppingBasket
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -36,11 +36,17 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/UserContext";
+import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
 export default function DropdownMenuDemo(user) {
     const navigate = useNavigate();
     const { logoutContext } = useContext(UserContext)
+    const { setDataCartContext } = useContext(ShoppingCartContext);
+    const { isChangeCart, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
+
     const handleLogout = () => {
         logoutContext()
+        setDataCartContext(0);
+        setDataIsChangeCartContext(!isChangeCart);
         navigate("/")
     }
     const handletest = () => {
@@ -84,7 +90,7 @@ export default function DropdownMenuDemo(user) {
                     <LogOut />
                     <span>Log out</span>
 
-                </DropdownMenuItem> 
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

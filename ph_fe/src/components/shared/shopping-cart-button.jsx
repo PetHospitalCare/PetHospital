@@ -3,12 +3,14 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/contexts/UserContext.jsx";
 import { ShoppingCartService } from "@/services/ShoppingCartService.js";
 import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
+import { getLocalStorageShoppingCart, updateLocalStorageShoppingCart } from "@/lib/shopping-cart-util.js";
 
 export default function ShoppingCartButton() {
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
     const { cartCount } = useContext(ShoppingCartContext);
     const [shoppingCartCount, setShoppingCartCount] = useState(0);
+    const { isChangeCart } = useContext(ShoppingCartContext);
 
     useEffect(() => {
         makeData();
@@ -16,7 +18,7 @@ export default function ShoppingCartButton() {
 
     useEffect(() => {
         updateCartCount();
-    }, [cartCount]);
+    }, [cartCount, isChangeCart]);
 
     const makeData = async () => {
         if (user && user._id) {
@@ -24,15 +26,20 @@ export default function ShoppingCartButton() {
             const response = await ShoppingCartService.getShoppingCartByUserId(user._id);
 
             if (response.data.success) {
-
                 if (response.data?.shoppingCart?.items) {
                     setShoppingCartCount(response.data?.shoppingCart?.items?.length || 0);
                 } else {
                     setShoppingCartCount(0);
                 }
+
+                updateLocalStorageShoppingCart(response.data?.shoppingCart || null, 'replace', null, null)
             }
         } else {
-            // get and set card data by localStorage
+            const cartLocal = getLocalStorageShoppingCart() || null;
+
+            if (cartLocal) {
+                setShoppingCartCount(JSON.parse(cartLocal).items.length);
+            }
         }
     }
 
