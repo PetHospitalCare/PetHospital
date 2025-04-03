@@ -21,6 +21,7 @@ const UserProvider = ({ children }) => {
     const logoutContext = () => {
         setUser(null);
         Cookies.remove("access_token");
+        localStorage.removeItem("cart");
     };
     useEffect(() => {
         const jwtToken = Cookies.get("access_token");
