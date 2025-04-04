@@ -20,12 +20,6 @@ const bookingSchema = new mongoose.Schema(
             order_code: {
                 type: Number,
                 unique: true,
-                default: function () {
-                    return parseInt(
-                        Date.now().toString().slice(-7) +
-                        Math.floor(100 + Math.random() * 900)
-                    );
-                }
             },
             status: { type: Boolean, default: false },
             method: {

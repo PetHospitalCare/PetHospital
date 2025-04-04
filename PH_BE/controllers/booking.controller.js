@@ -8,6 +8,14 @@ const payOS = new PayOS(
     process.env.Api_Key,
     process.env.Checksum_Key
 );
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "namkhanh2703.work@gmail.com",
+        pass: "tuff cyhw bwez qkcm",
+    },
+});
 const CreateNewBooking = async (req, res) => {
     try {
         const {
@@ -67,7 +75,64 @@ const AssignDoctor = async (req, res) => {
     try {
         const { doctor_id } = req.body
         const booking_id = req.params.id;
-        await Booking.findByIdAndUpdate(booking_id, { doctor_id: doctor_id, status: "confirm" });
+        const booking = await Booking.findByIdAndUpdate(booking_id, { doctor_id: doctor_id, status: "confirm" }, { new: true }).populate("doctor_id");
+
+        await transporter.sendMail({
+            to: booking.guest_email,
+            subject: "Xác nhận đặt lịch khám tại PetCare",
+            html: `
+                <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
+                    <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+                        
+                        <!-- Logo -->
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <img src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png" alt="PetCare Logo" width="120">
+                        </div>
+        
+                        <h2 style="color: #2c3e50; text-align: center;">Xác nhận lịch hẹn khám thú cưng</h2>
+                        <p style="text-align: center; color: #555;">Chào <b>${booking?.guest_name}</b>,</p>
+                        
+                        <p style="color: #555;">Bạn đã đặt lịch khám thành công tại <b>PetCare</b>. Dưới đây là thông tin chi tiết:</p>
+        
+                        <div style="background: #ecf7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <p><strong>Bác sĩ phụ trách:</strong> ${booking.doctor_id.username}</p>
+                            <p><strong>Ngày khám:</strong> ${new Date(booking.date).toLocaleDateString()}</p>
+                            <p><strong>Thời gian:</strong> ${booking?.hour}</p>
+                            <p><strong>Địa điểm:</strong> PetCare Clinic</p>
+                        </div>
+        
+                        <p style="color: #555;">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.</p>
+        
+                        <!-- Button CTA -->
+                        <div style="text-align: center; margin-top: 20px;">
+                            <a href="https://your-petcare-website.com/appointments/${booking_id}" 
+                               style="display: inline-block; padding: 12px 24px; background: #3498db; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px;">
+                               Xem chi tiết lịch hẹn
+                            </a>
+                        </div>
+        
+                        <p style="margin-top: 20px; text-align: center; font-size: 12px; color: #7f8c8d;">
+                            PetCare Clinic - Hotline: 0123-456-789
+                        </p>
+        
+                        <!-- Footer -->
+                        <div style="text-align: center; margin-top: 20px;">
+                            <a href="https://facebook.com/petcare" style="margin: 0 10px;">
+                                <img src="https://your-petcare-website.com/icons/facebook.png" width="24">
+                            </a>
+                            <a href="https://instagram.com/petcare" style="margin: 0 10px;">
+                                <img src="https://your-petcare-website.com/icons/instagram.png" width="24">
+                            </a>
+                            <a href="https://your-petcare-website.com" style="margin: 0 10px;">
+                                <img src="https://your-petcare-website.com/icons/website.png" width="24">
+                            </a>
+                        </div>
+        
+                    </div>
+                </div>
+            `,
+        }).catch(err => console.error("Mail Error:", err));
+
         return res.status(200).json({ message: "Cập nhật bác sĩ thành công!" });
     } catch (error) {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
@@ -160,14 +225,9 @@ const GetAllBookingByStatus = async (req, res) => {
 const CreatePaymentBooking = async (req, res) => {
     const { booking_id } = req.params;
     const booking = await Booking.findById(booking_id);
-    if (booking?.payment?.qrcode) {
-        return res.status(200).json({
-            qrcode: booking.payment.qrcode,
-
-        });
-    }
+    const ordercode = parseInt(Date.now().toString().slice(-7) + Math.floor(100 + Math.random() * 900));
     const paymentLinkBody = {
-        orderCode: booking.payment.order_code,
+        orderCode: ordercode,
         amount: booking.price,
         description: `Thanh toán ${booking.payment.order_code}`,
         cancelUrl: `${process.env.FRONT_END_URL}`,
@@ -178,7 +238,8 @@ const CreatePaymentBooking = async (req, res) => {
         booking_id,
         {
             $set: {
-                "payment.qrcode": paymentLinkRes.qrCode
+                "payment.qrcode": paymentLinkRes.qrCode,
+                "payment.orderCode": ordercode
             }
         },
         { new: true } // Trả về document sau khi update

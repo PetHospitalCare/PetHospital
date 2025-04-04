@@ -37,7 +37,8 @@ export default function BookingDialog({ open, onClose }) {
     });
     const [selected, setSelected] = useState(null);
     const navigate = useNavigate();
-
+    const today = new Date()
+    const minDate = today.toISOString().split('T')[0]
     const fetchService = async () => {
         try {
             const response = await Services.getAllService("http://localhost:9999/service/get-all");
@@ -212,6 +213,7 @@ export default function BookingDialog({ open, onClose }) {
                                     value={formData.scheduleDate}
                                     onChange={handleChange}
                                     required
+                                    min={minDate}
                                     className="bg-white border-gray-300 rounded-lg pl-3 pr-10 w-full"
                                 />
                             </div>

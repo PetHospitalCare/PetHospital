@@ -29,11 +29,11 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
 
     const [errors, setErrors] = useState({});
 
-    const roles = ["customer", "staff", "doctor", "admin"];
+    const roles = ["staff", "doctor", "admin"];
 
     // Map role để hiển thị tên đẹp hơn
     const roleLabels = {
-        customer: "Customer",
+
         staff: "Staff",
         doctor: "Doctor",
         admin: "Admin"

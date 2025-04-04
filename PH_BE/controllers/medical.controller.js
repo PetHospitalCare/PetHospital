@@ -22,7 +22,7 @@ const getMedicalbyBookingId = async (req, res) => {
 const createMedicalRecord = async (req, res) => {
     try {
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { booking_id, services, diagnosis, result, prescription, note, symptom, totalPrice } = medicalData;
+        const { booking_id, services, followUpDate, generalConclusion, result, prescription, note, totalPrice } = medicalData;
         await Booking.findOneAndUpdate({ _id: booking_id }, { status: "complete", price: totalPrice });
         // Handle uploaded files
         const files = req.files;
@@ -70,8 +70,8 @@ const createMedicalRecord = async (req, res) => {
         const medicalRecord = new MedicalRecord({
             booking_id,
             services: servicesWithFiles,
-            diagnosis,
-            symptom,
+            followUpDate,
+            generalConclusion,
             result,
             prescription,
             note,
@@ -90,7 +90,7 @@ const updateMedicalRecord = async (req, res) => {
     try {
         const { id } = req.params;
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { booking_id, services, diagnosis, result, prescription, note, symptom, totalPrice } = medicalData;
+        const { booking_id, services, followUpDate, generalConclusion, result, prescription, note, totalPrice } = medicalData;
         await Booking.findOneAndUpdate({ _id: booking_id }, { price: totalPrice });
         const medicalRecord = await MedicalRecord.findOne({ booking_id: id });
         if (!medicalRecord) {
@@ -158,14 +158,14 @@ const updateMedicalRecord = async (req, res) => {
         }));
 
         medicalRecord.services = servicesWithFiles;
-        medicalRecord.diagnosis = diagnosis;
+        medicalRecord.generalConclusion = generalConclusion;
         medicalRecord.result = result;
         medicalRecord.prescription = prescription.map(item => ({
             medicine: item.medicine, // This is the medicine ObjectId
             quantity: Number(item.quantity),
             instructions: item.instructions || ""
         }));
-        medicalRecord.symptom = symptom;
+        medicalRecord.followUpDate = followUpDate;
         medicalRecord.note = note;
 
         await medicalRecord.save();
