@@ -64,7 +64,7 @@ const paymentVNPay = async (req, res) => {
             vnp_ReturnUrl: 'http://localhost:5173/payment-result',
             vnp_Locale: VnpLocale.VN,
             vnp_CreateDate: dateFormat(now),
-            vnp_ExpireDate:  dateFormat(new Date(now.getTime() + 15 * 60 * 1000))
+            vnp_ExpireDate: dateFormat(new Date(now.getTime() + 15 * 60 * 1000))
         })
 
         if (shoppingCart) {
@@ -124,4 +124,40 @@ const updatePayment = async (req, res) => {
     }
 };
 
-module.exports = { paymentVNPay, updatePayment };
+const getPaymentsByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'UserId không được cung cấp'
+            });
+        }
+
+        const payments = await db.payment.find({ userId: String(userId) });
+
+        if (!payments || payments.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: 'Không tìm thấy payment nào cho người dùng này',
+                payments: []
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy danh sách payment thành công',
+            payments,
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
+module.exports = { paymentVNPay, updatePayment, getPaymentsByUserId };

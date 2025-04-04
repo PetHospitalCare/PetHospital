@@ -4,6 +4,7 @@ import { UserContext } from "@/contexts/UserContext.jsx";
 import { updateLocalStorageShoppingCart, useAddToCart } from "@/lib/shopping-cart-util.js";
 import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function ShoppingCartDetail() {
     const { user } = useContext(UserContext);
@@ -58,7 +59,11 @@ export default function ShoppingCartDetail() {
     }
 
     const goToPayment = () => {
-        navigate("/shopping-cart-payment")
+        if (cart && cart?.items?.length > 0) {
+            navigate("/shopping-cart-payment");
+        } else {
+            toast.warning('Giỏ hàng trống!')
+        }
     }
 
     return (

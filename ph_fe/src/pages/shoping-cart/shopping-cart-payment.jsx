@@ -19,14 +19,14 @@ export default function ShoppingCartPayment() {
 
     const handlePayment = async () => {
         event.preventDefault();
-        if (cart) {
-            let contactInfo;
 
-            if (user && user._id) {
-                contactInfo = user._id;
-            } else {
-                contactInfo = 'contact_infor';
-            }
+        if (!user || !user._id) {
+            toast.warning('Bạn cần đăng nhập để mua hàng!');
+            return;
+        }
+
+        if (cart && cart?.items?.length > 0) {
+            const contactInfo = user._id;
 
             const response = await ShoppingCartService.paymentShoppingCartByUserId(contactInfo, cart);
 
@@ -35,6 +35,8 @@ export default function ShoppingCartPayment() {
             } else {
                 toast.error("Có lỗi xảy ra!");
             }
+        } else {
+            toast.warning("Giỏ hàng trống!");
         }
     }
 

@@ -52,6 +52,11 @@ export default function DropdownMenuDemo(user) {
     const handletest = () => {
         console.log(user.user)
     }
+
+    const goToOrders = () => {
+        navigate('/orders');
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -79,7 +84,7 @@ export default function DropdownMenuDemo(user) {
                             <span>Lịch sử đặt lịch</span>
                         </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={goToOrders}>
                         <ShoppingBasket />
                         <span>Đơn hàng</span>
 
