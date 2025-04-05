@@ -13,11 +13,10 @@ const transporter = nodemailer.createTransport({
 // send OTP
 const sendOTP = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, type } = req.body;
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log("Email received:", req.body.email);
 
-        await OTP.create({ email, otp })
+        await OTP.create({ email, otp, type });
         await transporter.sendMail({
             to: email,
             subject: "Xác thực OTP",
@@ -34,15 +33,14 @@ const sendOTP = async (req, res) => {
 // verify OTP
 const verifyOTP = async (req, res) => {
     try {
-        const { email, otp } = req.body;
+        const { email, otp, type } = req.body;
         const validOTP = await OTP.findOne({ email: email, otp: otp });
-        console.log(otp)
-        console.log(email)
+
         if (!validOTP) {
             return res.status(400).json({ status: 400, error: "Invalid OTP" });
         }
 
-        return res.status(200).json({ status: 200, message: "OTP verified" });
+        return res.status(200).json({ status: 200, message: "OTP verified", type: validOTP.type });
     } catch (err) {
         return res.status(500).json({ error: "Verification failed" });
     }

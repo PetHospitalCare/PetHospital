@@ -48,7 +48,6 @@ export default function UserProfile() {
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
-            toast.error("Không thể tải thông tin người dùng");
         }
     };
 

@@ -23,7 +23,8 @@ export default function OTP_Input() {
         setError("");
 
         try {
-            await UserService.sendOtp({ email: state?.email });
+            await UserService.sendOtp({ email: state?.email, type: state?.type });
+            // Gửi lại OTP thành công
             setCountdown(60); // Bắt đầu đếm ngược 60s
         } catch (err) {
             setError("Gửi lại OTP thất bại. Vui lòng thử lại.");
@@ -47,14 +48,20 @@ export default function OTP_Input() {
     const handleVerifyOTP = async (e) => {
         e.preventDefault();
         setError("");
-
         try {
             const storedEmail = JSON.parse(localStorage.getItem("tempSignupData"))?.email;
             const email = state?.email || storedEmail;
             const response = await UserService.verifyOTP({ email: email, otp });
 
             if (response.status === 200) {
-                navigate("/loading");
+                if (response.data.type == "forgotPassword") {
+                    // Nếu là quên mật khẩu, điều hướng đến trang nhập mật khẩu mới
+                    navigate("/reset-password", { state: { email: email } });
+                }
+                else if (response.data.type == "register") {
+                    navigate("/loading");
+                }
+
             } else {
                 throw new Error("Mã OTP không hợp lệ");
             }
@@ -84,10 +91,10 @@ export default function OTP_Input() {
                         <span className="font-bold text-black">{state?.email}</span>
                     </p>
                     <div className="text-center text-red-600 font-semibold mb-2">
-                    ⚠️ Mã OTP chỉ có hiệu lực trong vòng <span className="font-bold">5 phút</span>
+                        ⚠️ Mã OTP chỉ có hiệu lực trong vòng <span className="font-bold">5 phút</span>
                     </div>
                     <div className="text-center text-red-600 font-semibold mb-2">
-                     Vui lòng nhập mã trước khi hết hạn!
+                        Vui lòng nhập mã trước khi hết hạn!
                     </div>
 
                     {/* Form input OTP */}
@@ -122,7 +129,10 @@ export default function OTP_Input() {
                         {error && <p className="text-red-500">{error}</p>}
 
                         {/* Step Progress Bar */}
-                        <StepProgressBar step={2} />
+                        <div hidden={state?.type == "forgotPassword"} className="mb-4"> 
+                            <StepProgressBar step={2} />
+
+                        </div>
 
                         {/* Next */}
                         <div className="text-center">
