@@ -23,36 +23,82 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../contexts/UserContext";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+import { UserService } from "@/services/UserService";
 
 const ProtectedRoute = ({ allowedRoles }) => {
     const { user, setUser } = useContext(UserContext);
     const [checkingAuth, setCheckingAuth] = useState(true);
     const location = useLocation();
-
-    useEffect(() => {
-        const jwtToken = Cookies.get("access_token");
-
-        if (!jwtToken) {
-            console.log("Không có token, chuyển hướng về login");
-            setUser(null);
-        } else {
-            try {
-                const decoded = jwtDecode(jwtToken);
+    const fetchUserData = async () => {
+        try {
+            const response = await UserService.getCurrentUser();
+            if (response.data.success) {
                 setUser({
-                    _id: decoded.id,
-                    role: decoded.role,
-                    email: decoded.email,
-                    username: decoded.username,
+                    _id: response.data.account._id,
+                    role: response.data.account.role,
+                    email: response.data.account.email,
+                    username: response.data.account.username,
+                    phone: response.data.account.phone
                 });
-            } catch (error) {
-                console.error("Lỗi khi decode token:", error);
-                setUser(null);
             }
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
+            toast.error("Không thể tải thông tin người dùng");
         }
-        setCheckingAuth(false);
+    };
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const jwtToken = Cookies.get("access_token");
 
-        // Trả về một hàm cleanup hợp lệ (hoặc không return gì)
-        // return () => { };
+                if (!jwtToken) {
+                    console.log("Không có token, chuyển hướng về login");
+                    setUser(null);
+                    setCheckingAuth(false);
+                    return;
+                }
+
+                // Optional: Validate token first
+                // try {
+                //     const decodedToken = jwtDecode(jwtToken);
+                //     if (decodedToken.exp * 1000 < Date.now()) {
+                //         console.log("Token hết hạn");
+                //         setUser(null);
+                //         setCheckingAuth(false);
+                //         return;
+                //     }
+                // } catch (error) {
+                //     console.error("Token không hợp lệ:", error);
+                //     setUser(null);
+                //     setCheckingAuth(false);
+                //     return;
+                // }
+
+                const response = await UserService.getCurrentUser();
+                if (response.data.success) {
+                    setUser({
+                        _id: response.data.account._id,
+                        role: response.data.account.role,
+                        email: response.data.account.email,
+                        username: response.data.account.username,
+                        phone: response.data.account.phone
+                    });
+                } else {
+                    // Handle unsuccessful but non-error responses
+                    setUser(null);
+                    setCheckingAuth(false);
+                    return;
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
+                if (toast) toast.error("Không thể tải thông tin người dùng");
+                setUser(null);
+            } finally {
+                setCheckingAuth(false);
+            }
+        };
+
+        fetchUserData();
     }, [location.pathname, setUser]);
 
     if (checkingAuth) return <div className="flex items-center justify-center h-[50vh]">

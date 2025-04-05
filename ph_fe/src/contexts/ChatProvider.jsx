@@ -40,27 +40,16 @@ const ChatProvider = ({ children }) => {
         socket.on('new-message', (message) => {
             setMessages(prev => [...prev, message]);
         });
-        socket.on('new-conversation', (conversation) => {
-            // Sẽ được xử lý trong StaffChat
-        });
+        // socket.on('new-conversation', (conversation) => {
+        //     // Sẽ được xử lý trong StaffChat
+        //     console.log("New conversation received in context:", conversation._id);
+        // });
 
 
         // Listen for notifications
         socket.on('new-message-notification', (notification) => {
-            // Play notification sound
-            const audio = new Audio('/notification-sound.mp3'); // Create an audio file for notifications
-            audio.play().catch(e => console.log('Audio play failed:', e));
-
             // Add notification to state
-            setNotifications(prev => [notification, ...prev].slice(0, 50)); // Keep last 50 notifications
-
-            // Show browser notification if supported
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(`New message from ${notification.customerName}`, {
-                    body: notification.message.substring(0, 60) + (notification.message.length > 60 ? '...' : ''),
-                    icon: '/notification-icon.png' // Add your notification icon
-                });
-            }
+            setNotifications(prev => [notification, ...prev].slice(0, 50)); // Keep last 50 notifications         
         });
 
         socket.on('conversation-status-update', (data) => {
@@ -71,7 +60,7 @@ const ChatProvider = ({ children }) => {
             socket.off('new-message');
             socket.off('new-message-notification');
             socket.off('conversation-status-update');
-            socket.off('new-conversation'); // Nhớ bỏ lắng nghe khi unmount
+            // socket.off('new-conversation'); // Nhớ bỏ lắng nghe khi unmount
         };
     }, [socket, user]);
 

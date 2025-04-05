@@ -1,21 +1,22 @@
 import { useState, useEffect, useContext } from "react";
 import { ShoppingCartService } from "@/services/ShoppingCartService.js";
 import { UserContext } from "@/contexts/UserContext.jsx";
-import { useAddToCart } from "@/lib/shopping-cart-util.js";
+import { updateLocalStorageShoppingCart, useAddToCart } from "@/lib/shopping-cart-util.js";
 import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function ShoppingCartDetail() {
     const { user } = useContext(UserContext);
     const [cart, setCart] = useState(null);
     const addToCart = useAddToCart();
     const { cartCount, setDataCartContext } = useContext(ShoppingCartContext);
-    const { isChangeCard, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
+    const { isChangeCart, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         makeData();
-    }, [user, cartCount, isChangeCard]);
+    }, [user, cartCount, isChangeCart]);
 
     // const makeData = () => {
     //     // if userId => setCard by user
@@ -30,6 +31,7 @@ export default function ShoppingCartDetail() {
 
             if (response.data.success) {
                 setCart(response.data?.shoppingCart)
+                updateLocalStorageShoppingCart(response.data?.shoppingCart || null, 'replace', null, null)
             }
         } else {
             // console.log(521565656)
@@ -57,7 +59,11 @@ export default function ShoppingCartDetail() {
     }
 
     const goToPayment = () => {
-        navigate("/shopping-cart-payment")
+        if (cart && cart?.items?.length > 0) {
+            navigate("/shopping-cart-payment");
+        } else {
+            toast.warning('Giỏ hàng trống!')
+        }
     }
 
     return (

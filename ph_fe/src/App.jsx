@@ -42,6 +42,7 @@ import NewDetail from './pages/NewDetail/NewDetail'
 import CustomerChat from './pages/Chat/CustomerChat'
 import { StaffChat } from './pages/Chat/StaffChat'
 import Dashboard from './pages/DashBoard/dash-board'
+import UserOrdersPage from "@/pages/user-order-page/user-orders-page.jsx";
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
           <Route path='/shopping-cart-payment' element={<ShoppingCartPayment />} />
           <Route path='/payment-result' element={<PaymentResult />} />
           <Route path='/medical-detail/:id' element={<MedicalDetail />} />
+          <Route path='/orders' element={<UserOrdersPage />} />
         </Route>
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

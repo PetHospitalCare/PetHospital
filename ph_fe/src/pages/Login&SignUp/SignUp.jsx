@@ -28,16 +28,14 @@ export default function SignUp() {
         setError("");
         setIsLoading(true);
 
-        if (!validateEmail(email)) {
-            setError("Email phải là địa chỉ @gmail.com hợp lệ");
-            setIsLoading(false);
-            return;
-        }
-        if (!validatePhone(phone)) {
-            setError("Số điện thoại không hợp lệ");
-            setIsLoading(false);
-            return;
-        }
+        // if (!validateEmail(email)) {
+        //     setError("Email must be a valid @gmail.com address");
+        //     return;
+        // }
+        // if (!validatePhone(phone)) {
+        //     setError("Phone number must be a valid number");
+        //     return;
+        // }
         if (!validatePassword(password)) {
             setError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa và 1 ký tự đặc biệt");
             setIsLoading(false);
@@ -67,6 +65,8 @@ export default function SignUp() {
                 setIsLoading(false);
                 return;
             }
+
+            await UserService.sendOtp({ email: email });
 
             await UserService.sendOtp({ email: email });
 
@@ -143,17 +143,20 @@ export default function SignUp() {
                         {/* Email */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Email<span className="text-red-600">*</span></label>
+
                             <Input
                                 type="email"
                                 value={email}
                                 placeholder="Nhập email"
                                 onChange={(e) => setEmail(e.target.value)}
+
                                 required />
                         </div>
 
                         {/* Phone Number */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Số điện thoại<span className="text-red-600">*</span></label>
+
                             <Input
                                 type="tel"
                                 value={phone}
@@ -167,16 +170,16 @@ export default function SignUp() {
                             <Button
                                 type="button"
                                 value="male"
-                                className={`w-2/5 p-3 rounded-lg font-medium ${gender === "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
-                                onClick={() => setGender("male")}
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick={(e) => setGender(e.target.value)}
                             >
                                 Nam
                             </Button>
                             <Button
                                 type="button"
                                 value="female"
-                                className={`w-2/5 p-3 rounded-lg font-medium ${gender === "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
-                                onClick={() => setGender("female")}
+                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                onClick={(e) => setGender(e.target.value)}
                             >
                                 Nữ
                             </Button>
@@ -185,6 +188,7 @@ export default function SignUp() {
                         {/* Password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Mật khẩu<span className="text-red-600">*</span></label>
+
                             <Input
                                 type="password"
                                 value={password}
@@ -196,6 +200,7 @@ export default function SignUp() {
                         {/* Confirm password */}
                         <div>
                             <label className="block text-base font-medium text-gray-600 mb-1">Xác nhận mật khẩu<span className="text-red-600">*</span></label>
+
                             <Input
                                 type="password"
                                 value={confirmPassword}

@@ -135,53 +135,57 @@ export default function Header() {
                         Dịch vụ
                     </Link>
 
-                    <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}
-                        onClick={() => setIsOpen(!isOpen)}>
-                        <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">
-                            Danh sách sản phẩm
-                            <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
-                        </div>
+                    {/*<div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}*/}
+                    {/*    onClick={() => setIsOpen(!isOpen)}>*/}
+                    {/*    <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">*/}
+                    {/*        Danh sách sản phẩm*/}
+                    {/*        <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />*/}
+                    {/*    </div>*/}
 
-                        {isOpen && (
-                            <div
-                                className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition-opacity duration-200 ease-out opacity-100"
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                <div className="p-4">
-                                    <div
-                                        key="all"
-                                        className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"
-                                    >
-                                        <div className="flex-auto">
-                                            <Link to="/product" className="block font-semibold text-gray-900">
-                                                Tất cả sản phẩm
-                                                <span className="absolute inset-0" />
-                                            </Link>
-                                            <p className="mt-1 text-gray-600">Xem tất cả sản phẩm</p>
-                                        </div>
-                                    </div>
+                    {/*    {isOpen && (*/}
+                    {/*        <div*/}
+                    {/*            className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition-opacity duration-200 ease-out opacity-100"*/}
+                    {/*            onMouseEnter={handleMouseEnter}*/}
+                    {/*            onMouseLeave={handleMouseLeave}*/}
+                    {/*        >*/}
+                    {/*            <div className="p-4">*/}
+                    {/*                <div*/}
+                    {/*                    key="all"*/}
+                    {/*                    className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"*/}
+                    {/*                >*/}
+                    {/*                    <div className="flex-auto">*/}
+                    {/*                        <Link to="/product" className="block font-semibold text-gray-900">*/}
+                    {/*                            Tất cả sản phẩm*/}
+                    {/*                            <span className="absolute inset-0" />*/}
+                    {/*                        </Link>*/}
+                    {/*                        <p className="mt-1 text-gray-600">Xem tất cả sản phẩm</p>*/}
+                    {/*                    </div>*/}
+                    {/*                </div>*/}
 
-                                    {categories?.length > 0 &&
-                                        categories.map((item) => (
-                                            <div
-                                                key={item.name}
-                                                className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"
-                                            >
-                                                <div className="flex-auto">
-                                                    <Link to={item.to} className="block font-semibold text-gray-900">
-                                                        {item.name}
-                                                        <span className="absolute inset-0" />
-                                                    </Link>
-                                                    <p className="mt-1 text-gray-600">{item.description}</p>
-                                                </div>
-                                            </div>
-                                        ))
-                                    }
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    {/*                {categories?.length > 0 &&*/}
+                    {/*                    categories.map((item) => (*/}
+                    {/*                        <div*/}
+                    {/*                            key={item.name}*/}
+                    {/*                            className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"*/}
+                    {/*                        >*/}
+                    {/*                            <div className="flex-auto">*/}
+                    {/*                                <Link to={item.to} className="block font-semibold text-gray-900">*/}
+                    {/*                                    {item.name}*/}
+                    {/*                                    <span className="absolute inset-0" />*/}
+                    {/*                                </Link>*/}
+                    {/*                                <p className="mt-1 text-gray-600">{item.description}</p>*/}
+                    {/*                            </div>*/}
+                    {/*                        </div>*/}
+                    {/*                    ))*/}
+                    {/*                }*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    )}*/}
+                    {/*</div>*/}
+
+                    <Link to="/product" className="text-sm/6 font-semibold text-gray-900">
+                        Sản phẩm
+                    </Link>
 
                     <Link to="/test" className="text-sm/6 font-semibold text-gray-900">
                         Liên hệ

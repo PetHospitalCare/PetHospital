@@ -7,7 +7,7 @@ import { Pen } from "lucide-react";
 import axios from "axios";
 import { UserService } from "@/services/UserService";
 export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
-    const roles = ["customer", "staff", "admin", "doctor"];
+    const roles = ["staff", "admin", "doctor"];
     const [formData, setFormData] = useState({ username: "", email: "", phone: "", role: [] });
 
     useEffect(() => {

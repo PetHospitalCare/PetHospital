@@ -53,7 +53,7 @@ async function callAPIUpdateCart(userIdInput, productInput, contextFunction, con
     }
 }
 
-function updateLocalStorageShoppingCart(productInput, order, contextFunction, contextFunction2) {
+export function updateLocalStorageShoppingCart(productInput, order, contextFunction, contextFunction2) {
     let localStorageShoppingCart = localStorage.getItem("cart") || null;
 
     if (order === 'add' || order === 'subtract') {
@@ -145,4 +145,8 @@ function updateLocalStorageShoppingCart(productInput, order, contextFunction, co
     if (contextFunction2 !== undefined && contextFunction2 !== null) {
         contextFunction2();
     }
+}
+
+export function getLocalStorageShoppingCart() {
+    return localStorage.getItem("cart") || null;
 }

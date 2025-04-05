@@ -72,9 +72,6 @@ export default function BookingStatus({ status, setCount }) {
                 const bookings = complete.map(record => record.booking_id);
                 setMedicalRecord(complete);
                 setData(bookings);
-                if (status === "pending") {
-                    setCount(complete.length);
-                }
             } else {
                 const response = await BookingServices.getAllBookingByStatus(status);
                 //const pending = response?.data?.filter(booking => booking.status === status)
