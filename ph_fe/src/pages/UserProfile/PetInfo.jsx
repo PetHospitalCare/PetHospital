@@ -45,7 +45,6 @@ export default function PetInfo() {
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu thú cưng:", error);
-            toast.error("Không thể tải thông tin thú cưng");
         }
     };
 

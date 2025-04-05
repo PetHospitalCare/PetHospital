@@ -87,16 +87,16 @@ export default function SignUp() {
     };
 
     // Load temporary data from localStorage when component mounts
-    useEffect(() => {
-        const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
-        if (tempData) {
-            setUsername(tempData.username);
-            setEmail(tempData.email);
-            setPhone(tempData.phone);
-            setPassword(tempData.password);
-            setGender(tempData.gender);
-        }
-    }, []);
+    // useEffect(() => {
+    //     const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
+    //     if (tempData) {
+    //         setUsername(tempData.username);
+    //         setEmail(tempData.email);
+    //         setPhone(tempData.phone);
+    //         setPassword(tempData.password);
+    //         setGender(tempData.gender);
+    //     }
+    // }, []);
 
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
