@@ -61,6 +61,45 @@ const signin = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// Quên mật khẩu
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const account = await Account.findOne({ email });
+    if (!account) return res.status(404).json({ success: false, message: "Email không tồn tại." });
+    res.status(200).json({ success: true, account });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Reset mật khẩu
+const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    // Hash mật khẩu mới
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Cập nhật mật khẩu mới
+    const updatedAccount = await Account.findOneAndUpdate(
+      { email },
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!updatedAccount) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy tài khoản." });
+    }
+    
+    res.status(200).json({ success: true, message: "Đặt lại mật khẩu thành công." });
+  } catch (error) {
+    console.error("Lỗi khi đặt lại mật khẩu:", error);
+    res.status(500).json({ success: false, message: "Lỗi server." });
+  }
+};
+
+// Lấy tất cả tài khoản
 const getallAccount = async (req, res) => {
   try {
     const accounts = await Account.find();
@@ -69,6 +108,8 @@ const getallAccount = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// Tạo tài khoản mới
 const createNewAccount = async (req, res) => {
   try {
     const { username, password, email, phone, role } = req.body;
@@ -120,6 +161,8 @@ const createNewAccount = async (req, res) => {
     });
   }
 };
+
+// Xóa tài khoản
 const deleteAccount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -134,6 +177,8 @@ const deleteAccount = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+// Cập nhật tài khoản
 const editaccount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -154,6 +199,8 @@ const editaccount = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+// Lấy danh sách bác sĩ
 const getAllDoctor = async (req, res) => {
   try {
     const doctor = await Account.find({ role: "doctor" }).select("-password -role");
@@ -167,6 +214,7 @@ const getAllDoctor = async (req, res) => {
   }
 };
 
+// Lấy thông tin người dùng hiện tại
 const getCurrentUser = async (req, res) => {
   try {
     const userId = req.userId; // Lấy userId từ middleware verifyToken
@@ -261,4 +309,16 @@ const uploadAvatar = async (req, res) => {
     res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
-module.exports = { signup, signin, getallAccount, createNewAccount, deleteAccount, editaccount, getAllDoctor, getCurrentUser, updateUserAccount, uploadAvatar };
+module.exports = { 
+  signup, 
+  signin, 
+  forgotPassword,
+  resetPassword,
+  getallAccount, 
+  createNewAccount, 
+  deleteAccount, 
+  editaccount, 
+  getAllDoctor, 
+  getCurrentUser, 
+  updateUserAccount,
+  uploadAvatar };

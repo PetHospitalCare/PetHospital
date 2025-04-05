@@ -43,6 +43,8 @@ import CustomerChat from './pages/Chat/CustomerChat'
 import { StaffChat } from './pages/Chat/StaffChat'
 import Dashboard from './pages/DashBoard/dash-board'
 import UserOrdersPage from "@/pages/user-order-page/user-orders-page.jsx";
+import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Password'
+import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -53,6 +55,8 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/SignUp' element={<SignUp />} />
+          <Route path='/forgot-password' element={<Forgot_Password />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
           <Route path='/otp' element={<OTP_Input />} />
           <Route path='/change-email' element={<ChangeEmail />} />
           <Route path='/new-detail/:id' element={<NewDetail />} />

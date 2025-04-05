@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserService } from "../../services/UserService";
 import { UserContext } from "../../contexts/UserContext";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -78,11 +79,18 @@ export default function Login() {
                     className="w-full p-2 bg-gray-100 border rounded"
                     required
                   />
+                  <div className="text-right mt-1">
+                    <Link to="/forgot-password" className="text-sm text-blue-500 underline">
+                      Quên mật khẩu?
+                    </Link>
+                  </div>
                 </div>
 
-                <button className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors">
-                  Đăng nhập
-                </button>
+                <div className="flex justify-center">
+                  <Button className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors">
+                    Đăng nhập
+                  </Button>
+                </div>
               </form>
 
               <p className="mt-4 text-sm text-center">

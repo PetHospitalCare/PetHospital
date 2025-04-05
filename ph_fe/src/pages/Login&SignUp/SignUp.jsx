@@ -66,9 +66,7 @@ export default function SignUp() {
                 return;
             }
 
-            await UserService.sendOtp({ email: email });
-
-            await UserService.sendOtp({ email: email });
+            await UserService.sendOtp({ email: email, type: "register" });
 
             // save temporary in localStorage
             localStorage.setItem("tempSignupData", JSON.stringify({
@@ -80,7 +78,7 @@ export default function SignUp() {
                 role: ["customer"]
             }));
 
-            navigate("/otp", { state: { email } });
+            navigate("/otp", { state: { email: email, type: "register" } });
         } catch (err) {
             setError("Không thể kiểm tra tài khoản hiện có");
         } finally {

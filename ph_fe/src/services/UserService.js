@@ -6,6 +6,15 @@ const signInService = (data) => {
 const signUpService = (data) => {
   return axios.post("/account/signup", data);
 }
+
+const forgotPassword = (data) => {
+  return axios.post("/account/forgot-password", data);
+}
+
+const resetPassword = (data) => {
+  return axios.post("/account/reset-password", data);
+}
+
 const sendOtp = (data) => {
   return axios.post("/account/send-otp", data);
 
@@ -41,6 +50,8 @@ const uploadAvatar = (data) => {
 export const UserService = {
   signInService,
   signUpService,
+  forgotPassword,
+  resetPassword,
   sendOtp,
   verifyOTP,
   getAllAccount,
