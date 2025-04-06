@@ -13,6 +13,7 @@ const NewController = require("./new.controller")
 const PaymentController = require("./payment.controller");
 const DashBoardController = require("./dashboard.controller")
 const MessageController = require("./message.controller")
+const NotificationController = require("./notification.controller")
 module.exports = {
     ProductController,
     CategoryController,
@@ -28,5 +29,6 @@ module.exports = {
     NewController,
     PaymentController,
     DashBoardController,
-    MessageController
+    MessageController,
+    NotificationController
 };

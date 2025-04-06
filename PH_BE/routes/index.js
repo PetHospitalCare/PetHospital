@@ -12,6 +12,7 @@ const NewRouter = require("./new.route")
 const PaymentRouter = require('./payment.route');
 const DashboardRouter = require('./dashboard.route');
 const MessageRoute = require('./message.route');
+const NotificationRoute = require('./notification.route');
 
 module.exports = {
     ProductRouter,
@@ -27,5 +28,7 @@ module.exports = {
     MedicalRoute,
     PaymentRouter,
     DashboardRouter,
-    MessageRoute
+    MessageRoute,
+    NotificationRoute
+
 };

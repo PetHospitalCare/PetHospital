@@ -1,6 +1,7 @@
 const db = require("../models");
 const Message = db.message;
 const Conversation = db.conversation;
+const Notification = db.notification;
 module.exports = (io) => {
     io.on("connection", (socket) => {
         console.log("New connection:", socket.id);
@@ -49,12 +50,11 @@ module.exports = (io) => {
 
                 // Get the conversation details
                 const conversation = await Conversation.findById(data.conversationId)
-                    .populate('customerId', 'username')
-                    .populate('staffParticipants', 'username');
+                    .populate('customerId')
 
+                console.log("Conversation details:", conversation);
                 // Check if this is a customer message
                 const isCustomerMessage = data.sender.toString() === conversation.customerId._id.toString();
-
                 if (isCustomerMessage) {
                     const messageCount = await Message.countDocuments({
                         conversationId: data.conversationId
@@ -69,6 +69,7 @@ module.exports = (io) => {
                         data.conversationId,
                         { unread: true }
                     );
+
 
                     // Notify all staff members about the new message
                     const notificationData = {
@@ -97,6 +98,14 @@ module.exports = (io) => {
                         lastMessage: message.content,
                         timestamp: new Date()
                     });
+                    const notification = new Notification({
+                        type: "message",
+                        content: `${conversation.customerId.username} đã gửi cho bạn 1 tin nhắn mới!`,
+                        isRead: false,
+                    })
+                    await notification.save();
+                    io.emit('new-notification', notification);
+
                 }
             } catch (error) {
                 console.error("Error sending message:", error);

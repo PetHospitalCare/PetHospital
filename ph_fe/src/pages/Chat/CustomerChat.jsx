@@ -3,6 +3,7 @@ import { ChatContext } from '../../contexts/ChatProvider';
 import { UserContext } from '@/contexts/UserContext';
 import { Send, Smile, Paperclip, MessageCircle, X, LogIn, Headset } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { MessageService } from '@/services/MessageService';
 
 const CustomerChat = () => {
     const navigate = useNavigate();
@@ -18,15 +19,22 @@ const CustomerChat = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOnline, setIsOnline] = useState(false);
     const messagesEndRef = useRef(null);
-
-    // Tự động join conversation khi load
     useEffect(() => {
-        if (user?._id) {
-            fetch(`http://localhost:9999/message/customer/${user?._id}`)
-                .then(res => res.json())
-                .then(data => joinConversation(data._id));
-        }
+        const fetchConversation = async () => {
+            if (user?._id) {
+                try {
+                    const data = await MessageService.getConversationById(user._id);
+                    console.log("Join conversation with ID:", data.data._id);
+                    joinConversation(data?.data?._id);
+                } catch (error) {
+                    console.error("Error fetching conversation:", error);
+                }
+            }
+        };
+
+        fetchConversation();
     }, [user]);
+
 
     // Tự động cuộn xuống tin nhắn mới nhất
     useEffect(() => {
