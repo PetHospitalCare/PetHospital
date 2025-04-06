@@ -13,7 +13,8 @@ import {
   HeartPulse,
   CalendarCheck,
   User,
-  MessageSquare
+  MessageSquare,
+  FolderOpen
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -126,6 +127,11 @@ export function AppSidebar({
         url: "/chat",
         icon: MessageSquare,
       },
+      {
+        name: "Hồ sơ Khám",
+        url: "/MedicalRecord",
+        icon: FolderOpen,
+      }
 
     ],
   }

@@ -138,7 +138,11 @@ export default function Page({ children }) {
     return null;
   };
   const parentTitle = findSectionTitleByItemTitle(navTitle, currentBreadcrumb?.title);
-  const projecttilte = project.find((item) => item.url === location.pathname);
+  const parts = location.pathname.split("/");
+  const medicalRecordPath = `/${parts[1]}`;
+  const projecttilte = project.find((item) => item.url === medicalRecordPath);
+
+
 
   return (
     <SidebarProvider>
