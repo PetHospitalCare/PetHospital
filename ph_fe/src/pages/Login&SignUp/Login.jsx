@@ -8,6 +8,7 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const { loginContext, user } = useContext(UserContext)
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
       const response = await UserService.signInService(formData);
@@ -37,6 +39,8 @@ export default function Login() {
 
     } catch (error) {
       setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,8 +91,12 @@ export default function Login() {
                 </div>
 
                 <div className="flex justify-center">
-                  <Button className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors">
-                    Đăng nhập
+                  <Button 
+                  type="submit"
+                  className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+                  disabled={isLoading}
+                  >
+                    {isLoading ? "Đang xử lý..." : "Đăng nhập"}
                   </Button>
                 </div>
               </form>

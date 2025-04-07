@@ -150,7 +150,7 @@ const EditNew = ({ open, onOpenChange, post, onsuccess }) => {
                     )}
                     <DialogFooter className='mt-4'>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Đang xử lý...' : 'Đăng bài'}
+                            {isSubmitting ? 'Đang xử lý...' : 'Cập nhật bài viết'}
                         </Button>
                     </DialogFooter>
                 </form>
