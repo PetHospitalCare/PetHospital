@@ -13,7 +13,7 @@ const http = require("http");
 
 
 const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute, NewRouter, PaymentRouter
-    , DashboardRouter, MessageRoute
+    , DashboardRouter, MessageRoute, NotificationRoute
 } = require("./routes");
 
 
@@ -57,6 +57,7 @@ app.use("/new", NewRouter);
 app.use("/payment", PaymentRouter);
 app.use("/dashboard", DashboardRouter)
 app.use("/message", MessageRoute)
+app.use("/notification", NotificationRoute)
 // io.on("connection", (socket) => {
 //     console.log("An user connect: ", socket.id);
 

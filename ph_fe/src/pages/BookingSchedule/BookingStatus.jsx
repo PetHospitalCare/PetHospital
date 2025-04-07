@@ -69,13 +69,15 @@ export default function BookingStatus({ status, setCount }) {
             if (status === "complete") {
                 const response = await MeidicalServices.getAllMedicalRecords();
                 const complete = response?.data?.data?.filter(record => record.booking_id?.status === status);
-                const bookings = complete.map(record => record.booking_id);
+                const bookings = complete.map(record => record.booking_id).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
                 setMedicalRecord(complete);
                 setData(bookings);
             } else {
                 const response = await BookingServices.getAllBookingByStatus(status);
-                //const pending = response?.data?.filter(booking => booking.status === status)
-                setData(response?.data);
+                const sortedData = response?.data?.sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+                setData(sortedData);
                 if (status === "pending") {
                     setCount(response?.data.length);
                 }

@@ -1,5 +1,6 @@
 const db = require("../models");
 const Booking = db.booking
+const Notification = db.notification
 require("dotenv").config();
 const server = require("../server");
 const PayOS = require("@payos/node");
@@ -54,7 +55,12 @@ const CreateNewBooking = async (req, res) => {
 
         const newBooking = new Booking(newBookingData);
         await newBooking.save();
+        const noti = new Notification({
+            content: `${newBooking.guest_name} đã đặt lịch khám thú cưng`,
+            type: "booking",
 
+        })
+        await noti.save();
         server.io.emit("newBooking", newBooking);
         res.status(201).json({ message: "Đặt lịch thành công!", booking: newBooking });
     } catch (error) {
@@ -96,9 +102,9 @@ const AssignDoctor = async (req, res) => {
         
                         <div style="background: #ecf7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                             <p><strong>Bác sĩ phụ trách:</strong> ${booking.doctor_id.username}</p>
-                            <p><strong>Ngày khám:</strong> ${new Date(booking.date).toLocaleDateString()}</p>
+                            <p><strong>Ngày khám:</strong> ${new Date(booking.date).toLocaleDateString('vi-VN')}</p>
                             <p><strong>Thời gian:</strong> ${booking?.hour}</p>
-                            <p><strong>Địa điểm:</strong> PetCare Clinic</p>
+                            <p><strong>Địa điểm:</strong> PetCare Hospital - Hòa Lạch, Hà Nội</p>
                         </div>
         
                         <p style="color: #555;">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.</p>

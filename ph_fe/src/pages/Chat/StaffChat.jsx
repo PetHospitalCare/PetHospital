@@ -3,6 +3,7 @@ import { ChatContext } from '../../contexts/ChatProvider';
 import { UserContext } from '@/contexts/UserContext';
 import { Send, ChevronRight, User, Users, MessageSquare, Bell } from 'lucide-react';
 import { socket } from "../../App";
+import { MessageService } from '@/services/MessageService';
 
 export const StaffChat = () => {
     const { user } = useContext(UserContext);
@@ -29,22 +30,6 @@ export const StaffChat = () => {
         }
     }, []);
 
-    // Load all conversations
-    useEffect(() => {
-        const fetchConversations = async () => {
-            try {
-                const res = await fetch('http://localhost:9999/message/staff');
-                if (!res.ok) throw new Error('Failed to fetch conversations');
-                const data = await res.json();
-                setConversations(data);
-            } catch (error) {
-                console.error('Error fetching conversations:', error);
-            }
-        };
-
-        fetchConversations();
-    }, []);
-
     // Filter messages by current conversation
     useEffect(() => {
         if (currentConversation) {
@@ -56,13 +41,15 @@ export const StaffChat = () => {
             setFilteredMessages([]);
         }
     }, [messages, currentConversation]);
+
+    // Fetch conversations
     useEffect(() => {
         const fetchConversations = async () => {
             try {
-                const res = await fetch('http://localhost:9999/message/staff');
-                if (!res.ok) throw new Error('Failed to fetch conversations');
-                const data = await res.json();
-                setConversations(data);
+                const res = await MessageService.fetchConversations();
+                if (res.status !== 200) throw new Error('Failed to fetch conversations');
+
+                setConversations(res.data);
             } catch (error) {
                 console.error('Error fetching conversations:', error);
             }
@@ -71,25 +58,27 @@ export const StaffChat = () => {
         fetchConversations();
     }, []);
 
-    // Filter messages by current conversation
+    // Socket listeners for real-time updates
     useEffect(() => {
-        socket.on('conversation-status-update', (conversation) => {
+        const handleConversationUpdate = (conversation) => {
+            console.log("Conversation update received:", conversation); // Debug log
             setConversations(prevConversations => {
                 return prevConversations.map(conv => {
                     if (conv._id === conversation.conversationId) {
                         return {
                             ...conv,
                             unread: conversation.unread,
-                            lastMessage: conversation.lastMessage,
+                            lastMessage: conversation.lastMessage || conv.lastMessage,
                             updatedAt: conversation.timestamp || conv.updatedAt
                         };
                     }
                     return conv;
                 });
             });
-        });
-        socket.on('new-conversation', (newConversation) => {
-            console.log("New conversation received:", newConversation._id);
+        };
+
+        const handleNewConversation = (newConversation) => {
+            console.log("New conversation received:", newConversation); // Debug log
             setConversations(prevConversations => {
                 // Check if the conversation already exists
                 const exists = prevConversations.some(conv => conv._id === newConversation._id);
@@ -105,13 +94,16 @@ export const StaffChat = () => {
                 }
                 return prevConversations;
             });
-        });
+        };
+
+        socket.on('conversation-status-update', handleConversationUpdate);
+        socket.on('new-conversation', handleNewConversation);
 
         return () => {
-            socket.off('conversation-status-update');
-            socket.off('new-conversation');
+            socket.off('conversation-status-update', handleConversationUpdate);
+            socket.off('new-conversation', handleNewConversation);
         };
-    }, [messages, currentConversation]);
+    }, []);
 
     // Auto scroll to bottom when messages change
     useEffect(() => {
@@ -145,7 +137,7 @@ export const StaffChat = () => {
     // Filter conversations by search term
     const filteredConversations = conversations
         .filter(conv =>
-            conv.customerId.username.toLowerCase().includes(searchTerm.toLowerCase())
+            conv.customerId?.username?.toLowerCase().includes(searchTerm.toLowerCase())
         )
         .sort((a, b) => {
             // First sort by unread status (unread conversations come first)
@@ -170,7 +162,6 @@ export const StaffChat = () => {
                             <MessageSquare className="mr-2" size={20} />
                             Conversations
                         </h2>
-
                     </div>
                     <div className="mt-3 relative">
                         <input
@@ -198,18 +189,19 @@ export const StaffChat = () => {
                             >
                                 <div className="flex-1">
                                     <h4 className="font-medium flex items-center">
-                                        Khách hàng - {conv.customerId.username}
+                                        {conv.customerId?.username ? `Khách hàng - ${conv.customerId.username}` : 'Unknown Customer'}
                                         {conv.unread && (
                                             <span className="ml-2 w-2 h-2 rounded-full bg-red-500"></span>
                                         )}
                                     </h4>
                                     <p className="text-sm text-gray-500 mt-1 flex items-center truncate">
                                         <Users className="mr-1" size={14} />
-                                        {conv.unread && (
-                                            <span className="truncate">Bạn có tin nhắn mới</span>
-                                        )}
-                                        {conv.lastMessage && (
-                                            <span className="truncate">: {conv.lastMessage}</span>
+                                        {conv.unread ? (
+                                            <span className="font-medium text-indigo-600">
+                                                {conv.lastMessage ? conv.lastMessage : 'Bạn có tin nhắn mới'}
+                                            </span>
+                                        ) : (
+                                            <span className="truncate">{conv.lastMessage || ''}</span>
                                         )}
                                     </p>
                                 </div>
@@ -228,11 +220,9 @@ export const StaffChat = () => {
                         <div className="p-4 border-b border-gray-200 bg-white flex items-center">
                             <div className="flex-1">
                                 <h3 className="font-semibold">
-                                    {conversations.find(c => c._id === currentConversation)?.customerId.username || 'Chat'}
+                                    {conversations.find(c => c._id === currentConversation)?.customerId?.username || 'Chat'}
                                 </h3>
-                                <p className="text-sm text-gray-500">
-
-                                </p>
+                                <p className="text-sm text-gray-500"></p>
                             </div>
                         </div>
 

@@ -45,6 +45,7 @@ import Dashboard from './pages/DashBoard/dash-board'
 import UserOrdersPage from "@/pages/user-order-page/user-orders-page.jsx";
 import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Password'
 import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
+import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx'
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -86,9 +87,10 @@ function App() {
             <Route path='/News_Management' element={<News_Management />} />
             <Route path='/Dashboard' element={<Dashboard />} />
             <Route path='/chat' element={<StaffChat />} />
+            <Route path='/MedicalRecord' element={<MedicalRecord />}></Route>
+            <Route path="/MedicalRecord/:id" element={< MedicalDetail />} />
           </Route>
         </Route>
-        <Route path="*" element={< Notfound />} />
       </Routes>
 
     </BrowserRouter>

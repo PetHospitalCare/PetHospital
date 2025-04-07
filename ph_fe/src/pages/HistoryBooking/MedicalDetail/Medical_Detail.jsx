@@ -2,13 +2,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MeidicalServices } from "@/services/MedicalService";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import MedicalResult from "./Medical/Medical_result";
 
 export default function MedicalDetail() {
     const { id } = useParams();
     const [medical, setMedical] = useState();
-
+    const navigate = useNavigate();
+    const location = useLocation();
+    const parts = location.pathname.split("/");
+    const medicalRecordPath = parts[1];
     const fetchMedical = async () => {
         try {
             const response = await MeidicalServices.getOneMedicalRecords(id);
@@ -25,19 +28,26 @@ export default function MedicalDetail() {
     }, []);
 
     return (
-        <div className="container mx-auto pt-28 px-20">
+        <div className={medicalRecordPath === "MedicalRecord" ? "w-full" : "container mx-auto pt-28 px-20"}>
+            {medicalRecordPath !== "MedicalRecord" && (
+                <>
+                    {/* Header */}
+                    <div className="inline-block bg-[#3F2E2E] px-12 py-2 text-white text-2xl font-bold rounded-t">
+                        Hồ sơ khám
+                    </div>
 
-            {/* Header */}
-            <div className="inline-block bg-[#3F2E2E] px-12 py-2 text-white text-2xl font-bold rounded-t">
-                Hồ sơ khám
-            </div>
-            <hr className="h-1 bg-[#3F2E2E] border-none" />
 
+                    <hr className="h-1 bg-[#3F2E2E] border-none" />
+                </>
+            )
+            }
             {/* nút quay về */}
             <div className="mt-4">
-                <Link to="/history-booking">
-                    <Button className="bg-[#3F2E2E] text-white px-4 py-2 rounded">Quay lại</Button>
-                </Link>
+
+                <Button
+                    onClick={() => navigate(-1)}
+                    className="bg-[#3F2E2E] text-white px-4 py-2 rounded">Quay lại</Button>
+
             </div>
 
             {/* Thông tin của thú cưng */}
@@ -87,6 +97,6 @@ export default function MedicalDetail() {
                 {/* Hiển thị kết quả khám bệnh với 2 cột */}
                 <MedicalResult medical={medical} />
             </div>
-        </div>
+        </div >
     );
 }

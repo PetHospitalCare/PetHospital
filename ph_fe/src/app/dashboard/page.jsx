@@ -20,6 +20,8 @@ import { socket } from "../../App";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { MessageService } from "@/services/MessageService";
+import { toast } from "sonner";
 
 export default function Page({ children }) {
   const [navTitle, setNavTitle] = useState([]);
@@ -36,6 +38,16 @@ export default function Page({ children }) {
     setIsOpen((prev) => !prev); // Đảo ngược giá trị của isOpen
     if (!isOpen) {
       setUnreadCount(0); // Reset số lượng thông báo chưa đọc khi mở dropdown
+      const markAllAsRead = async () => {
+        try {
+          const res = await MessageService.MarkNotificationAsRead();
+          console.log(res);
+        } catch (error) {
+          console.error("Error marking notifications as read:", error);
+          toast.error("Không thể đánh dấu thông báo là đã đọc");
+        }
+      };
+      markAllAsRead();
     }
   }, [isOpen]);
 
@@ -45,38 +57,62 @@ export default function Page({ children }) {
   };
 
   useEffect(() => {
-
-
     socket.on("newBooking", (newBooking) => {
       if (!newBooking || !newBooking.guest_name) {
         return;
       }
+      console.log("New booking notification:", newBooking);
       setNotifications((prevNotifications) => [
         {
           message: `${newBooking.guest_name} có đặt lịch hẹn mới!`,
           time: newBooking.createdAt,
+          type: "booking",
+          isRead: false
         },
         ...prevNotifications,
       ]);
       setUnreadCount((prevCount) => prevCount + 1);
     });
-    socket.on('conversation-status-update', (conversation) => {
-      if (!conversation) return
-      console.log("Conservation: ", conversation)
+    socket.on("new-notification", (notification) => {
+      console.log("New message notification:", notification);
       setNotifications((prevNotifications) => [
         {
-          message: `Bạn có tin nhắn mới!`,
-          time: conversation?.timestamp
+          message: notification?.content,
+          time: notification?.createdAt,
+          type: "message",
+          isRead: false
         },
         ...prevNotifications,
-      ])
+      ]);
       setUnreadCount((prevCount) => prevCount + 1);
     });
 
     return () => {
       socket.off("newBooking");
-      socket.off("conversation-status-update");
+      socket.off("new-notification");
     };
+  }, []);
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await MessageService.getNotification();
+        console.log("Thông báo mới:", response);
+        if (response.status === 200) {
+          const newNotifications = response.data.map((newBooking) => ({
+            message: newBooking?.content,
+            time: newBooking?.createdAt,
+            type: newBooking?.type,
+            isRead: newBooking?.
+              isRead
+          }));
+          setNotifications(newNotifications);
+          setUnreadCount(newNotifications.filter((notif) => !notif.isRead).length)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchNotifications();
   }, []);
 
   useEffect(() => {
@@ -102,7 +138,11 @@ export default function Page({ children }) {
     return null;
   };
   const parentTitle = findSectionTitleByItemTitle(navTitle, currentBreadcrumb?.title);
-  const projecttilte = project.find((item) => item.url === location.pathname);
+  const parts = location.pathname.split("/");
+  const medicalRecordPath = `/${parts[1]}`;
+  const projecttilte = project.find((item) => item.url === medicalRecordPath);
+
+
 
   return (
     <SidebarProvider>
@@ -157,7 +197,13 @@ export default function Page({ children }) {
                         <li
                           key={index}
                           className="p-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg mb-2 cursor-pointer transition"
-                          onClick={() => navigate("/Booking_Management")}
+                          onClick={() => {
+                            if (notif.type === "booking") {
+                              navigate("/Booking_Management");
+                            } else {
+                              navigate("/chat"); // Đường dẫn khác nếu không phải "booking"
+                            }
+                          }}
                         >
                           <p className="font-medium">{notif.message}</p>
                           <p className="text-xs text-gray-500 mt-1">{formatTime(notif.time)}</p>

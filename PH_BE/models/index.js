@@ -18,6 +18,7 @@ const MedicalRecord = require("./medicalRecord.model");
 const Payment = require("./payment.model");
 const Conversation = require("./conversation.model");
 const Message = require("./message.model");
+const Notification = require("./notification.model");
 mongoose.Promise = global.Promise;
 
 const db = {};
@@ -36,6 +37,7 @@ db.shoppingcart = ShoppingCart
 db.new = New
 
 db.payment = Payment
+db.notification = Notification
 
 
 
