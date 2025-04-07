@@ -118,7 +118,7 @@ export default function TestimonialAndNews() {
                     <div ref={containerRef} className="lg:w-1/2 transition-all duration-1000 ease-in-out"
                         style={{ opacity: isVisible ? 1 : 0, transform: isVisible ? 'translateY(0)' : 'translateY(20px)' }}>
                         <div className="text-center mb-10">
-                            <h2 className="text-3xl font-bold text-[#1a237e] mb-3">Our Services</h2>
+                            <h2 className="text-3xl font-bold text-[#1a237e] mb-3">Dịch vụ</h2>
                             <div className="h-1 w-24 bg-blue-600 mx-auto rounded-full mb-4"></div>
                             <p className="text-xl font-semibold text-[#1a237e]">{services[selectedIndex ?? centerIndex]?.author}</p>
                         </div>
@@ -202,9 +202,9 @@ export default function TestimonialAndNews() {
                     {/* News Section - Right Column */}
                     <div className="lg:w-1/2">
                         <div className="text-center mb-10">
-                            <h2 className="text-3xl font-bold text-[#1a237e] mb-3">Latest News</h2>
+                            <h2 className="text-3xl font-bold text-[#1a237e] mb-3">Bài viết mới nhất</h2>
                             <div className="h-1 w-24 bg-blue-600 mx-auto rounded-full mb-4"></div>
-                            <p className="text-lg text-gray-600">Stay updated with our latest information</p>
+                            <p className="text-lg text-gray-600">Đừng bỏ lỡ những thông tin mới nhất của chúng tôi!</p>
                         </div>
 
                         <div className="space-y-6">
@@ -231,7 +231,7 @@ export default function TestimonialAndNews() {
                                         ></p>
                                         <div className="flex justify-between items-center">
                                             <span className="text-blue-600 font-medium inline-flex items-center group-hover:text-blue-800 group-hover:underline">
-                                                Read Full Article
+                                                Xem chi tiết
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1 group-hover:ml-2 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                                 </svg>
