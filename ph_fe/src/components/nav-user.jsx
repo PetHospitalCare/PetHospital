@@ -81,17 +81,9 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <BadgeCheck />
-                  Hồ hơ
-                </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
+                <BadgeCheck />
+                Hồ hơ
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

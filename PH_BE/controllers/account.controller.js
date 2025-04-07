@@ -99,6 +99,39 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// Đổi mật khẩu
+const changePassword = async (req, res) => {
+  try {
+    const id = req.userId; // Lấy userId từ middleware verifyToken
+    const { currentPassword, newPassword } = req.body;
+
+    // Tìm tài khoản theo email
+    const account = await Account.findOne({ _id: id });
+    if (!account) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy tài khoản." });
+    }
+
+    // So sánh mật khẩu hiện tại
+    const isMatch = await bcrypt.compare(currentPassword, account.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Mật khẩu hiện tại không chính xác." });
+    }
+
+    // Hash mật khẩu mới
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Cập nhật mật khẩu
+    account.password = hashedNewPassword;
+    await account.save();
+
+    res.status(200).json({ success: true, message: "Đổi mật khẩu thành công." });
+  } catch (error) {
+    console.error("Lỗi khi đổi mật khẩu:", error);
+    res.status(500).json({ success: false, message: "Lỗi server." });
+  }
+};
+
+
 // Lấy tất cả tài khoản
 const getallAccount = async (req, res) => {
   try {
@@ -314,6 +347,7 @@ module.exports = {
   signin, 
   forgotPassword,
   resetPassword,
+  changePassword,
   getallAccount, 
   createNewAccount, 
   deleteAccount, 

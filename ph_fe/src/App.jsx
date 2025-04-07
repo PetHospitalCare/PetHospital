@@ -58,6 +58,7 @@ function App() {
           <Route path='/SignUp' element={<SignUp />} />
           <Route path='/forgot-password' element={<Forgot_Password />} />
           <Route path='/reset-password' element={<ResetPassword />} />
+          <Route path='/change-password' element={<ResetPassword />} />
           <Route path='/otp' element={<OTP_Input />} />
           <Route path='/change-email' element={<ChangeEmail />} />
           <Route path='/new-detail/:id' element={<NewDetail />} />
