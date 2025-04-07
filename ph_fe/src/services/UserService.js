@@ -10,7 +10,9 @@ const signUpService = (data) => {
 const forgotPassword = (data) => {
   return axios.post("/account/forgot-password", data);
 }
-
+const changePassword = (data) => {
+  return axios.post("/account/change-password", data);
+}
 const resetPassword = (data) => {
   return axios.post("/account/reset-password", data);
 }
@@ -52,6 +54,7 @@ export const UserService = {
   signUpService,
   forgotPassword,
   resetPassword,
+  changePassword,
   sendOtp,
   verifyOTP,
   getAllAccount,

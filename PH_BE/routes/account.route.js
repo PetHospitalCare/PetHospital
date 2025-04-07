@@ -7,6 +7,7 @@ accountRouter.post("/signup", AccountController.signup);
 accountRouter.post("/signin", AccountController.signin);
 accountRouter.post("/forgot-password", AccountController.forgotPassword);
 accountRouter.post("/reset-password", AccountController.resetPassword);
+accountRouter.post("/change-password",verifyToken, AccountController.changePassword)
 accountRouter.post("/send-otp", OTPController.sendOTP);
 accountRouter.post("/verify-otp", OTPController.verifyOTP);
 accountRouter.get("/get-all", AccountController.getallAccount);

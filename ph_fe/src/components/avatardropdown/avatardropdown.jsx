@@ -15,7 +15,8 @@ import {
     Users,
     CalendarCheck,
     Contact,
-    ShoppingBasket
+    ShoppingBasket,
+    Lock
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -49,9 +50,6 @@ export default function DropdownMenuDemo(user) {
         setDataIsChangeCartContext(!isChangeCart);
         navigate("/")
     }
-    const handletest = () => {
-        console.log(user.user)
-    }
 
     const goToOrders = () => {
         navigate('/orders');
@@ -73,22 +71,30 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <Link to="/profile">
-                        <DropdownMenuItem onClick={handletest}>
+                        <DropdownMenuItem>
                             <Contact />
                             <span>Thông tin cá nhân</span>
                         </DropdownMenuItem>
                     </Link>
+
                     <Link to="/history-booking">
                         <DropdownMenuItem>
                             <CalendarCheck />
                             <span>Lịch sử đặt lịch</span>
                         </DropdownMenuItem>
                     </Link>
+
                     <DropdownMenuItem onClick={goToOrders}>
                         <ShoppingBasket />
                         <span>Đơn hàng</span>
-
                     </DropdownMenuItem>
+
+                    <Link to="/change-password">
+                        <DropdownMenuItem>
+                            <Lock />
+                            <span>Đổi mật khẩu </span>
+                        </DropdownMenuItem>
+                    </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>

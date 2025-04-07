@@ -77,7 +77,7 @@ const EditNew = ({ open, onOpenChange, post, onsuccess }) => {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto ">
                 <DialogHeader>
                     <DialogTitle>Chỉnh sửa bài viết</DialogTitle>
                     <DialogDescription>Chỉnh sửa thông tin bài viết và lưu thay đổi.</DialogDescription>
