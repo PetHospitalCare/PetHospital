@@ -24,7 +24,8 @@ import {
 import AddProfileDialog from "./Add_Account_Modal";
 import SheetDemo from "./Edit_Management";
 import { UserService } from "@/services/UserService";
-
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 export default function AccountManagement() {
     const [data, setData] = useState([]);
     const [search, setSearch] = useState("");
@@ -35,6 +36,9 @@ export default function AccountManagement() {
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
     const [open, setOpen] = useState(false);
+    const [pageSize, setPageSize] = useState(5); // Mặc định hiển thị 5 sản phẩm mỗi trang
+    const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
     const fetchData = async () => {
         try {
             const response = await UserService.getAllAccount()
@@ -152,9 +156,34 @@ export default function AccountManagement() {
             columnFilters,
             columnVisibility,
             rowSelection,
+            pagination: {
+                pageIndex: currentPageIndex, // Sử dụng state currentPageIndex
+                pageSize: pageSize, // Sử dụng state pageSize
+            },
+        },
+        initialState: {
+            pagination: {
+                pageSize: pageSize, // Thiết lập kích thước trang ban đầu
+            },
         },
     });
 
+    useEffect(() => {
+        setCurrentPageIndex(0);
+        table.setPageSize(pageSize);
+    }, [pageSize]);
+
+    const handleNextPage = () => {
+        if (table.getCanNextPage()) {
+            setCurrentPageIndex(prev => prev + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (table.getCanPreviousPage()) {
+            setCurrentPageIndex(prev => prev - 1);
+        }
+    };
 
     return (
 
@@ -213,23 +242,47 @@ export default function AccountManagement() {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Previous
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next
-                </Button>
+            <div className="flex items-center justify-between py-4">
+                <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-700">Số tài khoản mỗi trang:</span>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 px-2">
+                                {pageSize}
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {[5, 10, 15, 20].map((size) => (
+                                <DropdownMenuItem key={size} onClick={() => setPageSize(size)}>
+                                    {size}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="flex-1 text-sm text-gray-700">
+                        {`Trang ${table.getState().pagination.pageIndex + 1} / ${table.getPageCount()}`}
+                    </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePreviousPage}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        Trước
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleNextPage}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        Sau
+                    </Button>
+                </div>
             </div>
         </div>
 

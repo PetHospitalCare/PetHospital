@@ -302,7 +302,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             })
             ?.filter(Boolean);
     }, [services, searchTerm]);
-    console.log("cl: ", conclusion)
     const renderServiceForm = (subService) => {
         const serviceData = formData[subService?.id] || {};
         switch (subService?.parentType) {
