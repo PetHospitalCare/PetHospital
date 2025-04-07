@@ -81,10 +81,12 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Hồ hơ
-              </DropdownMenuItem>
+              <Link to="/admin/profile">
+                <DropdownMenuItem>
+                  <BadgeCheck />
+                  Hồ hơ
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
