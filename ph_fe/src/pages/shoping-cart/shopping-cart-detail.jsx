@@ -76,9 +76,9 @@ export default function ShoppingCartDetail() {
     }
 
     return (
-        <div className="w-full" style={{ backgroundColor: "#fef6e9", minHeight: "calc(100vh - 120px)" }}>
+        <div className="w-full" style={{ backgroundColor: "#fef6e9", minHeight: "calc(100vh - 100px)" }}>
             <div className="w-full" style={{height: 96}}></div>
-            <div className="w-full" style={{height: 20, backgroundColor: "white"}}></div>
+            {/*<div className="w-full" style={{height: 20, backgroundColor: "white"}}></div>*/}
             <div className="ml-4 mr-4 px-4 py-8">
                 {/* Main grid with equal height columns */}
                 <div className="grid grid-cols-12 gap-6">
@@ -102,12 +102,7 @@ export default function ShoppingCartDetail() {
                                     <a href="/" className="text-blue-500 hover:underline">Trang chủ</a>
                                 </li>
                                 <li>&gt;</li>
-                                <li>
-                                    <a href="/product" className="text-blue-500 hover:underline">Sản phẩm</a>
-                                </li>
-                                <li>&gt;</li>
-
-                                <li className="text-gray-500">Đơn hàng</li>
+                                <li className="text-gray-500">Giỏ hàng</li>
                             </ul>
                         </nav>
 

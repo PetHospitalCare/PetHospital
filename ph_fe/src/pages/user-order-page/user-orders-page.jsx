@@ -269,8 +269,17 @@ const UserOrdersPage = () => {
     };
 
     return (
-        <div className="pt-40" style={{ backgroundColor: "#fef6e9" }}>
+        <div className="pt-32" style={{ backgroundColor: "#fef6e9" }}>
             <div className="max-w-6xl mx-auto px-4 py-8">
+                <nav className="text-lg px-4 mb-8">
+                    <ul className="flex space-x-2">
+                        <li>
+                            <a href="/" className="text-blue-500 hover:underline">Trang chủ</a>
+                        </li>
+                        <li>&gt;</li>
+                        <li className="text-gray-500">Đơn hàng</li>
+                    </ul>
+                </nav>
                 <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Đơn hàng của tôi</h1>
 
                 {/* Tìm kiếm và lọc */}

@@ -225,11 +225,16 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
                   </SelectTrigger>
                   <SelectContent>
                     {medicines.map((medicine) => (
-                      <SelectItem key={medicine._id} value={medicine._id}>
+                      <SelectItem
+                        key={medicine._id}
+                        value={medicine._id}
+                        disabled={medicine.quantity <= 0} // Vô hiệu hóa nếu thuốc hết hàng
+                      >
                         <div className="flex flex-col">
                           <div>{medicine.name}</div>
                           <div className="text-xs text-muted-foreground">
-                            {medicine.type} • {medicine.unit}
+                            {medicine.type} • {medicine.unit} •{" "}
+                            {medicine.quantity > 0 ? `Còn ${medicine.quantity}` : "Hết hàng"}
                           </div>
                         </div>
                       </SelectItem>

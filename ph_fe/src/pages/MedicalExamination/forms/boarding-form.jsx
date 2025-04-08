@@ -13,24 +13,6 @@ export function BoardingForm({ formData, onChange }) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="startDate">Ngày bắt đầu</Label>
-            <Input
-              id="startDate"
-              type="date"
-              value={formData.startDate || ""}
-              onChange={(e) => onChange("startDate", e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="endDate">Ngày kết thúc</Label>
-            <Input
-              id="endDate"
-              type="date"
-              value={formData.endDate || ""}
-              onChange={(e) => onChange("endDate", e.target.value)}
-            />
-          </div>
         </div>
 
         <div className="space-y-2">

@@ -41,9 +41,10 @@ export default function AccountManagement() {
 
     const fetchData = async () => {
         try {
-            const response = await UserService.getAllAccount()
+            const response = await UserService.getAllAccount();
             if (response.data.success) {
-                setData(response.data.accounts);
+                const sortedAccounts = response.data.accounts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setData(sortedAccounts);
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
@@ -56,9 +57,9 @@ export default function AccountManagement() {
     const handleDelete = async (id) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
             try {
-                const response = await UserService.deleteAccount(id);
+                await UserService.deleteAccount(id);
                 setData((prevData) => prevData.filter((acc) => acc._id !== id));
-                alert("Xóa tài khoản thành công!");
+                toast.success("Xóa tài khoản thành công!");
             } catch (error) {
                 console.error("Lỗi khi xóa tài khoản:", error);
                 alert("Đã xảy ra lỗi. Vui lòng thử lại.");
@@ -66,32 +67,6 @@ export default function AccountManagement() {
         }
     };
     const columns = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={
-                            table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
-                        }
-                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                        aria-label="Select all"
-                    />
-                </div>
-            ),
-            cell: ({ row }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                    />
-                </div>
-            ),
-            enableSorting: false,
-            enableHiding: false,
-        },
         {
             accessorKey: "url",
             header: () => <div className="text-center">Hình ảnh</div>,
@@ -118,6 +93,11 @@ export default function AccountManagement() {
             accessorKey: "role",
             header: () => <div className="text-center">Vai trò</div>,
             cell: ({ row }) => <div className="capitalize text-center">{row.getValue("role").join(", ")}</div>,
+        },
+        {
+            accessorKey: "phone",
+            header: () => <div className="text-center">Phone</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("phone")}</div>,
         },
         {
             id: "actions",

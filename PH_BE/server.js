@@ -29,7 +29,7 @@ const io = new Server(server, {
 });
 app.use(
     cors({
-        origin: true,
+        origin: process.env.FRONT_END_URL,
         credentials: true,
     })
 );
@@ -58,18 +58,16 @@ app.use("/payment", PaymentRouter);
 app.use("/dashboard", DashboardRouter)
 app.use("/message", MessageRoute)
 app.use("/notification", NotificationRoute)
-// io.on("connection", (socket) => {
-//     console.log("An user connect: ", socket.id);
-
-
-//     socket.on("disconnect", () => {
-//         console.log("🔥: A user disconnected");
-//     });
-// });
 
 exports.io = io;
 require("./sockets")(io);
-server.listen(process.env.PORT || 9999, process.env.HOST_NAME || "localhost", () => {
-    console.log(`Server in running at: http://${process.env.HOST_NAME}:${process.env.PORT}`);
-    db.connect();
+
+// Kết nối database
+db.connect();
+
+// Lắng nghe trên cổng Render cung cấp
+const port = process.env.PORT || 9999;
+server.listen(port, () => {
+    console.log(`✅ Server is running on port: ${port}`);
 });
+

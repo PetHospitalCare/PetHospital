@@ -158,7 +158,7 @@ export const StaffChat = () => {
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-semibold flex items-center">
                             <MessageSquare className="mr-2" size={20} />
-                            Conversations
+                            Trò Chuyện
                         </h2>
                     </div>
                     <div className="mt-3 relative">

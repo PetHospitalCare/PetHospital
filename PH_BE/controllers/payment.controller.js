@@ -160,4 +160,58 @@ const getPaymentsByUserId = async (req, res) => {
     }
 };
 
-module.exports = { paymentVNPay, updatePayment, getPaymentsByUserId };
+const paymentCodPay = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const data = req.body;
+        let payment = null;
+        let shoppingCart;
+        let savedPayment = null;
+
+        if (userId && userId !== 'contact_infor') {
+            shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
+
+            if (!shoppingCart) {
+                console.log('Không tìm thấy cart')
+
+                return res.status(500).json({
+                    message: "Lỗi hệ thống Back-end"
+                });
+            }
+
+            payment = new Payment({
+                userId: shoppingCart.userId,
+                contactInfo: '',
+                items: shoppingCart.items,
+                totalPrice: shoppingCart.totalPrice,
+                shipFee: shoppingCart.shipFee,
+                address: shoppingCart.address,
+                status: 1
+            });
+        }
+
+        if (payment) {
+            savedPayment = await payment.save();
+        }
+
+
+        if (shoppingCart) {
+            await shoppingCart.deleteOne({ userId: String(userId) });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Thanh toán code thành công',
+            savedPayment,
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
+module.exports = { paymentVNPay, updatePayment, getPaymentsByUserId, paymentCodPay };

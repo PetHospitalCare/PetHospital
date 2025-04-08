@@ -3,14 +3,14 @@ import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { UserService } from "@/services/UserService";
 
-
+import { toast } from "sonner";
 const UserContext = React.createContext(null);
 
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(true);
 
-    const loginContext = (data) => {
+    const loginContext = () => {
         fetchUserData();
     };
 
@@ -22,13 +22,14 @@ const UserProvider = ({ children }) => {
     const fetchUserData = async () => {
         try {
             const response = await UserService.getCurrentUser();
-            if (response.data.success) {
+            if (response?.data?.success) {
                 setUser({
                     _id: response.data.account._id,
                     role: response.data.account.role,
                     email: response.data.account.email,
                     username: response.data.account.username,
-                    phone: response.data.account.phone
+                    phone: response.data.account.phone,
+                    address: response.data.account.address
                 });
             }
         } catch (error) {

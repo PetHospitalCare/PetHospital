@@ -30,7 +30,7 @@ export default function Login() {
     try {
       const response = await UserService.signInService(formData);
       if (response.status == 200) {
-        loginContext(response.data)
+        loginContext()
         toast.success("Đăng nhập thành công!");
         navigate("/");
       } else {
@@ -91,10 +91,10 @@ export default function Login() {
                 </div>
 
                 <div className="flex justify-center">
-                  <Button 
-                  type="submit"
-                  className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
-                  disabled={isLoading}
+                  <Button
+                    type="submit"
+                    className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+                    disabled={isLoading}
                   >
                     {isLoading ? "Đang xử lý..." : "Đăng nhập"}
                   </Button>

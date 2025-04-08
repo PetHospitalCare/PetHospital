@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
 import { BrowserRouter, Route, Router, Routes } from 'react-router-dom'
 import Home from './pages/HomePage/Home'
@@ -30,11 +28,8 @@ import PublicLayout from './layout/PublicRoutes'
 
 import { io } from "socket.io-client";
 import UserProfile from './pages/UserProfile/UserProfile'
-import HistoryBooking from './pages/HistoryBooking/historyBooking'
 import ShoppingCartDetail from "@/pages/shoping-cart/shopping-cart-detail.jsx";
-
 import News_Management from './pages/NewsManagement/News_Management'
-
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 import PaymentResult from "@/pages/payments/payment-result.jsx";
 import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'
@@ -45,9 +40,10 @@ import Dashboard from './pages/DashBoard/dash-board'
 import UserOrdersPage from "@/pages/user-order-page/user-orders-page.jsx";
 import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Password'
 import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
-import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx'
+import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx';
+import HistoryBooking from './pages/HistoryBooking/HistoryBooking';
+// export const socket = io.connect("https://pethospital.onrender.com",);
 export const socket = io.connect("http://localhost:9999",);
-
 function App() {
   return (
     <BrowserRouter>

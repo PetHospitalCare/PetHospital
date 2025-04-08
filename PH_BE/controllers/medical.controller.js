@@ -2,6 +2,7 @@ const db = require("../models");
 const MedicalRecord = db.medicalRecord;
 const cloudinary = require('cloudinary').v2;
 const Booking = db.booking
+const Medicine = db.medicine
 // Cấu hình Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -24,6 +25,31 @@ const createMedicalRecord = async (req, res) => {
         const medicalData = JSON.parse(req.body.medicalRecord);
         const { booking_id, services, followUpDate, generalConclusion, result, prescription, note, totalPrice } = medicalData;
         await Booking.findOneAndUpdate({ _id: booking_id }, { status: "complete", price: totalPrice });
+        // Trừ số lượng thuốc trong kho
+        // Trừ số lượng thuốc trong kho
+        if (prescription && prescription.length > 0) {
+            for (const item of prescription) {
+                const { medicine, quantity } = item;
+
+                // Tìm thuốc trong kho
+                const medicineRecord = await Medicine.findById(medicine);
+                if (!medicineRecord) {
+                    return res.status(404).json({ success: false, message: `Medicine not found: ${medicine}` });
+                }
+
+                // Kiểm tra số lượng tồn kho
+                if (medicineRecord.quantity < quantity) { // Sửa từ stock thành quantity
+                    return res.status(400).json({
+                        success: false,
+                        message: `Not enough stock for medicine: ${medicineRecord.name}`,
+                    });
+                }
+
+                // Trừ số lượng
+                medicineRecord.quantity -= quantity; // Sửa từ stock thành quantity
+                await medicineRecord.save();
+            }
+        }
         // Handle uploaded files
         const files = req.files;
         const fileServices = Array.isArray(req.body.fileServices)
@@ -95,6 +121,30 @@ const updateMedicalRecord = async (req, res) => {
         const medicalRecord = await MedicalRecord.findOne({ booking_id: id });
         if (!medicalRecord) {
             return res.status(404).json({ error: "Medical record not found" });
+        }
+        // Trừ số lượng thuốc trong kho
+        if (prescription && prescription.length > 0) {
+            for (const item of prescription) {
+                const { medicine, quantity } = item;
+
+                // Tìm thuốc trong kho
+                const medicineRecord = await Medicine.findById(medicine);
+                if (!medicineRecord) {
+                    return res.status(404).json({ success: false, message: `Medicine not found: ${medicine}` });
+                }
+
+                // Kiểm tra số lượng tồn kho
+                if (medicineRecord.quantity < quantity) { // Sửa từ stock thành quantity
+                    return res.status(400).json({
+                        success: false,
+                        message: `Not enough stock for medicine: ${medicineRecord.name}`,
+                    });
+                }
+
+                // Trừ số lượng
+                medicineRecord.quantity -= quantity; // Sửa từ stock thành quantity
+                await medicineRecord.save();
+            }
         }
 
         // Handle uploaded files
