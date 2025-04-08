@@ -90,6 +90,8 @@ function App() {
             <Route path='/chat' element={<StaffChat />} />
             <Route path='/MedicalRecord' element={<MedicalRecord />}></Route>
             <Route path="/MedicalRecord/:id" element={< MedicalDetail />} />
+            <Route path='admin/profile' element={<UserProfile />} />
+
           </Route>
         </Route>
       </Routes>

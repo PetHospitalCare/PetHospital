@@ -184,7 +184,7 @@ export default function Header() {
                     {/*</div>*/}
 
                     <Link to="/product" className="text-sm/6 font-semibold text-gray-900">
-                        Sản phẩm
+                        Cửa hàng
                     </Link>
 
                     <Link to="/test" className="text-sm/6 font-semibold text-gray-900">
@@ -283,6 +283,7 @@ export default function Header() {
                     </div>
                 </DialogPanel>
             </Dialog>
+            <div className="h-1 w-full" style={{backgroundColor: '#3f2e2e'}}></div>
         </header>
     );
 }

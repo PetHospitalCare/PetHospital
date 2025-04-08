@@ -41,7 +41,6 @@ export default function Page({ children }) {
       const markAllAsRead = async () => {
         try {
           const res = await MessageService.MarkNotificationAsRead();
-          console.log(res);
         } catch (error) {
           console.error("Error marking notifications as read:", error);
           toast.error("Không thể đánh dấu thông báo là đã đọc");
@@ -61,7 +60,6 @@ export default function Page({ children }) {
       if (!newBooking || !newBooking.guest_name) {
         return;
       }
-      console.log("New booking notification:", newBooking);
       setNotifications((prevNotifications) => [
         {
           message: `${newBooking.guest_name} có đặt lịch hẹn mới!`,
@@ -74,7 +72,6 @@ export default function Page({ children }) {
       setUnreadCount((prevCount) => prevCount + 1);
     });
     socket.on("new-notification", (notification) => {
-      console.log("New message notification:", notification);
       setNotifications((prevNotifications) => [
         {
           message: notification?.content,
@@ -96,7 +93,6 @@ export default function Page({ children }) {
     const fetchNotifications = async () => {
       try {
         const response = await MessageService.getNotification();
-        console.log("Thông báo mới:", response);
         if (response.status === 200) {
           const newNotifications = response.data.map((newBooking) => ({
             message: newBooking?.content,

@@ -61,7 +61,6 @@ export const StaffChat = () => {
     // Socket listeners for real-time updates
     useEffect(() => {
         const handleConversationUpdate = (conversation) => {
-            console.log("Conversation update received:", conversation); // Debug log
             setConversations(prevConversations => {
                 return prevConversations.map(conv => {
                     if (conv._id === conversation.conversationId) {
@@ -78,7 +77,6 @@ export const StaffChat = () => {
         };
 
         const handleNewConversation = (newConversation) => {
-            console.log("New conversation received:", newConversation); // Debug log
             setConversations(prevConversations => {
                 // Check if the conversation already exists
                 const exists = prevConversations.some(conv => conv._id === newConversation._id);

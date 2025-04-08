@@ -24,7 +24,6 @@ const CustomerChat = () => {
             if (user?._id) {
                 try {
                     const data = await MessageService.getConversationById(user._id);
-                    console.log("Join conversation with ID:", data.data._id);
                     joinConversation(data?.data?._id);
                 } catch (error) {
                     console.error("Error fetching conversation:", error);

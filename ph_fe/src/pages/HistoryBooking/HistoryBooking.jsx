@@ -50,20 +50,20 @@ export default function HistoryBooking() {
                 {HBooking.length > 0 ? (
                     HBooking.map((booking) => (
                         <div
-                            key={booking.id}
+                            key={booking._id}
                             className="flex flex-col md:flex-row bg-white rounded border-2 shadow-lg overflow-hidden relative"
                         >
                             {/* Date Box */}
                             <div className="bg-[#E8EFFF] text-[#6B84C2] rounded flex flex-col items-center justify-center p-6 sm:p-8 w-full md:w-40 h-36 sm:h-44">
                                 <span className="text-4xl sm:text-6xl font-semibold">
-                                    {new Date(booking.date).getDate()}
+                                    {new Date(booking?.date).getDate()}
                                 </span>
                                 <div className="flex flex-col sm:flex-row sm:space-x-1 text-center">
                                     <span className="text-base sm:text-lg font-semibold">
-                                        {`${String(new Date(booking.date).getMonth() + 1).padStart(2, "0")}/${String(new Date(booking.date).getFullYear()).slice(-2)}`}
+                                        {`${String(new Date(booking?.date).getMonth() + 1).padStart(2, "0")}/${String(new Date(booking?.date).getFullYear()).slice(-2)}`}
                                     </span>
                                     <span className="text-base sm:text-lg font-semibold">
-                                        {booking.hour}
+                                        {booking?.hour}
                                     </span>
                                 </div>
                             </div>
@@ -71,13 +71,13 @@ export default function HistoryBooking() {
                             {/* Booking Details */}
                             <div className="flex-1 p-4">
                                 <p className="font-bold text-xl sm:text-2xl md:text-3xl mb-3">
-                                    {booking.pet_id.name}
+                                    {booking?.pet_id?.name}
                                 </p>
                                 <p className="font-medium text-lg sm:text-xl mb-2">
-                                    {booking.service_id.name}
+                                    {booking?.service_id?.name}
                                 </p>
                                 <p className="text-gray-500 text-sm sm:text-base">
-                                    Chi tiết: {booking.service_id.description}
+                                    Chi tiết: {booking?.service_id?.description}
                                 </p>
                             </div>
 
@@ -86,19 +86,19 @@ export default function HistoryBooking() {
                                 <div
                                     className={cn(
                                         "font-bold text-sm sm:text-lg",
-                                        booking.status === "complete" && "text-green-600",
-                                        booking.status === "cancel" && "text-red-600",
-                                        booking.status === "confirm" && "text-blue-600",
-                                        booking.status === "pending" && "text-orange-500"
+                                        booking?.status === "complete" && "text-green-600",
+                                        booking?.status === "cancel" && "text-red-600",
+                                        booking?.status === "confirm" && "text-blue-600",
+                                        booking?.status === "pending" && "text-orange-500"
                                     )}
                                 >
-                                    {statusMapping[booking.status] || "Không xác định"}
+                                    {statusMapping[booking?.status] || "Không xác định"}
                                 </div>
                             </div>
 
                             {/* View Details Button */}
                             <div className="absolute bottom-3 right-6 sm:right-12">
-                                {booking.status === "complete" && (
+                                {booking?.status === "complete" && (
                                     <Button
                                         className="mt-2 px-4 py-2 bg-[#5b3131] text-white font-bold rounded text-sm sm:text-base"
                                         onClick={() => HandleClick(booking._id)}

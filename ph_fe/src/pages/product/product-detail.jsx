@@ -87,7 +87,7 @@ export default function ProductDetail() {
                                 </li>
                                 <li>&gt;</li>
                                 <li>
-                                    <a href="/product" className="text-blue-500 hover:underline">Sản phẩm</a>
+                                    <a href="/product" className="text-blue-500 hover:underline">Cửa hàng</a>
                                 </li>
                                 <li>&gt;</li>
 

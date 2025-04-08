@@ -84,10 +84,6 @@ export function AppSidebar({
             title: "Bảng Tin",
             url: "/News_Management",
           },
-          {
-            title: "Bản Ghi Thú cưng",
-            url: "/PetRecord_Management",
-          },
         ],
       },
       {

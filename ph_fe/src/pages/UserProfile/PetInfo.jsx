@@ -62,7 +62,7 @@ export default function PetInfo() {
                 toast.success("Xóa thú cưng thành công");
                 fetchPetData(); // Tải lại danh sách thú cưng
             } else {
-                toast.error("Không thể xóa thú cưng");
+                toast.error("Không thể xóa thú cưng vì có lịch hẹn liên quan");
             }
         } catch (error) {
             console.error("Lỗi khi xóa thú cưng:", error);
