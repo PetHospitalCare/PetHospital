@@ -12,11 +12,6 @@ const UserProvider = ({ children }) => {
 
     const loginContext = () => {
         fetchUserData();
-        if (user) {
-            setTimeout(() => {
-                toast.success("Đăng nhập thành công");
-            }, 1000); // Delay 1 giây
-        }
     };
 
     const logoutContext = () => {
