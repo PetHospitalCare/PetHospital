@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
 import { BrowserRouter, Route, Router, Routes } from 'react-router-dom'
 import Home from './pages/HomePage/Home'
@@ -32,9 +30,7 @@ import { io } from "socket.io-client";
 import UserProfile from './pages/UserProfile/UserProfile'
 import HistoryBooking from './pages/HistoryBooking/historyBooking'
 import ShoppingCartDetail from "@/pages/shoping-cart/shopping-cart-detail.jsx";
-
 import News_Management from './pages/NewsManagement/News_Management'
-
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 import PaymentResult from "@/pages/payments/payment-result.jsx";
 import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'

@@ -29,7 +29,7 @@ const io = new Server(server, {
 });
 app.use(
     cors({
-        origin: true,
+        origin: process.env.FRONT_END_URL,
         credentials: true,
     })
 );
@@ -67,7 +67,7 @@ db.connect();
 
 // Lắng nghe trên cổng Render cung cấp
 const port = process.env.PORT || 9999;
-server.listen(port, () => {
+app.listen(port, () => {
     console.log(`✅ Server is running on port: ${port}`);
 });
 

@@ -3,14 +3,14 @@ import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
 import { UserService } from "@/services/UserService";
 
-
+import { toast } from "sonner";
 const UserContext = React.createContext(null);
 
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(true);
 
-    const loginContext = (data) => {
+    const loginContext = () => {
         fetchUserData();
     };
 
