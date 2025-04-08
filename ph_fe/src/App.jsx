@@ -28,7 +28,7 @@ import PublicLayout from './layout/PublicRoutes'
 
 import { io } from "socket.io-client";
 import UserProfile from './pages/UserProfile/UserProfile'
-import HistoryBooking from './pages/HistoryBooking/historyBooking'
+import HistoryBooking from './pages/HistoryBooking/historyBooking.jsx'
 import ShoppingCartDetail from "@/pages/shoping-cart/shopping-cart-detail.jsx";
 import News_Management from './pages/NewsManagement/News_Management'
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
