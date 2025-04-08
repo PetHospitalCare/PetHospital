@@ -82,36 +82,50 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                         <Input type="text" placeholder="Nhập tên dịch vụ" value={name} onChange={(e) => setName(e.target.value)} required />
                     </div>
 
-                    {/* Giá tiền (Dog & Cat trên cùng một hàng) */}
-                    <div className="flex space-x-4">
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium mb-2 text-left">Giá tiền (Chó)</label>
-                            <Input type="number" placeholder="Nhập giá cho chó" value={price.dog} onChange={(e) => handlePriceChange(e, "dog")} required />
+
+
+                    {/* Giá tiền section - UI được cải thiện */}
+                    <div className="space-y-4">
+                        <label className="block text-sm font-medium text-left">Giá tiền theo loại</label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 sm:text-sm">🐕</span>
+                                </div>
+                                <Input
+                                    type="number"
+                                    placeholder="Giá cho chó"
+                                    value={price.dog.toLocaleString("vi-VN")}
+                                    onChange={(e) => handlePriceChange(e, "dog")}
+                                    className="pl-9"
+                                    required
+                                />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 sm:text-sm">VNĐ</span>
+                                </div>
+                            </div>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 sm:text-sm">🐱</span>
+                                </div>
+                                <Input
+                                    type="number"
+                                    placeholder="Giá cho mèo"
+                                    value={price.cat.toLocaleString("vi-VN")}
+                                    onChange={(e) => handlePriceChange(e, "cat")}
+                                    className="pl-9"
+                                    required
+                                />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 sm:text-sm">VNĐ</span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium mb-2 text-left">Giá tiền (Mèo)</label>
-                            <Input type="number" placeholder="Nhập giá cho mèo" value={price.cat} onChange={(e) => handlePriceChange(e, "cat")} required />
-                        </div>
+                        <p className="text-xs text-gray-500 italic">
+                            * Giá đã bao gồm VAT và có thể thay đổi tùy theo tình trạng thú cưng
+                        </p>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-2 text-left">Thời gian (phút)</label>
-                        <Select value={duration} onValueChange={setDuration}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Chọn thời gian" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="5">5 phút</SelectItem>
-                                    <SelectItem value="10">10 phút</SelectItem>
-                                    <SelectItem value="15">15 phút</SelectItem>
-                                    <SelectItem value="30">30 phút</SelectItem>
-                                    <SelectItem value="60">1 giờ</SelectItem>
-                                    <SelectItem value="120">2 giờ</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
 
                     <div>
                         <label className="block text-sm font-medium mb-2 text-left">Trạng thái</label>

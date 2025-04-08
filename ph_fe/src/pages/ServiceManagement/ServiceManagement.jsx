@@ -95,11 +95,6 @@ export default function Service_Managerment() {
             cell: ({ row }) => <div className="text-center capitalize">{row.getValue("name")}</div>,
         },
         {
-            accessorKey: "duration",
-            header: () => <div className="text-center">thời gian</div>,
-            cell: ({ row }) => <div className="text-center capitalize">{row.getValue("duration")}</div>,
-        },
-        {
             accessorKey: "price",
             header: () => <div className="text-center">Giá tiền</div>,
             cell: ({ row }) => {

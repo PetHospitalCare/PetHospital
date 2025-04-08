@@ -157,7 +157,7 @@ export default function MedicalRecord() {
     const columns = [
         {
             accessorKey: "date",
-            header: "Ngày và giờ đặt",
+            header: "Ngày và giờ Khám",
             cell: ({ row }) => {
                 const time = row.original.hour;
                 return (<>
@@ -279,12 +279,12 @@ export default function MedicalRecord() {
                 <div className="flex items-center justify-center">
 
                     <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0"
-                        // onClick={() => handleViewRecord(row.original)}
+                        variant="outline"
+                        className="flex items-center gap-1  hover:bg-primary hover:text-white transition-colors duration-200"
                         onClick={() => navigate(`/MedicalRecord/${row.original._id}`)}
                     >
-                        Xem Chi tiết
+                        <FileText className="h-2 w-1" />
+                        <span>Xem chi tiết</span>
                     </Button>
                 </div>
             ),
