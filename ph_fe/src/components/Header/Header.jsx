@@ -118,7 +118,7 @@ export default function Header() {
                         <span className="sr-only">Your Company</span>
                         <img
                             alt=""
-                            src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png"
+                            src="/pethospital.png"
                             className="h-12 w-auto pointer-events-none select-none"
                         // onContextMenu="return false;"
                         // onDrag="retrun false;"
@@ -257,7 +257,6 @@ export default function Header() {
                     </div>
                 </DialogPanel>
             </Dialog>
-            <div className="h-1 w-full" style={{ backgroundColor: '#3f2e2e' }}></div>
         </header>
     );
 }

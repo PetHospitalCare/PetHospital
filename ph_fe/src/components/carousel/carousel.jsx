@@ -112,7 +112,7 @@ export default function TestimonialAndNews() {
 
     return (
         <div className="bg-gradient-to-b from-slate-50 to-slate-100 py-16">
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto px-4 ">
                 <div className="flex flex-col lg:flex-row gap-12">
                     {/* Services Carousel Section - Left Column */}
                     <div ref={containerRef} className="lg:w-1/2 transition-all duration-1000 ease-in-out"

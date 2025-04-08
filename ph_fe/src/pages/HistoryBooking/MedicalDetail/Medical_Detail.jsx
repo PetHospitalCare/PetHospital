@@ -4,6 +4,7 @@ import { MeidicalServices } from "@/services/MedicalService";
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import MedicalResult from "./Medical/Medical_result";
+import { Loader2 } from "lucide-react";
 
 export default function MedicalDetail() {
     const { id } = useParams();
@@ -28,6 +29,11 @@ export default function MedicalDetail() {
     }, []);
 
     return (
+        !medical ? (
+            <div className="flex justify-center items-center h-screen">
+                <Loader2 className="animate-spin h-10 w-10 text-[#3F2E2E]" />
+            </div>
+        ) : (
         <div className={medicalRecordPath === "MedicalRecord" ? "w-full" : "container mx-auto pt-28 px-20"}>
             {medicalRecordPath !== "MedicalRecord" && (
                 <>
@@ -78,6 +84,9 @@ export default function MedicalDetail() {
                                 <span className="font-semibold">Thời gian khám:</span>
                                 {`${String(new Date(medical?.booking_id?.date).getDate() + 1).padStart(2, "0")}/${String(new Date(medical?.booking_id?.date).getMonth() + 1).padStart(2, "0")}/${String(new Date(medical?.booking_id?.date).getFullYear())} - ${medical?.booking_id?.hour}`}
                             </p>
+                            <p className="text-gray-900 text-lg md:text-xl">
+                                <span className="font-semibold">Kết luận tổng:</span> {medical?.generalConclusion || "Chưa có kết luận tổng"}
+                            </p>
                         </div>
                         <div className="space-y-4">
                             <p className="text-gray-900 text-lg md:text-xl">
@@ -85,6 +94,12 @@ export default function MedicalDetail() {
                             </p>
                             <p className="text-gray-900 text-lg md:text-xl">
                                 <span className="font-semibold">Giống:</span> {medical?.booking_id?.pet_id?.species}
+                            </p>
+                            <p className="text-gray-900 text-lg md:text-xl">
+                                <span className="font-semibold">Ngày hẹn tái khám: </span>
+                                {medical?.followUpDate ? (
+                                    `${String(new Date(medical?.followUpDate).getDate() + 1).padStart(2, "0")}/${String(new Date(medical?.followUpDate).getMonth() + 1).padStart(2, "0")}/${String(new Date(medical?.followUpDate).getFullYear())}`
+                                ) : "Hiện đang không có"}
                             </p>
                         </div>
                     </div>
@@ -98,5 +113,6 @@ export default function MedicalDetail() {
                 <MedicalResult medical={medical} />
             </div>
         </div >
+        )
     );
 }
