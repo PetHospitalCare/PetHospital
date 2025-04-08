@@ -45,13 +45,32 @@ export default function PetInfo() {
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu thú cưng:", error);
-            toast.error("Không thể tải thông tin thú cưng");
         }
     };
 
     React.useEffect(() => {
         fetchPetData();
     }, []);
+
+    //Xử lý xóa thú cưng
+    const handleDeletePet = async (petId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xóa thú cưng này không?")) return;
+        setIsLoading(true);
+        try {
+            const response = await PetService.deletePetByUser(petId);
+            if (response.status === 200) {
+                toast.success("Xóa thú cưng thành công");
+                fetchPetData(); // Tải lại danh sách thú cưng
+            } else {
+                toast.error("Không thể xóa thú cưng vì có lịch hẹn liên quan");
+            }
+        } catch (error) {
+            console.error("Lỗi khi xóa thú cưng:", error);
+            toast.error("Đã xảy ra lỗi khi xóa thú cưng");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Xử lý dropdown
     const toggleDropdown = (id) => {
@@ -96,7 +115,7 @@ export default function PetInfo() {
             toast.error("Vui lòng điền đầy đủ các trường bắt buộc: Tên, Loài động vật, và Giống.");
             return;
         }
-    
+
         setIsLoading(true);
         try {
             const updatedPet = {
@@ -107,16 +126,13 @@ export default function PetInfo() {
                 weight: petFormData.weight ? parseFloat(petFormData.weight) : null, // Không bắt buộc
                 dateOfBirth: petFormData.dateOfBirth || null, // Không bắt buộc
             };
-    
+
             // Gọi API cập nhật thú cưng
             const response = await PetService.updatePet(petId, updatedPet);
-            console.log("Sending data to backend:", petId, updatedPet);
             if (response.status === 200) {
                 toast.success("Cập nhật thông tin thú cưng thành công");
                 fetchPetData(); // Tải lại dữ liệu thú cưng
                 setEditPetId(null); // Tắt chế độ chỉnh sửa
-            } else {
-                toast.error("Không thể cập nhật thông tin thú cưng");
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật thú cưng:", error);
@@ -331,13 +347,22 @@ export default function PetInfo() {
                                                 </Button>
                                             </>
                                         ) : (
-                                            <Button
-                                                className="bg-[#3F2E2E] text-white hover:bg-[#533b3b] transition-all"
-                                                onClick={() => handleEditPet(pet)}
-                                            >
-                                                <Pencil className="mr-2 h-4 w-4" />
-                                                Chỉnh sửa
-                                            </Button>
+                                            <>
+                                                <Button
+                                                    className="bg-[#3F2E2E] text-white hover:bg-[#533b3b] transition-all"
+                                                    onClick={() => handleEditPet(pet)}
+                                                >
+                                                    <Pencil className="mr-2 h-4 w-4" />
+                                                    Chỉnh sửa
+                                                </Button>
+                                                <Button
+                                                    className="bg-red-700 text-white hover:bg-red-700 transition-all"
+                                                    onClick={() => handleDeletePet(pet._id)}
+                                                    disabled={isLoading}
+                                                >
+                                                    Xóa
+                                                </Button>
+                                            </>
                                         )}
                                     </div>
                                 </div>
@@ -380,7 +405,7 @@ export default function PetInfo() {
                                 type="file"
                                 className="hidden"
                                 accept="image/*"
-                                onChange={handleFileChange} 
+                                onChange={handleFileChange}
                             />
                         </div>
                         <div className="flex justify-end space-x-2 w-full">

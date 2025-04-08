@@ -55,11 +55,9 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         setFormData({});
         setActiveTab("examination");
         setConclusion({
-            generalHealth: "",
-            diagnosis: "",
             prescription: [],
-            treatment: "",
-            followUp: "",
+            generalConclusion: "",
+            followUpDate: "",
             notes: "",
         });
         setIsEditing(false);
@@ -77,7 +75,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     // Load appointment data
                     const data = await BookingServices.GetBookingbyId(appointment?.id);
                     if (data?.data?.success) {
-                        console.log("Appointment data:", data?.data?.booking)
                         setpetInfo({
                             name: data?.data?.booking?.pet_id?.name,
                             type: data?.data?.booking?.type,
@@ -96,8 +93,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     // Load medical record
                     const recordData = await MeidicalServices.getMedicalByBookingId(appointment?.id);
                     if (recordData.data.data) {
-                        console.log("record: ", recordData.data.data)
-                        const { services, diagnosis, result, note, createdAt, updatedAt, symptom, prescription } = recordData?.data.data;
+                        const { services, followUpDate, result, note, createdAt, updatedAt, generalConclusion, prescription } = recordData?.data.data;
 
                         setSelectedSubServices(services?.map(service => ({
                             name: service?.service_id.subServices?.find(sub =>
@@ -116,11 +112,8 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         setConclusion({
                             createdAt,
                             updatedAt,
-                            generalHealth: result?.generalHealth,
-                            diagnosis,
-                            symptom,
-                            treatment: result?.treatment,
-                            followUp: result?.followUp,
+                            followUpDate,
+                            generalConclusion,
                             notes: note,
                             prescription,
                         });
@@ -156,7 +149,10 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         Array.isArray(service?.subServices) &&
                         service?.subServices?.some((sub) => sub?._id === subService?._id),
                 );
-
+                // Find the actual subService from parent to get the name
+                const actualSubService = parentService?.subServices?.find(
+                    sub => sub?._id === subService?._id
+                );
                 if (!parentService) {
                     console.error("Parent service not found for sub-service:", subService);
                     return prev;
@@ -166,9 +162,9 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     ...prev,
                     {
                         id: subService?._id,
-                        name: subService?.name,
                         parentName: parentService?.name || "",
                         parentId: parentService?._id || "",
+                        name: actualSubService?.name,
                         parentType: serviceNameToType[parentService?.name] || "",
                     },
                 ];
@@ -223,13 +219,13 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                         result: serviceData, // Giữ nguyên object result
                     };
                 }),
-                diagnosis: conclusion?.diagnosis || "",
+                followUpDate: conclusion?.followUpDate || "",
                 result: {
                     generalHealth: conclusion?.generalHealth || "",
                     treatment: conclusion?.treatment || "",
                     followUp: conclusion?.followUp || "",
                 },
-                symptom: conclusion?.symptom || "",
+                generalConclusion: conclusion?.generalConclusion || "",
                 prescription: conclusion.prescription.map(item => ({
                     medicine: item.medicine_id, // Medicine ID reference
                     quantity: Number(item.quantity),
@@ -271,7 +267,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                 console.log('FormData entry:', pair[0], pair[1]);
             }
 
-            console.log("Medical:", medicalRecordData)
             toast.success(isEditing ? "Cập nhật kết quả khám thành công!" : "Lưu kết quả khám thành công!");
             onOpenChange(false);
 
@@ -307,10 +302,8 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             })
             ?.filter(Boolean);
     }, [services, searchTerm]);
-
     const renderServiceForm = (subService) => {
         const serviceData = formData[subService?.id] || {};
-        console.log(formData)
         switch (subService?.parentType) {
             case "vaccination":
                 return (
@@ -523,7 +516,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                                 <TabsList className="grid grid-cols-2">
                                     <TabsTrigger value="examination">Khám bệnh</TabsTrigger>
-                                    <TabsTrigger value="conclusion">Thuốc</TabsTrigger>
+                                    <TabsTrigger value="conclusion">Thuốc & Kết luận</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="examination" className="mt-4 flex-1 overflow-hidden">
                                     <ScrollArea className="h-[calc(90vh-240px)]">

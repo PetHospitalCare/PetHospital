@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,8 +29,10 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         unit: "",
         price: "",
         quantity: "",
-        expiry_date: ""
+        expiry_date: "",
     });
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false); // Trạng thái loading
 
     useEffect(() => {
         if (medicine) {
@@ -39,7 +49,7 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                 quantity: medicine.quantity || "",
                 expiry_date: medicine.expiry_date
                     ? new Date(medicine.expiry_date).toISOString().split("T")[0]
-                    : ""
+                    : "",
             });
         }
     }, [medicine]);
@@ -58,52 +68,77 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
     };
 
     const handleImageChange = (e) => {
-        if (formData.images.length >= 9) return;
         const files = Array.from(e.target.files);
-        const newImages = files.map(file => ({ url: URL.createObjectURL(file), file }));
+        if (files.length > 1 || formData.images.length >= 1) {
+            toast.error("Chỉ được tải lên tối đa 1 ảnh.");
+            return;
+        }
+        const newImages = files.map((file) => ({ url: URL.createObjectURL(file), file }));
         setFormData((prev) => ({ ...prev, images: [...prev.images, ...newImages] }));
     };
 
-    const handleRemoveImage = (index) => {
+    const handleRemoveImage = () => {
         setFormData((prev) => ({
             ...prev,
-            images: prev.images.filter((_, i) => i !== index),
+            images: [],
         }));
     };
 
+    const validateForm = () => {
+        let newErrors = {};
+        const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
+
+        if (!formData.name) newErrors.name = "Vui lòng nhập tên thuốc";
+        if (!formData.price) newErrors.price = "Vui lòng nhập giá thuốc";
+        if (!formData.quantity) newErrors.quantity = "Vui lòng nhập số lượng";
+        if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
+        if (!formData.expiry_date) {
+            newErrors.expiry_date = "Vui lòng nhập ngày hết hạn";
+        } else if (formData.expiry_date < today) {
+            newErrors.expiry_date = "Ngày hết hạn không thể là ngày trong quá khứ";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async () => {
+        if (!validateForm()) return;
+
+        setIsLoading(true); // Bắt đầu trạng thái loading
+        const formDataToSend = new FormData();
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("description", formData.description);
+        formDataToSend.append("type", formData.type);
+        formDataToSend.append("dosage", formData.dosage);
+        formDataToSend.append("manufacturer", formData.manufacturer);
+        formDataToSend.append("unit", formData.unit);
+        formDataToSend.append("price", formData.price);
+        formDataToSend.append("quantity", formData.quantity);
+        formDataToSend.append("expiry_date", formData.expiry_date);
+
+        formData.pet_type.forEach((type) => {
+            formDataToSend.append("pet_type[]", type);
+        });
+
+        formData.images.forEach((image) => {
+            if (image.file) {
+                formDataToSend.append("imageUrl", image.file);
+            } else {
+                formDataToSend.append("existingImages[]", image.url);
+            }
+        });
+
         try {
-            const formDataToSend = new FormData();
-            formDataToSend.append("name", formData.name);
-            formDataToSend.append("description", formData.description);
-            formDataToSend.append("type", formData.type);
-            formDataToSend.append("dosage", formData.dosage);
-            formDataToSend.append("manufacturer", formData.manufacturer);
-            formDataToSend.append("unit", formData.unit);
-            formDataToSend.append("price", formData.price);
-            formDataToSend.append("quantity", formData.quantity);
-            formDataToSend.append("expiry_date", formData.expiry_date);
-
-            formData.pet_type.forEach((type) => {
-                formDataToSend.append("pet_type[]", type);
-            });
-
-            // Gửi danh sách ảnh cũ lên để BE biết ảnh nào cần giữ
-            formData.images.forEach((image, index) => {
-                if (image.file) {
-                    formDataToSend.append("imageUrl", image.file);
-                } else {
-                    formDataToSend.append(`existingImages[${index}][url]`, image.url);
-                    formDataToSend.append(`existingImages[${index}][publicId]`, image.publicId || "");
-                }
-            });
-
-            const response = await MedicineService.updateMedicine(medicine._id, formDataToSend);
+            await MedicineService.updateMedicine(medicine._id, formDataToSend);
             toast.success("Cập nhật thành công");
             onsuccess?.();
             onOpenChange(false);
         } catch (error) {
             console.error("Lỗi khi cập nhật thuốc:", error);
+            toast.error("Cập nhật thất bại");
+        } finally {
+            setIsLoading(false); // Kết thúc trạng thái loading
         }
     };
 
@@ -120,6 +155,7 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                     <div>
                         <Label htmlFor="name">Tên thuốc</Label>
                         <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
+                        {errors.name && <p className="text-red-500">{errors.name}</p>}
                         <Label htmlFor="description">Mô tả</Label>
                         <Input id="description" name="description" value={formData.description} onChange={handleInputChange} />
                         <Label htmlFor="type">Loại</Label>
@@ -134,10 +170,13 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                         <Input id="unit" name="unit" value={formData.unit} onChange={handleInputChange} />
                         <Label htmlFor="price">Giá</Label>
                         <Input id="price" name="price" type="number" value={formData.price} onChange={handleInputChange} />
+                        {errors.price && <p className="text-red-500">{errors.price}</p>}
                         <Label htmlFor="quantity">Số lượng</Label>
                         <Input id="quantity" name="quantity" type="number" value={formData.quantity} onChange={handleInputChange} />
+                        {errors.quantity && <p className="text-red-500">{errors.quantity}</p>}
                         <Label htmlFor="expiry_date">Ngày hết hạn</Label>
                         <Input id="expiry_date" name="expiry_date" type="date" value={formData.expiry_date} onChange={handleInputChange} />
+                        {errors.expiry_date && <p className="text-red-500">{errors.expiry_date}</p>}
                         <Label>Loại thú cưng</Label>
                         <div className="flex gap-4">
                             {petTypes.map((type) => (
@@ -149,26 +188,27 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                                 </div>
                             ))}
                         </div>
+                        {errors.pet_type && <p className="text-red-500">{errors.pet_type}</p>}
                     </div>
                 </div>
-                <Label>Hình ảnh</Label>
-                <div className="grid grid-cols-3 gap-2">
+                <Label>Hình ảnh (Tối đa 1 ảnh)</Label>
+                <div className="grid grid-cols-1 gap-2">
                     {formData.images.map((image, index) => (
                         <div key={index} className="relative">
                             <img src={image.url} alt="Medicine" className="w-full h-24 object-cover rounded-md" />
-                            <Button size="icon" className="absolute top-1 right-1 bg-red-500" onClick={() => handleRemoveImage(index)}>
+                            <Button size="icon" className="absolute top-1 right-1 bg-red-500" onClick={handleRemoveImage}>
                                 <Trash2 size={12} />
                             </Button>
                         </div>
                     ))}
                 </div>
-                {formData.images.length < 9 && (
-                    <input type="file" multiple accept="image/*" onChange={handleImageChange} />
+                {formData.images.length < 1 && (
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
                 )}
                 <SheetFooter>
-                    <SheetClose asChild>
-                        <Button onClick={handleSubmit}>Lưu thay đổi</Button>
-                    </SheetClose>
+                    <Button onClick={handleSubmit} disabled={isLoading}>
+                        {isLoading ? "Đang xử lý..." : "Lưu thay đổi"}
+                    </Button>
                 </SheetFooter>
             </SheetContent>
         </Sheet>

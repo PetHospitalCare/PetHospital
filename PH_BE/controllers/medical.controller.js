@@ -2,6 +2,7 @@ const db = require("../models");
 const MedicalRecord = db.medicalRecord;
 const cloudinary = require('cloudinary').v2;
 const Booking = db.booking
+const Medicine = db.medicine
 // Cấu hình Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -22,8 +23,33 @@ const getMedicalbyBookingId = async (req, res) => {
 const createMedicalRecord = async (req, res) => {
     try {
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { booking_id, services, diagnosis, result, prescription, note, symptom, totalPrice } = medicalData;
+        const { booking_id, services, followUpDate, generalConclusion, result, prescription, note, totalPrice } = medicalData;
         await Booking.findOneAndUpdate({ _id: booking_id }, { status: "complete", price: totalPrice });
+        // Trừ số lượng thuốc trong kho
+        // Trừ số lượng thuốc trong kho
+        if (prescription && prescription.length > 0) {
+            for (const item of prescription) {
+                const { medicine, quantity } = item;
+
+                // Tìm thuốc trong kho
+                const medicineRecord = await Medicine.findById(medicine);
+                if (!medicineRecord) {
+                    return res.status(404).json({ success: false, message: `Medicine not found: ${medicine}` });
+                }
+
+                // Kiểm tra số lượng tồn kho
+                if (medicineRecord.quantity < quantity) { // Sửa từ stock thành quantity
+                    return res.status(400).json({
+                        success: false,
+                        message: `Not enough stock for medicine: ${medicineRecord.name}`,
+                    });
+                }
+
+                // Trừ số lượng
+                medicineRecord.quantity -= quantity; // Sửa từ stock thành quantity
+                await medicineRecord.save();
+            }
+        }
         // Handle uploaded files
         const files = req.files;
         const fileServices = Array.isArray(req.body.fileServices)
@@ -70,8 +96,8 @@ const createMedicalRecord = async (req, res) => {
         const medicalRecord = new MedicalRecord({
             booking_id,
             services: servicesWithFiles,
-            diagnosis,
-            symptom,
+            followUpDate,
+            generalConclusion,
             result,
             prescription,
             note,
@@ -90,11 +116,35 @@ const updateMedicalRecord = async (req, res) => {
     try {
         const { id } = req.params;
         const medicalData = JSON.parse(req.body.medicalRecord);
-        const { booking_id, services, diagnosis, result, prescription, note, symptom, totalPrice } = medicalData;
+        const { booking_id, services, followUpDate, generalConclusion, result, prescription, note, totalPrice } = medicalData;
         await Booking.findOneAndUpdate({ _id: booking_id }, { price: totalPrice });
         const medicalRecord = await MedicalRecord.findOne({ booking_id: id });
         if (!medicalRecord) {
             return res.status(404).json({ error: "Medical record not found" });
+        }
+        // Trừ số lượng thuốc trong kho
+        if (prescription && prescription.length > 0) {
+            for (const item of prescription) {
+                const { medicine, quantity } = item;
+
+                // Tìm thuốc trong kho
+                const medicineRecord = await Medicine.findById(medicine);
+                if (!medicineRecord) {
+                    return res.status(404).json({ success: false, message: `Medicine not found: ${medicine}` });
+                }
+
+                // Kiểm tra số lượng tồn kho
+                if (medicineRecord.quantity < quantity) { // Sửa từ stock thành quantity
+                    return res.status(400).json({
+                        success: false,
+                        message: `Not enough stock for medicine: ${medicineRecord.name}`,
+                    });
+                }
+
+                // Trừ số lượng
+                medicineRecord.quantity -= quantity; // Sửa từ stock thành quantity
+                await medicineRecord.save();
+            }
         }
 
         // Handle uploaded files
@@ -158,14 +208,14 @@ const updateMedicalRecord = async (req, res) => {
         }));
 
         medicalRecord.services = servicesWithFiles;
-        medicalRecord.diagnosis = diagnosis;
+        medicalRecord.generalConclusion = generalConclusion;
         medicalRecord.result = result;
         medicalRecord.prescription = prescription.map(item => ({
             medicine: item.medicine, // This is the medicine ObjectId
             quantity: Number(item.quantity),
             instructions: item.instructions || ""
         }));
-        medicalRecord.symptom = symptom;
+        medicalRecord.followUpDate = followUpDate;
         medicalRecord.note = note;
 
         await medicalRecord.save();
@@ -180,7 +230,7 @@ const getAllMedicalRecords = async (req, res) => {
         const medicalRecords = await MedicalRecord.find().populate({
             path: 'booking_id',
             populate: [
-
+                { path: 'pet_id' },
                 { path: 'doctor_id' }
             ]
         }).select(`booking_id _id createdAt updatedAt services note `);
@@ -190,4 +240,48 @@ const getAllMedicalRecords = async (req, res) => {
     }
 }
 
-module.exports = { getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord, getAllMedicalRecords };
+const getOneMedicalByUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        let medicalRecords = await MedicalRecord.findOne({ booking_id: id })
+            .populate({
+                path: 'booking_id',
+                populate: [
+                    { path: 'doctor_id' },
+                    {
+                        path: 'pet_id',
+                        populate: { path: 'account_id' }
+                    }
+                ]
+            })
+            .populate({
+                path: 'services.service_id',
+            })
+            .populate("prescription.medicine")
+            .select(`booking_id _id createdAt updatedAt services note prescription`);
+
+        // **Lọc subServices**
+        if (medicalRecords) {
+            medicalRecords = medicalRecords.toObject(); // Convert to plain object
+            medicalRecords.services = medicalRecords.services.map(service => {
+                const filteredSubServices = service.service_id?.subServices.filter(sub =>
+                    service.sub_service_id?.equals(sub._id)
+                );
+                return {
+                    ...service,
+                    service_id: {
+                        ...service.service_id,
+                        subServices: filteredSubServices, // Chỉ giữ subServices đã chọn
+                    }
+                };
+            });
+        }
+
+        res.status(200).json({ success: true, data: medicalRecords });
+    } catch (err) {
+        console.error("Error in getOneMedicalByUser:", err);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+module.exports = { getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord, getAllMedicalRecords, getOneMedicalByUser };

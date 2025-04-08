@@ -21,6 +21,13 @@ const UpdateMedical = (id, data) => {
 const getAllMedicalRecords = () => {
     return axios.get(`/medical/get-all`);
 };
+const getOneMedicalRecords = (id) => {
+    return axios.get(`/medical/get-by-user/${id}`);
+};
 export const MeidicalServices = {
-    getMedicalByBookingId, CreateNewMedical, UpdateMedical, getAllMedicalRecords
+    getMedicalByBookingId, 
+    CreateNewMedical, 
+    UpdateMedical, 
+    getAllMedicalRecords, 
+    getOneMedicalRecords
 };

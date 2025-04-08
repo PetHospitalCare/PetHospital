@@ -69,16 +69,15 @@ export default function BookingStatus({ status, setCount }) {
             if (status === "complete") {
                 const response = await MeidicalServices.getAllMedicalRecords();
                 const complete = response?.data?.data?.filter(record => record.booking_id?.status === status);
-                const bookings = complete.map(record => record.booking_id);
+                const bookings = complete.map(record => record.booking_id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 setMedicalRecord(complete);
                 setData(bookings);
-                if (status === "pending") {
-                    setCount(complete.length);
-                }
             } else {
                 const response = await BookingServices.getAllBookingByStatus(status);
-                //const pending = response?.data?.filter(booking => booking.status === status)
-                setData(response?.data);
+                const sortedData = response?.data?.sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+                setData(sortedData);
                 if (status === "pending") {
                     setCount(response?.data.length);
                 }
@@ -168,7 +167,6 @@ export default function BookingStatus({ status, setCount }) {
         });
         setIsViewDialogOpen(true);
     };
-    console.log(data)
 
     const columns = [
         {
@@ -190,7 +188,8 @@ export default function BookingStatus({ status, setCount }) {
                 const email = row.original.guest_email;
                 return (<>
                     <div className="font-medium">{row.getValue("guest_name")}</div>
-                    <div className="text-sm text-muted-foreground">{sdt} - {email}</div></>
+                    <div className="text-sm text-muted-foreground">{sdt}</div>
+                    <div className="text-sm text-muted-foreground">{email}</div></>
                 )
             }
         },
@@ -228,11 +227,35 @@ export default function BookingStatus({ status, setCount }) {
         },
         {
             accessorKey: "type",
-            header: "Loại thú cưng",
+            header: "Thú cưng",
             cell: ({ row }) => {
-                const type = row.original.pet_id?.type
-                return (<Badge variant="outline" className="capitalize">{type ? type : row.getValue("type")}</Badge>
-                )
+                const type = row.original.pet_id?.type;
+                const petname = row.original?.pet_id?.name;
+
+                return (
+                    <div className="flex items-center gap-2 min-h-[40px]">
+                        {type ? (
+                            <>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                    {petname} -
+                                </span>
+                                <Badge
+                                    variant="outline"
+                                    className="capitalize bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700"
+                                >
+                                    {type === "dog" ? "Chó" : "Mèo"}
+                                </Badge>
+                            </>
+                        ) : (
+                            <Badge
+                                variant="outline"
+                                className="capitalize bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700"
+                            >
+                                {row.getValue("type") === "dog" ? "Chó" : "Mèo"}
+                            </Badge>
+                        )}
+                    </div>
+                );
             }
         },
         {

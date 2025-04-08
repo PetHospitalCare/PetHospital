@@ -37,7 +37,15 @@ import News_Management from './pages/NewsManagement/News_Management'
 
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 import PaymentResult from "@/pages/payments/payment-result.jsx";
-
+import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'
+import NewDetail from './pages/NewDetail/NewDetail'
+import CustomerChat from './pages/Chat/CustomerChat'
+import { StaffChat } from './pages/Chat/StaffChat'
+import Dashboard from './pages/DashBoard/dash-board'
+import UserOrdersPage from "@/pages/user-order-page/user-orders-page.jsx";
+import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Password'
+import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
+import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx'
 export const socket = io.connect("http://localhost:9999",);
 
 function App() {
@@ -48,8 +56,12 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/Login' element={<Login />} />
           <Route path='/SignUp' element={<SignUp />} />
+          <Route path='/forgot-password' element={<Forgot_Password />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
+          <Route path='/change-password' element={<ResetPassword />} />
           <Route path='/otp' element={<OTP_Input />} />
           <Route path='/change-email' element={<ChangeEmail />} />
+          <Route path='/new-detail/:id' element={<NewDetail />} />
           <Route path="/loading" element={<LoadingScreen />} />
           <Route path='/signup-success' element={<SignupSuccess />} />
           <Route path='/unauthorized' element={<Unauthorized />} />
@@ -60,8 +72,9 @@ function App() {
           <Route path='/shopping-cart-detail' element={<ShoppingCartDetail />} />
           <Route path='/shopping-cart-payment' element={<ShoppingCartPayment />} />
           <Route path='/payment-result' element={<PaymentResult />} />
+          <Route path='/medical-detail/:id' element={<MedicalDetail />} />
+          <Route path='/orders' element={<UserOrdersPage />} />
         </Route>
-
         {/* Trang dành cho admin */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route element={<AdminLayout />}> {/* Bọc toàn bộ route admin */}
@@ -73,9 +86,14 @@ function App() {
             <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
             <Route path='/Booking_Management' element={<ManageBooking />} />
             <Route path='/News_Management' element={<News_Management />} />
+            <Route path='/Dashboard' element={<Dashboard />} />
+            <Route path='/chat' element={<StaffChat />} />
+            <Route path='/MedicalRecord' element={<MedicalRecord />}></Route>
+            <Route path="/MedicalRecord/:id" element={< MedicalDetail />} />
+            <Route path='admin/profile' element={<UserProfile />} />
+
           </Route>
         </Route>
-        <Route path="*" element={< Notfound />} />
       </Routes>
 
     </BrowserRouter>

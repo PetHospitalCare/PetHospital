@@ -3,10 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserService } from "../../services/UserService";
 import { UserContext } from "../../contexts/UserContext";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const { loginContext, user } = useContext(UserContext)
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
       const response = await UserService.signInService(formData);
@@ -36,6 +39,8 @@ export default function Login() {
 
     } catch (error) {
       setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -59,7 +64,7 @@ export default function Login() {
                 <div>
                   <label className="block text-sm font-medium mb-2 text-left">Email</label>
                   <input
-                    type="email"
+                    type="text"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
@@ -78,11 +83,22 @@ export default function Login() {
                     className="w-full p-2 bg-gray-100 border rounded"
                     required
                   />
+                  <div className="text-right mt-1">
+                    <Link to="/forgot-password" className="text-sm text-blue-500 underline">
+                      Quên mật khẩu?
+                    </Link>
+                  </div>
                 </div>
 
-                <button className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors">
-                  Đăng nhập
-                </button>
+                <div className="flex justify-center">
+                  <Button 
+                  type="submit"
+                  className="w-2/5 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+                  disabled={isLoading}
+                  >
+                    {isLoading ? "Đang xử lý..." : "Đăng nhập"}
+                  </Button>
+                </div>
               </form>
 
               <p className="mt-4 text-sm text-center">

@@ -12,7 +12,9 @@ import {
   SquareTerminal,
   HeartPulse,
   CalendarCheck,
-  User
+  User,
+  MessageSquare,
+  FolderOpen
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -82,10 +84,6 @@ export function AppSidebar({
             title: "Bảng Tin",
             url: "/News_Management",
           },
-          {
-            title: "Bản Ghi Thú cưng",
-            url: "/PetRecord_Management",
-          },
         ],
       },
       {
@@ -102,7 +100,7 @@ export function AppSidebar({
     projects: [
       {
         name: "Thông số & Doanh thu",
-        url: "#",
+        url: "/Dashboard",
         icon: Map,
       },
       {
@@ -120,6 +118,16 @@ export function AppSidebar({
         url: "/Account_Management",
         icon: User,
       },
+      {
+        name: "Trò chuyện",
+        url: "/chat",
+        icon: MessageSquare,
+      },
+      {
+        name: "Hồ sơ Khám",
+        url: "/MedicalRecord",
+        icon: FolderOpen,
+      }
 
     ],
   }

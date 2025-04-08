@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import Page from "@/app/dashboard/page";
 import axios from "axios";
-import { ArrowUpDown, Pen, Trash2 } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Pen, Trash2 } from "lucide-react";
 import {
     flexRender,
     getCoreRowModel,
@@ -27,6 +27,7 @@ import AddMedicineDialog from "./Add_Medicine_Modal";
 import SheetDemo from "./Edit_Management";
 import { MedicineService } from "@/services/MedicineService";
 import { toast } from "sonner";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function MedicineManagerment() {
     const [data, setData] = useState([]);
@@ -38,6 +39,9 @@ export default function MedicineManagerment() {
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
     const [open, setOpen] = useState(false);
+    const [pageSize, setPageSize] = useState(5); // Mặc định hiển thị 5 sản phẩm mỗi trang
+    const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
     const fetchData = async () => {
         try {
             const response = await MedicineService.getAllMedicine()
@@ -56,7 +60,6 @@ export default function MedicineManagerment() {
         if (window.confirm("Bạn có chắc chắn muốn xóa thuốc này?")) {
             try {
                 const response = await MedicineService.deleteMedicine(id);
-                console.log(response)
                 setData((prevData) => prevData.filter((acc) => acc._id !== id));
                 toast.success("Xóa thuốc thành công!");
             } catch (error) {
@@ -67,42 +70,16 @@ export default function MedicineManagerment() {
     };
     const columns = [
         {
-            id: "select",
-            header: ({ table }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={
-                            table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
-                        }
-                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                        aria-label="Select all"
-                    />
-                </div>
-            ),
-            cell: ({ row }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                    />
-                </div>
-            ),
-            enableSorting: false,
-            enableHiding: false,
-        },
-        {
             accessorKey: "images",
             header: () => <div className="text-center">Ảnh</div>,
             cell: ({ row }) => {
-                const images = row.original.images; // Lấy danh sách ảnh từ API
+                const images = row?.original?.images; // Lấy danh sách ảnh từ API
                 return (
                     <div className="flex flex-wrap justify-center gap-3"> {/* Tăng khoảng cách giữa các ảnh */}
                         {images.map((image, index) => (
-                            <Zoom>
+                            <Zoom key={index}>
                                 <img
-                                    src={image.url}
+                                    src={image?.url}
                                     alt={`Medicine ${index}`}
                                     className="h-28 w-28 object-cover rounded-md"
                                 />
@@ -136,6 +113,11 @@ export default function MedicineManagerment() {
 
                 return <div className="text-center">{translatedPetType}</div>;
             }
+        },
+        {
+            accessorKey: "unit",
+            header: () => <div className="text-center">Đơn vị</div>,
+            cell: ({ row }) => <div className=" text-center">{row.getValue("unit")}</div>,
         },
         {
             accessorKey: "quantity",
@@ -212,9 +194,34 @@ export default function MedicineManagerment() {
             columnFilters,
             columnVisibility,
             rowSelection,
+            pagination: {
+                pageIndex: currentPageIndex, // Sử dụng state currentPageIndex
+                pageSize: pageSize, // Sử dụng state pageSize
+            },
+        },
+        initialState: {
+            pagination: {
+                pageSize: pageSize, // Thiết lập kích thước trang ban đầu
+            },
         },
     });
 
+    useEffect(() => {
+        setCurrentPageIndex(0);
+        table.setPageSize(pageSize);
+    }, [pageSize]);
+
+    const handleNextPage = () => {
+        if (table.getCanNextPage()) {
+            setCurrentPageIndex(prev => prev + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (table.getCanPreviousPage()) {
+            setCurrentPageIndex(prev => prev - 1);
+        }
+    };
 
     return (
 
@@ -272,23 +279,47 @@ export default function MedicineManagerment() {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Previous
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next
-                </Button>
+            <div className="flex items-center justify-between py-4">
+                <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-700">Số sản phẩm mỗi trang:</span>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 px-2">
+                                {pageSize}
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {[5, 10, 15, 20].map((size) => (
+                                <DropdownMenuItem key={size} onClick={() => setPageSize(size)}>
+                                    {size}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="flex-1 text-sm text-gray-700">
+                        {`Trang ${table.getState().pagination.pageIndex + 1} / ${table.getPageCount()}`}
+                    </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePreviousPage}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        Trước
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleNextPage}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        Sau
+                    </Button>
+                </div>
             </div>
         </div>
 

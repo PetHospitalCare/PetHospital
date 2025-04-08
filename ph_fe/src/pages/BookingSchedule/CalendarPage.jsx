@@ -41,6 +41,7 @@ export default function Calendar() {
 
             const formattedAppointments = bookings.map(booking => {
                 const subService = getSubService(booking.service_id, booking.sub_service_id);
+                const color = booking.payment.status == true ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
                 return {
                     id: booking._id,
                     owner: booking?.guest_name || "Không có tên",
@@ -48,12 +49,12 @@ export default function Calendar() {
                     doctor: booking?.doctor_id?.username || "Không có bác sĩ",
                     startHour: booking.hour,
                     duration: subService?.duration || 30,
-                    color: "bg-green-100 text-green-700",
+                    color: color,
                     date: new Date(booking.date),
+                    status: booking.payment.status
                 };
             });
             setAppointments(formattedAppointments);
-            console.log(appointments)
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu booking:", error);
         }
@@ -209,7 +210,7 @@ export default function Calendar() {
                                                     <div className="text-xs mt-1 italic border-t pt-1 truncate">
                                                         <span className="font-medium">BS:</span> {event.doctor}
                                                     </div>
-                                                    <Button
+                                                    {event.status == true ? <>Xem</> : <Button
                                                         variant="outline"
                                                         size="sm"
                                                         className="mt-2 px-3 py-1 text-xs"
@@ -219,7 +220,18 @@ export default function Calendar() {
                                                         }}
                                                     >
                                                         <ChevronRight className="w-3 h-3 mr-1" /> Khám bệnh
-                                                    </Button>
+                                                    </Button>}
+                                                    {/* <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="mt-2 px-3 py-1 text-xs"
+                                                        onClick={() => {
+                                                            setSelectedAppointment(event);
+                                                            setIsDialogOpen(true);
+                                                        }}
+                                                    >
+                                                        <ChevronRight className="w-3 h-3 mr-1" /> Khám bệnh
+                                                    </Button> */}
 
 
                                                 </div>

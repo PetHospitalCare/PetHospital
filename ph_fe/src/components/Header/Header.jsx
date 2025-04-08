@@ -1,8 +1,8 @@
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
-import {Link} from "react-router-dom"
-import {useEffect, useState, useContext, useRef} from "react";
+import { Link } from "react-router-dom"
+import { useEffect, useState, useContext, useRef } from "react";
 import ShoppingCartButton from "@/components/shared/shopping-cart-button.jsx";
 import {
     Dialog,
@@ -38,14 +38,14 @@ const callsToAction = [
 ]
 const tempCategories = [
     { name: 'Thực phẩm', description: 'Thức ăn dành cho chó và mèo', to: '/product/1' },
-    { name: 'Thực phẩm bổ sung', description: 'Các sản phẩm bổ sung dinh dưỡng và các chất cho chó mèo', to: '/product/2'},
+    { name: 'Thực phẩm bổ sung', description: 'Các sản phẩm bổ sung dinh dưỡng và các chất cho chó mèo', to: '/product/2' },
     { name: 'Phụ kiện', description: 'Các phụ kiện dành cho chó mèo: lược, sữa tắm, dầu thơm, dây, chuồng, cát', to: '/product/3' },
     { name: 'Thuốc', description: 'Các sản phẩm trị bệnh cho chó mèo', to: '/product/4' },
     { name: 'Pate', description: 'Pate dành cho chó mèo', to: '/product/5' },
 ]
 import DropdownMenuDemo from "../avatardropdown/avatardropdown"
 import { UserContext } from "../../contexts/UserContext";
-import {ProductService} from "@/services/ProductService.js";
+import { ProductService } from "@/services/ProductService.js";
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false);
@@ -106,8 +106,8 @@ export default function Header() {
                             alt=""
                             src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png"
                             className="h-12 w-auto pointer-events-none select-none"
-                            // onContextMenu="return false;"
-                            // onDrag="retrun false;"
+                        // onContextMenu="return false;"
+                        // onDrag="retrun false;"
 
                         />
                     </Link>
@@ -123,124 +123,86 @@ export default function Header() {
                     </button>
                 </div>
                 <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-                    <Popover className="relative">
-                        <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
-                            Menu
-                            <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
-                        </PopoverButton>
-
-                        <PopoverPanel
-                            transition
-                            className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition data-[closed]:translate-y-1 data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-150 data-[enter]:ease-out data-[leave]:ease-in"
-                        >
-                            <div className="p-4">
-                                {products.map((item) => (
-                                    <div
-                                        key={item.name}
-                                        className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm/6 hover:bg-gray-50"
-                                    >
-                                        <div className="flex size-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                            <item.icon aria-hidden="true" className="size-6 text-gray-600 group-hover:text-indigo-600" />
-                                        </div>
-                                        <div className="flex-auto">
-                                            <Link to={item.to} className="block font-semibold text-gray-900">
-                                                {item.name}
-                                                <span className="absolute inset-0" />
-                                            </Link>
-                                            <p className="mt-1 text-gray-600">{item.description}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
-                                {callsToAction.map((item) => (
-                                    <Link
-                                        key={item.name}
-                                        to={item.to}
-                                        className="flex items-center justify-center gap-x-2.5 p-3 text-sm/6 font-semibold text-gray-900 hover:bg-gray-100 rounded-lg"
-                                    >
-                                        <item.icon aria-hidden="true" className="size-5 flex-none text-gray-400" />
-                                        {item.name}
-                                    </Link>
-                                ))}
-                            </div>
-                        </PopoverPanel>
-                    </Popover>
 
                     <Link to="/" className="text-sm/6 font-semibold text-gray-900">
-                        About us
+                        Trang chủ
+                    </Link>
+
+                    <Link to="/" className="text-sm/6 font-semibold text-gray-900">
+                        Giới thiệu
                     </Link>
                     <Link to="/" className="text-sm/6 font-semibold text-gray-900">
-                        Our Services
+                        Dịch vụ
                     </Link>
-                    {/*<Link to="/product" className="text-sm/6 font-semibold text-gray-900">*/}
-                    {/*    Product*/}
-                    {/*</Link>*/}
 
-                    <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}
-                         onClick={() => setIsOpen(!isOpen)}>
-                        <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">
-                            Product
-                            <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400"/>
-                        </div>
+                    {/*<div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}*/}
+                    {/*    onClick={() => setIsOpen(!isOpen)}>*/}
+                    {/*    <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">*/}
+                    {/*        Danh sách sản phẩm*/}
+                    {/*        <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />*/}
+                    {/*    </div>*/}
 
-                        {isOpen && (
-                            <div
-                                className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition-opacity duration-200 ease-out opacity-100"
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                    <div className="p-4">
-                                        <div
-                                            key="all"
-                                            className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"
-                                        >
-                                            <div className="flex-auto">
-                                                <Link to="/product" className="block font-semibold text-gray-900">
-                                                    Tất cả sản phẩm
-                                                    <span className="absolute inset-0"/>
-                                                </Link>
-                                                <p className="mt-1 text-gray-600">Xem tất cả sản phẩm</p>
-                                            </div>
-                                        </div>
+                    {/*    {isOpen && (*/}
+                    {/*        <div*/}
+                    {/*            className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition-opacity duration-200 ease-out opacity-100"*/}
+                    {/*            onMouseEnter={handleMouseEnter}*/}
+                    {/*            onMouseLeave={handleMouseLeave}*/}
+                    {/*        >*/}
+                    {/*            <div className="p-4">*/}
+                    {/*                <div*/}
+                    {/*                    key="all"*/}
+                    {/*                    className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"*/}
+                    {/*                >*/}
+                    {/*                    <div className="flex-auto">*/}
+                    {/*                        <Link to="/product" className="block font-semibold text-gray-900">*/}
+                    {/*                            Tất cả sản phẩm*/}
+                    {/*                            <span className="absolute inset-0" />*/}
+                    {/*                        </Link>*/}
+                    {/*                        <p className="mt-1 text-gray-600">Xem tất cả sản phẩm</p>*/}
+                    {/*                    </div>*/}
+                    {/*                </div>*/}
 
-                                        {categories?.length > 0 &&
-                                        categories.map((item) => (
-                                            <div
-                                                key={item.name}
-                                                className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"
-                                            >
-                                                <div className="flex-auto">
-                                                    <Link to={item.to} className="block font-semibold text-gray-900">
-                                                        {item.name}
-                                                        <span className="absolute inset-0"/>
-                                                    </Link>
-                                                    <p className="mt-1 text-gray-600">{item.description}</p>
-                                                </div>
-                                            </div>
-                                        ))
-                                        }
-                                    </div>
-                            </div>
-                        )}
-                    </div>
+                    {/*                {categories?.length > 0 &&*/}
+                    {/*                    categories.map((item) => (*/}
+                    {/*                        <div*/}
+                    {/*                            key={item.name}*/}
+                    {/*                            className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"*/}
+                    {/*                        >*/}
+                    {/*                            <div className="flex-auto">*/}
+                    {/*                                <Link to={item.to} className="block font-semibold text-gray-900">*/}
+                    {/*                                    {item.name}*/}
+                    {/*                                    <span className="absolute inset-0" />*/}
+                    {/*                                </Link>*/}
+                    {/*                                <p className="mt-1 text-gray-600">{item.description}</p>*/}
+                    {/*                            </div>*/}
+                    {/*                        </div>*/}
+                    {/*                    ))*/}
+                    {/*                }*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    )}*/}
+                    {/*</div>*/}
+
+                    <Link to="/product" className="text-sm/6 font-semibold text-gray-900">
+                        Cửa hàng
+                    </Link>
 
                     <Link to="/test" className="text-sm/6 font-semibold text-gray-900">
-                        Contact
+                        Liên hệ
                     </Link>
                 </PopoverGroup>
                 <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-center border:">
                     {user ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)
                         :
-                        <Link 
-                         to="/Login"
-                        className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
+                        <Link
+                            to="/Login"
+                            className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
                         >
-                         Đăng nhập <span aria-hidden="true"></span>
+                            Đăng nhập <span aria-hidden="true"></span>
                         </Link>
-                        }
+                    }
                 </div>
-                <ShoppingCartButton/>
+                <ShoppingCartButton />
             </nav>
             <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
                 <div className="fixed inset-0 z-10" />
@@ -314,13 +276,14 @@ export default function Header() {
                                     to="/Login"
                                     className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
                                 >
-                                   Đăng nhập
+                                    Đăng nhập
                                 </Link>
                             </div>
                         </div>
                     </div>
                 </DialogPanel>
             </Dialog>
+            <div className="h-1 w-full" style={{backgroundColor: '#3f2e2e'}}></div>
         </header>
     );
 }

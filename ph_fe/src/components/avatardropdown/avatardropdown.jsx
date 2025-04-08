@@ -13,11 +13,12 @@ import {
     User,
     UserPlus,
     Users,
-    CalendarCheck , 
-    Contact ,
-    ShoppingBasket 
+    CalendarCheck,
+    Contact,
+    ShoppingBasket,
+    Lock
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -36,16 +37,24 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/UserContext";
+import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
 export default function DropdownMenuDemo(user) {
     const navigate = useNavigate();
     const { logoutContext } = useContext(UserContext)
+    const { setDataCartContext } = useContext(ShoppingCartContext);
+    const { isChangeCart, setDataIsChangeCartContext } = useContext(ShoppingCartContext);
+
     const handleLogout = () => {
         logoutContext()
+        setDataCartContext(0);
+        setDataIsChangeCartContext(!isChangeCart);
         navigate("/")
     }
-    const handletest = () => {
-        console.log(user.user)
+
+    const goToOrders = () => {
+        navigate('/orders');
     }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -62,34 +71,37 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <Link to="/profile">
-                        <DropdownMenuItem onClick={handletest}>
+                        <DropdownMenuItem>
                             <Contact />
                             <span>Thông tin cá nhân</span>
                         </DropdownMenuItem>
                     </Link>
+
                     <Link to="/history-booking">
                         <DropdownMenuItem>
                             <CalendarCheck />
                             <span>Lịch sử đặt lịch</span>
                         </DropdownMenuItem>
                     </Link>
-                    <DropdownMenuItem>
-                        <User />
-                        <span>Hồ sơ khám bệnh</span>
 
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={goToOrders}>
                         <ShoppingBasket />
                         <span>Đơn hàng</span>
-
                     </DropdownMenuItem>
+
+                    <Link to="/change-password">
+                        <DropdownMenuItem>
+                            <Lock />
+                            <span>Đổi mật khẩu </span>
+                        </DropdownMenuItem>
+                    </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                     <LogOut />
                     <span>Log out</span>
 
-                </DropdownMenuItem> 
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

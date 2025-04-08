@@ -1,7 +1,7 @@
 const uploadCloud = require("../middlewares/UploadCloud");
 const db = require("../models");
 const Pet = db.pet
-
+const Booking = db.booking
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -146,4 +146,39 @@ const uploadPetAvatar = async (req, res) => {
     res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
-module.exports = { getPetsByUser, createPetByUser, updatedPet, uploadPetAvatar };
+
+const deletePetByUser = async (req, res) => {
+  try {
+      const { id } = req.params;
+
+      // Tìm thú cưng theo ID
+      const pet = await Pet.findById(id);
+
+      // Tìm thú cưng có tồn tại trong lịch đặt không
+      const checkBookingExist = await Booking.findOne({ pet_id: id });
+
+      // Nếu có tồn tại trong lịch đặt thì không cho xóa
+      if (checkBookingExist.status === "pending" || checkBookingExist.status === "confirm" || checkBookingExist.status === "complete") {  
+          return res.status(400).json({ success: false, message: "Thú cưng này đang có lịch đặt khám" });
+      }
+      
+      // Nếu không tìm thấy thú cưng, trả về lỗi 404
+      if (!pet) {
+          return res.status(404).json({ success: false, message: "Không tìm thấy thú cưng" });
+      }
+
+      // Nếu thú cưng có ảnh trên Cloudinary, xóa ảnh trước
+      if (pet.publicId) {
+          await cloudinary.uploader.destroy(pet.publicId);
+      }
+
+      // Xóa thú cưng khỏi database
+      await Pet.findByIdAndDelete(id);
+
+      res.status(200).json({ success: true, message: "Thú cưng đã được xóa thành công" });
+  } catch (error) {
+      console.error("Lỗi khi xóa thú cưng:", error);
+      res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+module.exports = { getPetsByUser, createPetByUser, updatedPet, uploadPetAvatar, deletePetByUser };

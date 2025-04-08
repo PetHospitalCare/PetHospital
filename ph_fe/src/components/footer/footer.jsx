@@ -2,49 +2,69 @@ import { Link } from "react-router-dom"
 
 export default function Footer() {
     return (
-        <footer className="bg-muted py-12 flex items-center justify-center w-full text-center">
-            <div className="container max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <footer className="bg-gray-100 py-12 flex items-center justify-center w-full text-center border-t border-gray-200">
+            <div className="container max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-4">
+                {/* Company Info */}
                 <div className="flex flex-col items-start gap-4">
-                    <Link href="#" className="flex items-center gap-2" prefetch={false}>
-                        <MountainIcon className="w-6 h-6" />
-                        <span className="text-lg font-semibold">Pet Hospital System</span>
+                    <Link to="/" className="flex items-center gap-2 hover:text-blue-600 transition-colors duration-200">
+                        <MountainIcon className="w-6 h-6 text-blue-500" />
+                        <span className="text-lg font-semibold">FPT Pet Care</span>
                     </Link>
-                    <p className="text-muted-foreground max-w-[300px]">
-                        Beautifully designed components that you can copy and paste into your apps.
+                    <p className="text-gray-600 max-w-[300px] text-sm">
+                        Dedicated pet care in Hanoi, with professional veterinary services and the best pet health care.
+                    </p>
+                    <p className="text-gray-500 text-xs">
+                        © {new Date().getFullYear()} FPT Pet Care. All rights reserved.
                     </p>
                 </div>
+
+                {/* Social Links */}
                 <div className="grid gap-2">
-                    <h3 className="font-semibold">Follow Us</h3>
+                    <h3 className="font-semibold text-gray-700">Follow Us</h3>
                     <div className="flex gap-4">
-                        <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
-                            <TwitterIcon className="w-5 h-5" />
-                        </Link>
-                        <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
+                        <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors duration-200">
                             <FacebookIcon className="w-5 h-5" />
-                        </Link>
-                        <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
+                        </a>
+                        <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors duration-200">
+                            <TwitterIcon className="w-5 h-5" />
+                        </a>
+                        <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors duration-200">
                             <InstagramIcon className="w-5 h-5" />
-                        </Link>
-                        <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
+                        </a>
+                        <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors duration-200">
                             <LinkedinIcon className="w-5 h-5" />
-                        </Link>
+                        </a>
                     </div>
                 </div>
+
+                {/* Resources */}
                 <div className="grid gap-2">
-                    <h3 className="font-semibold">Resources</h3>
-                    <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
+                    <h3 className="font-semibold text-gray-700">Resources</h3>
+                    <Link to="/documentation" className="text-gray-500 hover:text-blue-600 transition-colors duration-200 text-sm">
                         Documentation
                     </Link>
-                    <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
+                    <Link to="/blog" className="text-gray-500 hover:text-blue-600 transition-colors duration-200 text-sm">
                         Blog
                     </Link>
-                    <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
+                    <Link to="/support" className="text-gray-500 hover:text-blue-600 transition-colors duration-200 text-sm">
                         Support
                     </Link>
-                    <Link href="#" className="text-muted-foreground hover:underline" prefetch={false}>
+                    <Link to="/contact" className="text-gray-500 hover:text-blue-600 transition-colors duration-200 text-sm">
                         Contact
                     </Link>
                 </div>
+            </div>
+
+            {/* Google Map */}
+            <div className="w-full mt-8 px-4">
+                <h3 className="text-lg font-semibold mb-4 text-gray-700">Our Location in FPT University Hanoi</h3>
+                <iframe
+                    className="w-[640px] h-64 rounded-md shadow-md"
+                    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d11640.246173409367!2d105.53450707708018!3d21.012262136159258!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135abc60e7d3f19%3A0x2be9d7d0b5abcbf4!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBGUFQgSMOgIE7hu5lp!5e0!3m2!1svi!2s!4v1743965612599!5m2!1svi!2s"
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
             </div>
         </footer>
     )
@@ -69,7 +89,6 @@ function FacebookIcon(props) {
     )
 }
 
-
 function InstagramIcon(props) {
     return (
         <svg
@@ -90,7 +109,6 @@ function InstagramIcon(props) {
         </svg>
     )
 }
-
 
 function LinkedinIcon(props) {
     return (
@@ -113,7 +131,6 @@ function LinkedinIcon(props) {
     )
 }
 
-
 function MountainIcon(props) {
     return (
         <svg
@@ -132,7 +149,6 @@ function MountainIcon(props) {
         </svg>
     )
 }
-
 
 function TwitterIcon(props) {
     return (

@@ -109,8 +109,6 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                 sub_service_id: formData.subServiceId, // Dịch vụ con
                 note: formData.note, // Ghi chú
             };
-
-            console.log("Payload:", payload); // Log payload để kiểm tra
             const response = await BookingServices.UpdateBooking(bookingData._id, payload);
             if (response.status === 200) {
                 toast.success(`Cập nhật lịch khám thành công!`);

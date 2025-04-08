@@ -77,7 +77,7 @@ const EditNew = ({ open, onOpenChange, post, onsuccess }) => {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto ">
                 <DialogHeader>
                     <DialogTitle>Chỉnh sửa bài viết</DialogTitle>
                     <DialogDescription>Chỉnh sửa thông tin bài viết và lưu thay đổi.</DialogDescription>
@@ -150,7 +150,7 @@ const EditNew = ({ open, onOpenChange, post, onsuccess }) => {
                     )}
                     <DialogFooter className='mt-4'>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Đang xử lý...' : 'Đăng bài'}
+                            {isSubmitting ? 'Đang xử lý...' : 'Cập nhật bài viết'}
                         </Button>
                     </DialogFooter>
                 </form>
