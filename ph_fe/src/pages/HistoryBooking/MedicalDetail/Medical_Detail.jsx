@@ -15,6 +15,7 @@ export default function MedicalDetail() {
     const fetchMedical = async () => {
         try {
             const response = await MeidicalServices.getOneMedicalRecords(id);
+            console.log("response", response);
             if (response.data.success) {
                 setMedical(response.data.data);
             }
@@ -78,6 +79,9 @@ export default function MedicalDetail() {
                                 <span className="font-semibold">Thời gian khám:</span>
                                 {`${String(new Date(medical?.booking_id?.date).getDate() + 1).padStart(2, "0")}/${String(new Date(medical?.booking_id?.date).getMonth() + 1).padStart(2, "0")}/${String(new Date(medical?.booking_id?.date).getFullYear())} - ${medical?.booking_id?.hour}`}
                             </p>
+                            <p className="text-gray-900 text-lg md:text-xl">
+                                <span className="font-semibold">Kết luận tổng:</span> {medical?.generalConclusion || "Chưa có kết luận tổng"}
+                            </p>
                         </div>
                         <div className="space-y-4">
                             <p className="text-gray-900 text-lg md:text-xl">
@@ -85,6 +89,12 @@ export default function MedicalDetail() {
                             </p>
                             <p className="text-gray-900 text-lg md:text-xl">
                                 <span className="font-semibold">Giống:</span> {medical?.booking_id?.pet_id?.species}
+                            </p>
+                            <p className="text-gray-900 text-lg md:text-xl">
+                                <span className="font-semibold">Ngày hẹn tái khám: </span>
+                                {medical?.followUpDate ? (
+                                    `${String(new Date(medical?.followUpDate).getDate() + 1).padStart(2, "0")}/${String(new Date(medical?.followUpDate).getMonth() + 1).padStart(2, "0")}/${String(new Date(medical?.followUpDate).getFullYear())}`
+                                ) : "Hiện đang không có"}
                             </p>
                         </div>
                     </div>
