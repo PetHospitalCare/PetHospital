@@ -130,5 +130,95 @@ const getProductById = async (req, res) => {
         });
     }
 };
+const updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const files = req.files;
+        const { name, description, price, quantity, categoryId, type } = req.body;
+        const parsedType = typeof type === "string" ? JSON.parse(type) : type;
 
-module.exports = { CreateNewProduct, getAllProduct, deleteProduct, getProductById };
+        // Tìm sản phẩm cần cập nhật
+        const product = await Product.findById(id);
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy sản phẩm"
+            });
+        }
+
+        // Xử lý ảnh mới và ảnh cũ
+        let updatedImages = [];
+
+        // Giữ lại ảnh cũ nếu có
+        if (req.body.existingImages) {
+            const existingImages = Array.isArray(req.body.existingImages)
+                ? req.body.existingImages
+                : [req.body.existingImages];
+
+            for (let imageString of existingImages) {
+                const image = typeof imageString === 'string'
+                    ? JSON.parse(imageString)
+                    : imageString;
+                updatedImages.push({
+                    url: image.url,
+                    publicId: image.publicId
+                });
+            }
+        }
+
+        // Xử lý ảnh mới nếu có
+        if (files && files.length > 0) {
+            const newImages = files.map(file => ({
+                url: file.path,
+                publicId: file.filename
+            }));
+            updatedImages = [...updatedImages, ...newImages];
+        }
+
+        // Xóa ảnh cũ trên Cloudinary nếu không còn được sử dụng
+        const oldImages = product.images || [];
+        const keptImageIds = updatedImages.map(img => img.publicId);
+
+        for (const oldImage of oldImages) {
+            if (!keptImageIds.includes(oldImage.publicId)) {
+                await cloudinary.uploader.destroy(oldImage.publicId).catch(() => {
+                    console.log(`Failed to delete image: ${oldImage.publicId}`);
+                });
+            }
+        }
+
+        // Cập nhật sản phẩm
+        const updatedProduct = await Product.findByIdAndUpdate(
+            id,
+            {
+                name,
+                description,
+                price,
+                quantity,
+                categoryId,
+                type: parsedType,
+                images: updatedImages
+            },
+            { new: true }
+        ).populate('categoryId', 'name');
+
+        return res.status(200).json({
+            success: true,
+            message: "Cập nhật sản phẩm thành công",
+            product: updatedProduct
+        });
+
+    } catch (error) {
+        console.error("Lỗi khi cập nhật sản phẩm:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Lỗi server khi cập nhật sản phẩm",
+            error: error.message
+        });
+    }
+};
+
+module.exports = {
+    CreateNewProduct, getAllProduct, deleteProduct, getProductById
+    , updateProduct
+};
