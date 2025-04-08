@@ -12,7 +12,6 @@ export default function MedicalResult({ medical }) {
         if (medical?.services?.length > 0) {
             setSelectedServiceIndex(0);
         }
-        console.log("medical", medical);
     }, [medical]);
 
     if (!medical || !medical.services || medical.services.length === 0) {

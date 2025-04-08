@@ -4,6 +4,7 @@ import { MeidicalServices } from "@/services/MedicalService";
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import MedicalResult from "./Medical/Medical_result";
+import { Loader2 } from "lucide-react";
 
 export default function MedicalDetail() {
     const { id } = useParams();
@@ -15,7 +16,6 @@ export default function MedicalDetail() {
     const fetchMedical = async () => {
         try {
             const response = await MeidicalServices.getOneMedicalRecords(id);
-            console.log("response", response);
             if (response.data.success) {
                 setMedical(response.data.data);
             }
@@ -29,6 +29,11 @@ export default function MedicalDetail() {
     }, []);
 
     return (
+        !medical ? (
+            <div className="flex justify-center items-center h-screen">
+                <Loader2 className="animate-spin h-10 w-10 text-[#3F2E2E]" />
+            </div>
+        ) : (
         <div className={medicalRecordPath === "MedicalRecord" ? "w-full" : "container mx-auto pt-28 px-20"}>
             {medicalRecordPath !== "MedicalRecord" && (
                 <>
@@ -108,5 +113,6 @@ export default function MedicalDetail() {
                 <MedicalResult medical={medical} />
             </div>
         </div >
+        )
     );
 }
