@@ -1,226 +1,159 @@
+import { useState, useEffect, useContext } from "react";
+import { toast } from "sonner";
+import { ShoppingCartContext } from "@/contexts/ShoppingCartContext.jsx";
+import { useAddToCart } from "@/lib/shopping-cart-util.js";
 
-// import { Input } from "@/components/ui/input";
-// import React, { useState, useEffect } from "react";
+export default function ({ open, onClose, productData }) {
+    const { setDataCartContext } = useContext(ShoppingCartContext);
+    const { setDataIsChangeCartContext } = useContext(ShoppingCartContext);
+    const addToCart = useAddToCart();
+    const [product, setProduct] = useState(productData || {});
+    const [quantity, setQuantity] = useState(1);
 
-// import MultiSelect from "@/components/multi-select";
-// import { Dog, Cat } from "lucide-react"
+    useEffect(() => {
+        if (productData) {
+            setProduct(productData);
+            setQuantity(productData.quantity || 1);
+        }
+    }, [productData]);
 
-// import { Textarea } from "@/components/ui/textarea";
-// import { Combobox } from "@/components/Combobox";
-// import { ProductService } from "../../services/ProductService";
-// import { Loader2 } from "lucide-react";
-// import { Button } from "@/components/ui/button";
-// const frameworksList = [
-//     { value: "Dog", label: "Chó", icon: Dog },
-//     { value: "Cat", label: "Mèo", icon: Cat },
-// ];
-// import { toast } from "sonner";
-// export default function Add_Modal({ open, onClose, onSuccess }) {
-//     const [images, setImages] = useState([]);
-//     const [categories, setCategories] = useState([]);
-//     const [selectedCategory, setSelectedCategory] = useState("");
-//     const [productName, setProductName] = useState("");
-//     const [productDescription, setProductDescription] = useState("");
-//     const [price, setPrice] = useState("");
-//     const [quantity, setQuantity] = useState("");
-//     const [type, setType] = useState([]);
-//     const [loading, setLoading] = useState(false);
-//     // Lấy dữ liệu danh mục từ backend
-//     useEffect(() => {
-//         const fetchCategories = async () => {
-//             try {
-//                 const response = await ProductService.getAllCategory()
-//                 if (response.data.success) {
-//                     setCategories(
-//                         response.data.categories.map((category) => ({
-//                             value: category._id,
-//                             label: category.name,
-//                         }))
-//                     );
-//                 }
-//             } catch (error) {
-//                 console.error("Lỗi khi lấy danh mục:", error);
-//             }
-//         };
+    const handleIncrement = () => {
+        setQuantity(prev => prev + 1);
+    };
 
-//         fetchCategories();
-//     }, []);
+    const handleDecrement = () => {
+        if (quantity > 1) {
+            setQuantity(prev => prev - 1);
+        }
+    };
 
-//     //Tạo danh mục mới
-//     const handleCreateCategory = (label) => {
-//         if (label.trim() !== "") {
-//             const temporaryCategory = {
-//                 value: `temp-${Date.now()}`, // Tạo ID tạm thời
-//                 label: label.trim(),
-//                 isTemporary: true, // Đánh dấu là tạm thời
-//             };
-//             setCategories([...categories, temporaryCategory]);
-//             setSelectedCategory(temporaryCategory.value); // Gán danh mục tạm làm danh mục được chọn
-//         } else {
-//             alert("Vui lòng nhập tên danh mục.");
-//         }
-//     };
+    const handleInputChange = (e) => {
+        const value = parseInt(e.target.value);
+        if (!isNaN(value) && value > 0) {
+            setQuantity(value);
+        }
+    };
 
+    const addToCardFunction = (product, order) => {
+        addToCart({
+            productId: product.productId,
+            quantity: quantity,
+            price: product.price,
+            imageUrl: product.imageUrl,
+            name: product.name
+        }, setDataCartContext, setDataIsChangeCartContext, order, true);
+    }
 
-//     //xử lý lỗi ảnh up quá 9 ảnh
-//     const handleImageUpload = (event) => {
-//         const files = Array.from(event.target.files);
-//         if (files.length + images.length > 9) {
-//             alert("Bạn chỉ được tải tối đa 9 ảnh.");
-//             return;
-//         }
-//         setImages([...images, ...files]);
-//     };
+    const handleSetProductQuantity = async () => {
+        try {
+            await addToCardFunction(productData, 'update');
+            onClose();
+        } catch (e) {
+            toast.error("Có lỗi xảy ra khi chỉnh sửa số lượng sản phẩm!");
+        }
+    };
 
-//     //Xử lý xoá ảnh
-//     const handleImageRemove = (index) => {
-//         setImages(images.filter((_, i) => i !== index));
-//     };
+    if (!open) return null;
 
-//     //function xác nhận tạo sản phẩm
-//     const handleSubmit = async (event) => {
-//         event.preventDefault();
-//         if (!productName || !selectedCategory || !productDescription || !type.length || !images.length) {
-//             toast.error("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
-//             //alert("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
-//             return;
-//         }
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl flex flex-col overflow-hidden" style={{ backgroundColor: "#fef6e9" }}>
+                <div className="flex flex-1">
+                    <div className="w-1/3 bg-gray-50 p-6 flex flex-col" style={{ backgroundColor: "#fef6e9" }}>
+                        <div className="flex-grow flex flex-col items-center justify-center">
+                            <div className="w-full aspect-square bg-gray-200 rounded overflow-hidden mb-4">
+                                {product.imageUrl ? (
+                                    <img
+                                        src={product.imageUrl}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                        No image
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
 
-//         setLoading(true); // Bật trạng thái loading
+                    <div className="w-2/3 p-6 flex flex-col">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-left">Chỉnh sửa số lượng sản phẩm</h2>
+                            <button
+                                onClick={onClose}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
 
-//         let finalCategoryId = selectedCategory;
+                        <div className="mb-6">
+                            <h3 className="font-medium text-lg">{product.name || "Tên sản phẩm"}</h3>
+                            <p className="text-gray-600 mb-2">{product.price ? `${product.price.toLocaleString('vi-VN')} đ` : "Giá sản phẩm"}</p>
+                            <a href={`/product-detail?product_id=${product.productId}`} className="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+                                Xem chi tiết
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
 
-//         // Nếu danh mục là tạm thời, lưu vào DB trước
-//         if (categories.find((category) => category.value === selectedCategory)?.isTemporary) {
-//             try {
-//                 const response = await ProductService.createCategory({ name: categories.find((cat) => cat.value === selectedCategory).label });
-//                 if (response.data.success) {
-//                     finalCategoryId = response.data.category._id;
-//                     setCategories((prevCategories) =>
-//                         prevCategories.map((cat) =>
-//                             cat.value === selectedCategory
-//                                 ? { value: response.data.category._id, label: response.data.category.name }
-//                                 : cat
-//                         )
-//                     );
-//                 }
-//             } catch (error) {
-//                 toast.error("Đã xảy ra lỗi khi tạo danh mục, vui lòng thử lại.");
+                        <div className="mb-8">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Số lượng
+                            </label>
+                            <div className="flex items-center">
+                                <button
+                                    onClick={handleDecrement}
+                                    className="w-10 h-10 rounded-l border border-gray-300 flex items-center justify-center bg-gray-100 hover:bg-gray-200"
+                                    disabled={quantity <= 1}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                    </svg>
+                                </button>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={quantity}
+                                    onChange={handleInputChange}
+                                    className="w-16 h-10 border-t border-b border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <button
+                                    onClick={handleIncrement}
+                                    className="w-10 h-10 rounded-r border border-gray-300 flex items-center justify-center bg-gray-100 hover:bg-gray-200"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-//                 setLoading(false);
-//                 return;
-//             }
-//         }
-
-//         const formData = new FormData();
-//         formData.append("name", productName);
-//         images.forEach((image) => formData.append("imageUrl", image));
-//         formData.append("description", productDescription);
-//         formData.append("price", price);
-//         formData.append("quantity", quantity);
-//         formData.append("categoryId", finalCategoryId);
-//         formData.append("type", JSON.stringify(type));
-
-//         try {
-//             const response = await ProductService.createProduct(formData);
-//             if (response.data.message === "Tạo sản phẩm thành công") {
-//                 toast.success("Sản phẩm đã được thêm!");
-
-//                 onSuccess();
-//                 onClose();
-//             }
-//         } catch (error) {
-//             console.error("Lỗi khi thêm sản phẩm:", error);
-//             toast.error("Đã xảy ra lỗi, vui lòng thử lại.");
-
-//         } finally {
-//             setLoading(false); // Tắt trạng thái loading sau khi API hoàn tất
-//         }
-//     };
-
-
-//     if (!open) return null;
-
-//     return (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-//             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
-//                 <h2 className="text-xl font-bold mb-6 text-left">Thêm sản phẩm mới</h2>
-//                 <form onSubmit={handleSubmit}>
-//                     <div className="grid grid-cols-2 gap-6 mb-6">
-//                         <div>
-//                             <label htmlFor="pName" className="block text-sm font-medium text-left mb-2">Tên sản phẩm</label>
-//                             <Input type="text" placeholder="Nhập tên sản phẩm" value={productName} onChange={(e) => setProductName(e.target.value)} />
-//                         </div>
-//                         <div>
-//                             <label htmlFor="quantity" className="block text-sm font-medium text-left mb-2">Số lượng</label>
-//                             <Input type="number" placeholder="Nhập số lượng" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-//                         </div>
-//                     </div>
-
-//                     <div className="grid grid-cols-2 gap-6 mb-6">
-//                         <div>
-//                             <label htmlFor="price" className="block text-sm font-medium text-left mb-2">Giá tiền</label>
-//                             <Input type="number" placeholder="Nhập giá tiền" value={price} onChange={(e) => setPrice(e.target.value)} />
-//                         </div>
-//                         <div>
-//                             <label htmlFor="category" className="block text-sm font-medium text-left mb-2">Danh mục</label>
-//                             <Combobox
-//                                 options={categories}
-//                                 selected={selectedCategory}
-//                                 placeholder="Chọn danh mục"
-//                                 onChange={(selected) => setSelectedCategory(selected.value)}
-//                                 onCreate={(label) => handleCreateCategory(label)}
-//                             />
-//                         </div>
-//                         <div>
-//                             <label htmlFor="pName" className="block text-sm font-medium text-left mb-2">Mô tả về sản phẩm</label>
-//                             <Textarea placeholder="Hãy mô tả về sản phẩm của bạn" value={productDescription} onChange={(e) => setProductDescription(e.target.value)} />
-//                         </div>
-//                         <div>
-//                             <label htmlFor="type" className="block text-sm font-medium text-left mb-2">Loài động vật</label>
-//                             <MultiSelect
-//                                 className="text-gray-400"
-//                                 options={frameworksList}
-//                                 onValueChange={(selected) => setType(selected)}
-//                                 value={type}
-//                                 placeholder="Chọn loài động vật"
-//                                 variant="inverted"
-//                                 animation={2}
-//                                 maxCount={2}
-//                             />
-//                         </div>
-//                     </div>
-
-//                     <div className="mb-6">
-//                         <label className="block text-sm font-medium text-left mb-2">Thêm ảnh (tối đa 9 ảnh)</label>
-//                         <Input type="file" multiple accept="image/*" onChange={handleImageUpload} />
-//                         <div className="grid grid-cols-9 gap-4 mt-4">
-//                             {images.map((image, index) => (
-//                                 <div key={index} className="relative">
-//                                     <img src={URL.createObjectURL(image)} alt="Uploaded preview" className="w-32 h-32 object-cover rounded-md" />
-//                                     <button type="button" className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex justify-center items-center" onClick={() => handleImageRemove(index)}>
-//                                         ✕
-//                                     </button>
-//                                 </div>
-//                             ))}
-//                         </div>
-//                     </div>
-
-//                     <div className="flex justify-between items-center">
-//                         <button type="button" onClick={onClose} className="text-red-500 underline">Hủy bỏ</button>
-//                         <Button type="submit" className="bg-blue-500 text-white px-6 py-3 rounded flex items-center justify-center" disabled={loading}>
-//                             {loading ? (
-//                                 <>
-//                                     <Loader2 className="animate-spin mr-2" />
-//                                     Đang xử lý...
-//                                 </>
-//                             ) : (
-//                                 "Thêm sản phẩm"
-//                             )}
-//                         </Button>
-//                     </div>
-//                 </form>
-//             </div>
-//         </div>
-//     );
-// }
+                <div className="flex border-t border-gray-200 p-4">
+                    <div className="flex-1 flex justify-start">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            Hủy
+                        </button>
+                    </div>
+                    <div className="flex-1 flex justify-end">
+                        <button
+                            onClick={handleSetProductQuantity}
+                            className="px-6 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            Lưu thay đổi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

@@ -19,10 +19,15 @@ const paymentShoppingCartByUserId = (userId, data) => {
     return axios.post(`/payment/vnpay${userId}`, data);
 }
 
+const createCodOrder = (userId, data) => {
+    return axios.post(`/payment/cod/pay${userId}`, data);
+}
+
 export const ShoppingCartService = {
     createShoppingCart,
     deleteShoppingCart,
     getShoppingCartByUserId,
     updateShoppingCartByUserId,
-    paymentShoppingCartByUserId
+    paymentShoppingCartByUserId,
+    createCodOrder,
 };
