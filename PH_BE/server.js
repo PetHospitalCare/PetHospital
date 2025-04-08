@@ -69,7 +69,12 @@ app.use("/notification", NotificationRoute)
 
 exports.io = io;
 require("./sockets")(io);
-server.listen(process.env.PORT || 9999, process.env.HOST_NAME || "localhost", () => {
-    console.log(`Server in running at: http://${process.env.HOST_NAME}:${process.env.PORT}`);
+const isVercel = process.env.VERCEL === "1";
+const port = process.env.PORT || 9999;
+const host = isVercel ? "0.0.0.0" : (process.env.HOST_NAME || "localhost");
+
+server.listen(port, host, () => {
+    console.log(`Server is running at: http://${host}:${port}`);
     db.connect();
 });
+
