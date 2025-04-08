@@ -51,7 +51,7 @@ const signin = async (req, res) => {
     res.cookie("access_token", token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: "None",
       maxAge: 86400000 //1 ngày 
       // maxAge: 60000 // 1 phút
     });
@@ -91,7 +91,7 @@ const resetPassword = async (req, res) => {
     if (!updatedAccount) {
       return res.status(404).json({ success: false, message: "Không tìm thấy tài khoản." });
     }
-    
+
     res.status(200).json({ success: true, message: "Đặt lại mật khẩu thành công." });
   } catch (error) {
     console.error("Lỗi khi đặt lại mật khẩu:", error);
@@ -342,17 +342,18 @@ const uploadAvatar = async (req, res) => {
     res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
-module.exports = { 
-  signup, 
-  signin, 
+module.exports = {
+  signup,
+  signin,
   forgotPassword,
   resetPassword,
   changePassword,
-  getallAccount, 
-  createNewAccount, 
-  deleteAccount, 
-  editaccount, 
-  getAllDoctor, 
-  getCurrentUser, 
+  getallAccount,
+  createNewAccount,
+  deleteAccount,
+  editaccount,
+  getAllDoctor,
+  getCurrentUser,
   updateUserAccount,
-  uploadAvatar };
+  uploadAvatar
+};

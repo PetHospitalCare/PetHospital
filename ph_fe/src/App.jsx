@@ -43,7 +43,7 @@ import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Passwor
 import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
 import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx'
 export const socket = io.connect("https://pethospital.onrender.com",);
-
+// export const socket = io.connect("https://localhost:9999",);
 function App() {
   return (
     <BrowserRouter>
