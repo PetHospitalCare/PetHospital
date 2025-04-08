@@ -9,6 +9,7 @@ productRoute.post("/create", verifyToken, authorize("staff", "admin"), uploadClo
 productRoute.get("/get-all", ProductController.getAllProduct);
 productRoute.delete("/delete:id", verifyToken, authorize("staff", "admin"), ProductController.deleteProduct);
 productRoute.get("/getById:id", ProductController.getProductById);
+productRoute.put("/update/:id", uploadCloud.array('images'), ProductController.updateProduct);
 
 module.exports = productRoute;
 
