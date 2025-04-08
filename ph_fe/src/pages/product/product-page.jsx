@@ -458,7 +458,7 @@ export default function ProductPage() {
                                     <a href="/" className="text-blue-500 hover:underline">Trang chủ</a>
                                 </li>
                                 <li>&gt;</li>
-                                <li className="text-gray-500">Sản phẩm</li>
+                                <li className="text-gray-500">Cửa hàng</li>
                             </ul>
                         </nav>
 
