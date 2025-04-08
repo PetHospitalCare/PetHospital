@@ -46,7 +46,7 @@ import UserOrdersPage from "@/pages/user-order-page/user-orders-page.jsx";
 import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Password'
 import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
 import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx'
-export const socket = io.connect("http://localhost:9999",);
+export const socket = io.connect("https://pethospital.onrender.com",);
 
 function App() {
   return (
