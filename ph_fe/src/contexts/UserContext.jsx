@@ -28,7 +28,8 @@ const UserProvider = ({ children }) => {
                     role: response.data.account.role,
                     email: response.data.account.email,
                     username: response.data.account.username,
-                    phone: response.data.account.phone
+                    phone: response.data.account.phone,
+                    address: response.data.account.address
                 });
             }
         } catch (error) {

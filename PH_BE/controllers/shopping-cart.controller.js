@@ -47,7 +47,7 @@ const updateShoppingCartByUserId = async (req, res) => {
             });
         }
 
-        if ((data.order === 'add' || data.order === 'subtract') && shoppingCart) {
+        if ((data.order === 'add' || data.order === 'subtract' || data.order === 'update') && shoppingCart) {
             const existingItem = shoppingCart.items.find(
                 (item) => item.productId === data.product.productId
             );
@@ -71,6 +71,15 @@ const updateShoppingCartByUserId = async (req, res) => {
                         if (index > -1) {
                             shoppingCart.items.splice(index, 1);
                         }
+                    }
+                }
+            } else if (data.order === 'update') {
+
+                if (data.product.quantity > 0) {
+                    if (existingItem) {
+                        existingItem.quantity = data.product.quantity;
+                    } else {
+                        shoppingCart.items.push(data.product);
                     }
                 }
             }

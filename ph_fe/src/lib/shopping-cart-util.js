@@ -8,7 +8,7 @@ export function useAddToCart() {
     const userId = useUserId();
 
     return (productInput, contextFunction, contextFunction2, order, isShowToastInput) => {
-        // add, subtract, delete, replace
+        // add, subtract, delete, replace, update
 
         if (isShowToastInput !== undefined && isShowToastInput !== null && !isShowToastInput) {
             isShowToast = false;
@@ -44,6 +44,10 @@ async function callAPIUpdateCart(userIdInput, productInput, contextFunction, con
         if (order === 'add' && isShowToast) {
             toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
         }
+
+        if (order === 'update' && isShowToast) {
+            toast.success("Số lượng sản phẩm đã được cập nhật thành công!");
+        }
     } else if (contextFunction) {
         contextFunction(0);
     }
@@ -55,8 +59,10 @@ async function callAPIUpdateCart(userIdInput, productInput, contextFunction, con
 
 export function updateLocalStorageShoppingCart(productInput, order, contextFunction, contextFunction2) {
     let localStorageShoppingCart = localStorage.getItem("cart") || null;
+    let isShowToastAddSuccess = false;
+    let isShowToastUpdateSuccess = false;
 
-    if (order === 'add' || order === 'subtract') {
+    if (order === 'add' || order === 'subtract' || order === 'update') {
         if (localStorageShoppingCart) {
             localStorageShoppingCart = JSON.parse(localStorageShoppingCart);
 
@@ -74,7 +80,7 @@ export function updateLocalStorageShoppingCart(productInput, order, contextFunct
                 }
 
                 if (isShowToast) {
-                    toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
+                    isShowToastAddSuccess = true;
                 }
             } else if (order === 'subtract') {
                 if (existingItem) {
@@ -89,10 +95,18 @@ export function updateLocalStorageShoppingCart(productInput, order, contextFunct
                         }
                     }
                 }
+            } else if (order === 'update') {
+                if (existingItem && productInput.quantity > 0) {
+                    existingItem.quantity = productInput.quantity;
+
+                    if (isShowToast) {
+                        isShowToastUpdateSuccess = true;
+                    }
+                }
             }
 
         } else {
-            if (order === 'add') {
+            if (order === 'add' || order === 'update') {
                 localStorageShoppingCart = {
                     "items": [
                         productInput,
@@ -103,6 +117,14 @@ export function updateLocalStorageShoppingCart(productInput, order, contextFunct
                     "status": 0,
                     "shipFee": 20000.0,
                     "address": ""
+                }
+
+                if (isShowToast && order === 'add') {
+                    isShowToastAddSuccess = true;
+                }
+
+                if (isShowToast && order === 'update') {
+                    isShowToastUpdateSuccess = true;
                 }
             }
         }
@@ -144,6 +166,14 @@ export function updateLocalStorageShoppingCart(productInput, order, contextFunct
 
     if (contextFunction2 !== undefined && contextFunction2 !== null) {
         contextFunction2();
+    }
+
+    if (isShowToastAddSuccess) {
+        toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
+    }
+
+    if (isShowToastUpdateSuccess) {
+        toast.success("Số lượng sản phẩm đã được cập nhật thành công!");
     }
 }
 
