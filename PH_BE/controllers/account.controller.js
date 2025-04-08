@@ -49,6 +49,7 @@ const signin = async (req, res) => {
     const token = generateToken(account._id, account.role, account.username, account.email);
 
     res.cookie("access_token", token, {
+      path: "/",
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "None",
