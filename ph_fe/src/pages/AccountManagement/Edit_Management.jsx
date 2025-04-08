@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Pen } from "lucide-react";
 import axios from "axios";
 import { UserService } from "@/services/UserService";
+import { toast } from "sonner";
 export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
     const roles = ["staff", "admin", "doctor"];
     const [formData, setFormData] = useState({ username: "", email: "", phone: "", role: [] });
@@ -37,8 +38,8 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
     const handleSubmit = async () => {
         try {
             const response = await UserService.updateAccount(account._id, formData);
-            alert("Cập nhật thành công")
-            onsuccess?.();
+            toast.success("Cập nhật tài khoản thành công!");
+            onsuccess();
             onOpenChange(false);
 
         } catch (error) {

@@ -70,32 +70,6 @@ export default function MedicineManagerment() {
     };
     const columns = [
         {
-            id: "select",
-            header: ({ table }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={
-                            table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
-                        }
-                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                        aria-label="Select all"
-                    />
-                </div>
-            ),
-            cell: ({ row }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                    />
-                </div>
-            ),
-            enableSorting: false,
-            enableHiding: false,
-        },
-        {
             accessorKey: "images",
             header: () => <div className="text-center">Ảnh</div>,
             cell: ({ row }) => {
@@ -139,6 +113,11 @@ export default function MedicineManagerment() {
 
                 return <div className="text-center">{translatedPetType}</div>;
             }
+        },
+        {
+            accessorKey: "unit",
+            header: () => <div className="text-center">Đơn vị</div>,
+            cell: ({ row }) => <div className=" text-center">{row.getValue("unit")}</div>,
         },
         {
             accessorKey: "quantity",

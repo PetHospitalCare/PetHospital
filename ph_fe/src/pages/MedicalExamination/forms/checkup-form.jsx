@@ -24,12 +24,13 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
 
   const handleGeneratePDF = async () => {
     try {
+      // Initialize PDF with UTF-8 support
       const pdf = new jsPDF('p', 'mm', 'a4')
       const pageWidth = pdf.internal.pageSize.getWidth()
       const pageHeight = pdf.internal.pageSize.getHeight()
       const margin = 20
 
-      // Add font
+      // Add custom font
       pdf.addFileToVFS('times.ttf', font.time)
       pdf.addFont('times.ttf', 'times', 'normal')
       pdf.setFont('times', 'normal')
@@ -40,7 +41,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
       const logoHeight = 30
       pdf.addImage(logoImage, 'PNG', margin, margin, logoWidth, logoHeight)
 
-      // Add hospital info
+      // Add hospital name
       pdf.setFontSize(20)
       pdf.text('PET HOSPITAL', margin + logoWidth + 10, margin + 15)
       pdf.setFontSize(8)
@@ -49,19 +50,18 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
         'Hotline: 1900 xxxx - Tel: (028) xxxx xxxx',
         'Email: minhvhhe170320@fpt.edu.vn - Website: www.pethospital.com'
       ], margin + logoWidth + 10, margin + 25)
-
-      // Add line separator
+      // Add horizontal line
       pdf.setDrawColor(41, 128, 185)
       pdf.setLineWidth(0.5)
       pdf.line(margin, margin + logoHeight + 5, pageWidth - margin, margin + logoHeight + 5)
 
-      // Add title
+      // Add form title with background
       const titleY = margin + logoHeight + 15
       pdf.setFillColor(41, 128, 185)
       pdf.rect(margin, titleY, pageWidth - (margin * 2), 10, 'F')
       pdf.setFontSize(16)
       pdf.setTextColor(255, 255, 255)
-      pdf.text('PHIẾU KHÁM TỔNG QUÁT', pageWidth / 2, titleY + 7, { align: 'center' })
+      pdf.text(`${subService?.name}`, pageWidth / 2, titleY + 7, { align: 'center' })
 
       // Reset text color
       pdf.setTextColor(0, 0, 0)
@@ -70,85 +70,97 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
       const infoStartY = titleY + 20
       pdf.setFontSize(11)
 
-      // Pet info
+      // Left column - Pet info
+      const leftColX = margin
       pdf.text([
         `Tên thú cưng: ${petInfo?.name || ''}`,
         `Loại: ${petInfo?.type || ''}`,
         `Giống: ${petInfo?.breed || ''}`,
         `Ngày sinh: ${petInfo?.dob ? format(new Date(petInfo.dob), "dd-MM-yyyy") : ''}`,
         `Cân nặng: ${petInfo?.weight || ''} kg`
-      ], margin, infoStartY)
+      ], leftColX, infoStartY)
 
-      // Owner info
+      // Middle column - Owner info
+      const middleColX = pageWidth / 2 - 20
       pdf.text([
         `Chủ nuôi: ${petInfo?.ownerName || ''}`,
         `Số điện thoại: ${petInfo?.phone || ''}`,
         `Email: ${petInfo?.email || ''}`,
         `Địa chỉ: ${petInfo?.address || ''}`
-      ], pageWidth / 2 - 20, infoStartY)
+      ], middleColX, infoStartY)
 
-      // Pet image
+      // Right column - Pet image
       if (petInfo?.url) {
         const petImage = await loadImage(petInfo.url)
         pdf.addImage(petImage, 'JPEG', pageWidth - margin - 40, infoStartY - 5, 40, 40)
       }
+      let currentY = infoStartY + 45;
 
-      // Add examination details
-      const examY = infoStartY + 50
-      pdf.setFontSize(12)
-      pdf.text([
-        `Nhiệt độ: ${formData.temperature || 'N/A'} °C`,
-        `Nhịp tim: ${formData.heartRate || 'N/A'} bpm`,
-        `Nhịp thở: ${formData.respiratoryRate || 'N/A'} bpm`,
-        `Tình trạng nước: ${formData.hydration || 'N/A'}`,
-        `Thể trạng: ${formData.bodyCondition || 'N/A'}`
-      ], margin, examY)
+      pdf.setFontSize(12);
+      pdf.text('Thông tin khám:', margin, currentY);
+      pdf.setFontSize(10);
+      const lineHeight = 4; // Giảm chiều cao dòng để tiết kiệm không gian
+      const examDetails = [
+        `- Nhiệt độ: ${formData.temperature || 'N/A'} °C`,
+        `- Nhịp tim: ${formData.heartRate || 'N/A'} bpm`,
+        `- Nhịp thở: ${formData.respiratoryRate || 'N/A'} bpm`,
+        `- Tình trạng nước: ${formData.hydration || 'N/A'}`,
+        `- Thể trạng: ${formData.bodyCondition || 'N/A'}`,
+      ];
 
-      // Add description and diagnosis
-      const descY = examY + 50
-      pdf.setFontSize(12)
-      pdf.text('Mô tả:', margin, descY)
-      pdf.setFontSize(10)
-      const splitDesc = pdf.splitTextToSize(formData.description || 'N/A', pageWidth - (margin * 2))
-      pdf.text(splitDesc, margin, descY + 10)
+      pdf.text(examDetails, margin, currentY + lineHeight);
 
-      const predY = descY + 40
-      pdf.setFontSize(12)
-      pdf.text('Chuẩn đoán:', margin, predY)
-      pdf.setFontSize(10)
-      const splitPred = pdf.splitTextToSize(formData.prediction || 'N/A', pageWidth - (margin * 2))
-      pdf.text(splitPred, margin, predY + 10)
+      currentY += examDetails.length * lineHeight + 10; // Giảm khoảng cách
+      pdf.setFontSize(12);
+      pdf.text('Mô tả:', margin, currentY);
+      pdf.setFontSize(10);
+      const splitDesc = pdf.splitTextToSize(formData?.description || 'Không có', pageWidth - margin * 2);
+      pdf.text(splitDesc, margin, currentY + lineHeight);
 
-      const treatY = predY + 40
-      pdf.setFontSize(12)
-      pdf.text('Điều trị:', margin, treatY)
-      pdf.setFontSize(10)
-      const splitTreat = pdf.splitTextToSize(formData.treatment || 'N/A', pageWidth - (margin * 2))
-      pdf.text(splitTreat, margin, treatY + 10)
+      currentY += splitDesc.length * lineHeight + 10;
+      pdf.setFontSize(12);
+      pdf.text('Chuẩn đoán:', margin, currentY);
+      pdf.setFontSize(10);
+      const splitPred = pdf.splitTextToSize(formData?.prediction || 'Không có', pageWidth - margin * 2);
+      pdf.text(splitPred, margin, currentY + lineHeight);
 
-      // Add signature section
-      const signatureY = treatY + 50
-      pdf.text('Bác sĩ phụ trách', pageWidth - 40, signatureY, { align: 'center' })
-      pdf.text('(Ký và ghi rõ họ tên)', pageWidth - 40, signatureY + 10, { align: 'center' })
+      currentY += splitPred.length * lineHeight + 10;
+      pdf.setFontSize(12);
+      pdf.text('Điều trị:', margin, currentY);
+      pdf.setFontSize(10);
+      const splitTreat = pdf.splitTextToSize(formData?.treatment || 'Không có', pageWidth - margin * 2);
+      pdf.text(splitTreat, margin, currentY + lineHeight);
 
-      // Add footer
-      pdf.setFontSize(8)
+      currentY += splitTreat.length * lineHeight + 20; // Giảm thêm khoảng cách
+
+      currentY += splitTreat.length * 5 + 30;
+      const today = new Date();
+      const dateString = format(today, "dd/MM/yyyy");
+      pdf.setFontSize(11);
+      pdf.text(`Hà Nội, ngày ${dateString.split('/')[0]} tháng ${dateString.split('/')[1]} năm ${dateString.split('/')[2]}`,
+        pageWidth - margin - 10, currentY, { align: 'right' });
+
+      pdf.text('Bác sĩ phụ trách', pageWidth - 40, currentY + 10, { align: 'center' });
+      pdf.text(`${formData?.doctorName || ''}`, pageWidth - 40, currentY + 20, { align: 'center' });
+      pdf.text('(Ký và ghi rõ họ tên)', pageWidth - 40, currentY + 30, { align: 'center' });
+
+      // Chân trang
+      pdf.setFontSize(8);
       pdf.text('Pet Hospital - Chăm sóc thú cưng của bạn với tất cả sự yêu thương',
-        pageWidth / 2, pageHeight - 10, { align: 'center' })
+        pageWidth / 2, pdf.internal.pageSize.getHeight() - 10, { align: 'center' });
 
       if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl)
+        URL.revokeObjectURL(pdfUrl);
       }
-      const blob = pdf.output('blob')
-      const url = URL.createObjectURL(blob)
-      setPdfUrl(url)
-      return url
-
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+      return url;
     } catch (error) {
-      console.error('PDF generation error:', error)
-      return null
+      console.error('Detailed error:', error);
+      return null;
     }
-  }
+  };
 
   const handlePreview = async () => {
     const url = await handleGeneratePDF()
