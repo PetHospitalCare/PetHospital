@@ -13,7 +13,6 @@ import SignupSuccess from './pages/Login&SignUp/SignupSuccess.jsx'
 import LoadingScreen from './pages/Login&SignUp/LoadingScreen.jsx'
 import AccountManagement from './pages/AccountManagement/Account_Management.jsx'
 import { UserProvider } from './contexts/UserContext.jsx'
-import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
 import { Toaster } from "@/components/ui/sonner"
 
 import "./index.css"

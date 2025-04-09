@@ -18,8 +18,8 @@ export default function AboutSection() {
         }
     };
     return (
-        <section className="bg-[#FDF6E9] px-6 py-16 md:py-24">
-            <div className="container mx-auto max-w-6xl">
+        <section className=" px-4 py-16 md:py-24">
+            <div className="container mx-auto w-full bg-[#FDF6E9] rounded-lg shadow-lg p-8 md:p-12">
                 <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
                     <div className="space-y-6">
                         <h2 className="text-[#2196F3] text-4xl md:text-5xl font-bold">Giới thiệu</h2>

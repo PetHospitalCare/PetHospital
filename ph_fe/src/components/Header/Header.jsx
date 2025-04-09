@@ -160,10 +160,16 @@ export default function Header() {
                     <Link to="/product" className="text-sm/6 font-semibold text-gray-900">
                         Cửa hàng
                     </Link>
-
+                    <button
+                        onClick={() => scrollToSection('contact-section')}
+                        className="text-sm/6 font-semibold text-gray-900 cursor-pointer"
+                    >
+                        Liên hệ
+                    </button>
+                    {/* 
                     <Link to="/test" className="text-sm/6 font-semibold text-gray-900">
                         Liên hệ
-                    </Link>
+                    </Link> */}
                 </PopoverGroup>
                 <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-center border:">
                     {user ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)

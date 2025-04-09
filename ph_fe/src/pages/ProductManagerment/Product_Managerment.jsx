@@ -133,7 +133,7 @@ export default function Product_Managerment() {
         {
             accessorKey: "category",
             header: () => <div className="text-center">Danh mục</div>,
-            cell: ({ row }) => <div className="capitalize">{row.getValue("category")}</div>,
+            cell: ({ row }) => <div className="capitalize text-center">{row.getValue("category")}</div>,
         },
         {
             accessorKey: "quantity",
