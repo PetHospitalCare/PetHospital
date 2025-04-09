@@ -89,6 +89,7 @@ function App() {
             <Route path='admin/profile' element={<UserProfile />} />
 
           </Route>
+          <Route path='/*' element={<Notfound />} />
         </Route>
       </Routes>
 

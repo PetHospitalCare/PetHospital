@@ -5,11 +5,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
-export function BoardingForm({ formData, onChange }) {
+export function BoardingForm({ formData, onChange, subService, isReadOnly }) {
   return (
     <Card className="mb-4">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Dịch vụ Lưu trú</CardTitle>
+        <CardTitle className="text-lg">{subService.name}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid md:grid-cols-2 gap-4">

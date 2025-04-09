@@ -56,19 +56,21 @@ export default function Product_Managerment() {
 
     const fetchData = async () => {
         try {
-            const response = await ProductService.getAllProduct()
+            const response = await ProductService.getAllProduct();
             if (response.data.success) {
-                const formattedData = response.data.products.map((product) => ({
-                    id: product._id,
-                    name: product.name,
-                    imageUrl: product.images,
-                    description: product.description,
-                    price: product.price,
-                    quantity: product.quantity,
-                    type: product.type,
-                    category:
-                        product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
-                }));
+                const formattedData = response.data.products
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sắp xếp giảm dần theo createdAt
+                    .map((product) => ({
+                        id: product._id,
+                        name: product.name,
+                        imageUrl: product.images,
+                        description: product.description,
+                        price: product.price,
+                        quantity: product.quantity,
+                        type: product.type,
+                        category:
+                            product.categoryId.length > 0 ? product.categoryId[0].name : "Không rõ",
+                    }));
                 setData(formattedData);
             }
         } catch (error) {
