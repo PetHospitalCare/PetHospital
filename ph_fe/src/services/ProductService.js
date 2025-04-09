@@ -15,9 +15,12 @@ const createCategory = (data) => {
 const getAllCategory = () => axios.get("/category/get-all");
 
 const getProductById = (id) => axios.get(`/product/getById${id}`);
+
 const updateProduct = (id, data) => {
   return axios.put(`/product/update/${id}`, data);
 }
+
+const getTrendingProducts = () => axios.get("/product/get-trending-product");
 
 export const ProductService = {
   createProduct,
@@ -26,5 +29,6 @@ export const ProductService = {
   createCategory,
   getAllCategory,
   getProductById,
-  updateProduct
+  updateProduct,
+  getTrendingProducts
 };

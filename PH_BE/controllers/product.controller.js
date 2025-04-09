@@ -1,5 +1,6 @@
 const db = require("../models");
 const Product = db.product;
+const Payment = db.payment;
 const cloudinary = require('cloudinary').v2;
 
 // Cấu hình Cloudinary
@@ -218,7 +219,73 @@ const updateProduct = async (req, res) => {
     }
 };
 
+const getTrendingProducts = async (req, res) => {
+    try {
+        const payments = await Payment.find();
+        const productCounts = {};
+
+        payments.forEach(payment => {
+            if (payment.items && payment.items.length > 0) {
+                payment.items.forEach(item => {
+                    if (productCounts[item.productId]) {
+                        productCounts[item.productId] += item.quantity;
+                    } else {
+                        productCounts[item.productId] = item.quantity;
+                    }
+                });
+            }
+        });
+
+        const productCountArray = Object.entries(productCounts).map(([productId, count]) => ({
+            productId,
+            count
+        }));
+
+        productCountArray.sort((a, b) => b.count - a.count);
+
+        const allTrendingIds = productCountArray.map(item => item.productId);
+
+        const existingProducts = await Product.find({ _id: { $in: allTrendingIds } });
+
+        const existingProductIds = new Set(existingProducts.map(p => p._id.toString()));
+
+        const validTrendingIds = allTrendingIds.filter(id => existingProductIds.has(id));
+
+        const topProductIds = validTrendingIds.slice(0, 4);
+
+        const productMap = {};
+        existingProducts.forEach(product => {
+            productMap[product._id.toString()] = product;
+        });
+
+        const trendingProducts = topProductIds
+            .map(id => productMap[id])
+            .filter(Boolean);
+
+        const formattedProducts = trendingProducts.map(product => {
+            const hasImages = product.images && product.images.length > 0;
+            return {
+                _id: product._id,
+                name: product.name,
+                price: product.price,
+                imageUrl: hasImages ? product.images[0].url : null
+            };
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Lấy danh sách sản phẩm xu hướng thành công',
+            trendingProducts: formattedProducts,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
 module.exports = {
     CreateNewProduct, getAllProduct, deleteProduct, getProductById
-    , updateProduct
+    , updateProduct, getTrendingProducts
 };

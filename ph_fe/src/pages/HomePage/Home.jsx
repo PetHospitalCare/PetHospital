@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import AboutSection from "@/components/aboutus/aboutus";
 import Footer from "@/components/footer/footer";
 import Stickybutton from "@/components/stickybutton";
+import TrendingProducts from "@/components/trending-products/trending-products.jsx";
 
 export default function Home() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -62,7 +63,10 @@ export default function Home() {
             <div id="services-section">
                 <Carousel />
             </div>
-            
+
+            <div id="trending-products-section">
+                <TrendingProducts />
+            </div>
         </>
     );
 }
