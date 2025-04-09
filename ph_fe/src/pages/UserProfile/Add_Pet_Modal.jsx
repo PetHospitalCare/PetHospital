@@ -29,9 +29,27 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
 
     const validateForm = () => {
         let newErrors = {};
-        if (!formData.name) newErrors.name = "Vui lòng nhập tên thú cưng";
-        if (!formData.species) newErrors.species = "Vui lòng nhập giống loài";
-        if (!formData.weight) newErrors.weight = "Vui lòng nhập cân nặng";
+
+        // Kiểm tra tên thú cưng
+        const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/; // Chỉ cho phép chữ cái và khoảng trắng
+        if (!formData.name) {
+            newErrors.name = "Vui lòng nhập tên thú cưng.";
+        } else if (!nameRegex.test(formData.name)) {
+            newErrors.name = "Tên thú cưng không được chứa số hoặc ký tự đặc biệt.";
+        }
+
+        // Kiểm tra giống loài
+        const speciesRegex = /^[a-zA-ZÀ-ỹ\s]+$/; // Chỉ cho phép chữ cái và khoảng trắng
+        if (!formData.species) {
+            newErrors.species = "Vui lòng nhập giống loài.";
+        } else if (!speciesRegex.test(formData.species)) {
+            newErrors.species = "Giống loài không được chứa số hoặc ký tự đặc biệt.";
+        }
+
+        // Kiểm tra cân nặng
+        if (!formData.weight) {
+            newErrors.weight = "Vui lòng nhập cân nặng.";
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -40,18 +58,17 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
     const handleSubmit = async () => {
         try {
             if (!validateForm()) return;
-    
+
             const formattedData = {
                 ...formData,
                 weight: parseFloat(formData.weight), // Chuyển về số
                 dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : null // Chuyển về dạng ISODate
             };
-    
+
             const response = await PetService.createPetByUser(formattedData);
             onSuccess(response.pet);
             onOpenChange(false);
             toast.success("Thêm thú cưng thành công!");
-    
         } catch (error) {
             console.error("Lỗi khi thêm thú cưng:", error);
             toast.error("Thêm thú cưng thất bại!");
@@ -80,14 +97,30 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
                         {/* Tên thú cưng */}
                         <div className="col-span-1">
                             <Label htmlFor="name">Tên thú cưng</Label>
-                            <Input type="text" id="name" name="name" placeholder="Tên" value={formData.name} onChange={handleChange} className="border p-2 rounded-md w-full" required />
+                            <Input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="Tên"
+                                value={formData.name}
+                                onChange={handleChange}
+                                className="border p-2 rounded-md w-full"
+                            />
                             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                         </div>
 
                         {/* Giống loài */}
                         <div className="col-span-1">
                             <Label htmlFor="species">Giống loài</Label>
-                            <Input type="text" id="species" name="species" placeholder="Giống.." value={formData.species} onChange={handleChange} className="border p-2 rounded-md w-full" required />
+                            <Input
+                                type="text"
+                                id="species"
+                                name="species"
+                                placeholder="Giống.."
+                                value={formData.species}
+                                onChange={handleChange}
+                                className="border p-2 rounded-md w-full"
+                            />
                             {errors.species && <p className="text-red-500 text-sm mt-1">{errors.species}</p>}
                         </div>
 
@@ -108,18 +141,36 @@ export default function PetModal({ open, onOpenChange, onSuccess }) {
                         {/* Cân nặng */}
                         <div className="col-span-1">
                             <Label htmlFor="weight">Cân nặng</Label>
-                            <Input type="number" id="weight" name="weight" placeholder="Cân nặng" value={formData.weight} onChange={handleChange} className="border p-2 rounded-md w-full" required />
+                            <Input
+                                type="number"
+                                id="weight"
+                                name="weight"
+                                placeholder="Cân nặng"
+                                value={formData.weight}
+                                onChange={handleChange}
+                                className="border p-2 rounded-md w-full"
+                            />
                             {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
                         </div>
                         <div className="col-span-1">
                             <Label htmlFor="dateOfBirth">Ngày sinh</Label>
-                            <Input type="date" id="dateOfBirth" name="dateOfBirth" placeholder="Cân nặng" value={formData.dateOfBirth} onChange={handleChange} className="border p-2 rounded-md w-full" required />
+                            <Input
+                                type="date"
+                                id="dateOfBirth"
+                                name="dateOfBirth"
+                                placeholder="Ngày sinh"
+                                value={formData.dateOfBirth}
+                                onChange={handleChange}
+                                className="border p-2 rounded-md w-full"
+                            />
                         </div>
                     </div>
                 </div>
                 {/* Nút lưu ở cuối */}
                 <div className="flex justify-end mt-4">
-                    <Button className="bg-[#3F2E2E] text-white px-6 py-2 rounded-md" onClick={handleSubmit}>Lưu</Button>
+                    <Button className="bg-[#3F2E2E] text-white px-6 py-2 rounded-md" onClick={handleSubmit}>
+                        Lưu
+                    </Button>
                 </div>
             </DialogContent>
         </Dialog>

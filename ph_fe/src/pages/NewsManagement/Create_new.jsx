@@ -78,7 +78,7 @@ const CreateNew = ({ open, onOpenChange, onSuccess }) => {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[1200px]">
+            <DialogContent className="sm:max-w-[1200px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Thêm bài viết mới</DialogTitle>
                     <DialogDescription>Nhập thông tin để thêm bài viết vào hệ thống.</DialogDescription>

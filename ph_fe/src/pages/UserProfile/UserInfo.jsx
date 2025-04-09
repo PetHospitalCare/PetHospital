@@ -27,7 +27,9 @@ export default function UserInfo({ ...props }) {
         gender: "",
         address: ""
     });
+    const [errors, setErrors] = React.useState({});
     const [isLoading, setIsLoading] = React.useState(false);
+
     const fetchUserData = async () => {
         try {
             const response = await UserService.getCurrentUser();
@@ -36,7 +38,9 @@ export default function UserInfo({ ...props }) {
                 setFormData({
                     username: response.data.account.username || "",
                     email: response.data.account.email || "",
-                    dateOfBirth: response.data.account.dateOfBirth ? new Date(response.data.account.dateOfBirth).toISOString().split('T')[0] : "",
+                    dateOfBirth: response.data.account.dateOfBirth
+                        ? new Date(response.data.account.dateOfBirth).toISOString().split("T")[0]
+                        : "",
                     phone: response.data.account.phone || "",
                     gender: response.data.account.gender || "male",
                     address: response.data.account.address || "",
@@ -50,6 +54,32 @@ export default function UserInfo({ ...props }) {
     React.useEffect(() => {
         fetchUserData();
     }, []);
+
+    // Hàm validate form
+    const validateForm = () => {
+        const newErrors = {};
+        const today = new Date().toISOString().split("T")[0]; // Lấy ngày hiện tại (YYYY-MM-DD)
+
+        if (!formData.username.trim()) {
+            newErrors.username = "Vui lòng nhập tên người dùng.";
+        }
+        if (!formData.phone.trim()) {
+            newErrors.phone = "Vui lòng nhập số điện thoại.";
+        }else if(!formData.phone.length !== 10){
+            newErrors.phone = "Số điện thoại phải có đúng 10 chữ số.";
+        }
+        if (!formData.address.trim()) {
+            newErrors.address = "Vui lòng nhập địa chỉ.";
+        }
+        if (!formData.dateOfBirth.trim()) {
+            newErrors.dateOfBirth = "Vui lòng nhập ngày sinh.";
+        } else if (formData.dateOfBirth > today) {
+            newErrors.dateOfBirth = "Ngày sinh không được là ngày trong tương lai.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
+    };
 
     // Xử lý chọn file ảnh
     const handleFileChange = (e) => {
@@ -99,6 +129,8 @@ export default function UserInfo({ ...props }) {
 
     // Lưu update user
     const handleSave = async () => {
+        if (!validateForm()) return; // Dừng nếu form không hợp lệ
+
         setIsLoading(true);
         try {
             const updatedUser = {
@@ -130,7 +162,9 @@ export default function UserInfo({ ...props }) {
     // Thay đổi trong form
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: "" }); // Xóa lỗi khi người dùng nhập
     };
+
     return (
         <div className="p-6 border rounded-lg shadow-lg bg-white">
             <h1 className="font-bold text-3xl mb-6 text-gray-800">Thông Tin Cá Nhân</h1>
@@ -162,6 +196,7 @@ export default function UserInfo({ ...props }) {
                                 className="border-b-2 font-bold border-gray-400 focus:outline-none focus:border-gray-300 text-2xl w-full"
                                 placeholder="Tên người dùng"
                             />
+                            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
                         </div>
                     </div>
 
@@ -175,6 +210,7 @@ export default function UserInfo({ ...props }) {
                                 onChange={handleChange}
                                 className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
                             />
+                            {errors.dateOfBirth && <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>}
                         </div>
                         <div>
                             <Label className="text-gray-600 text-lg">Giới tính</Label>
@@ -206,13 +242,14 @@ export default function UserInfo({ ...props }) {
                     <div className="mt-4">
                         <Label className="text-gray-600 text-lg">Số điện thoại</Label>
                         <input
-                            type="text"
+                            type="number"
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
                             className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
                             placeholder="Nhập số điện thoại"
                         />
+                        {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                     </div>
                     <div className="mt-4">
                         <Label className="text-gray-600 text-lg">Email</Label>
@@ -235,6 +272,7 @@ export default function UserInfo({ ...props }) {
                             className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-lg w-full"
                             placeholder="Nhập địa chỉ"
                         />
+                        {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
                     </div>
 
                     <div className="mt-6 text-right">
