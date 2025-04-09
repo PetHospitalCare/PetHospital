@@ -84,6 +84,10 @@ export function AppSidebar({
             title: "Bảng Tin",
             url: "/News_Management",
           },
+          {
+            title: "Đơn Hàng",
+            url: "/orders_management",
+          },
         ],
       },
       {
