@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeftIcon } from '@heroicons/react/20/solid';
+import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/ui/button";
 import StepProgressBar from "@/components/Step-progress-bar";
 import { Input } from "@/components/ui/input";
@@ -14,54 +14,79 @@ export default function SignUp() {
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
-    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
-    const validatePhone = (phone) => /^(0[3|5|7|8|9])+([0-9]{8})$/.test(phone);
-    const validatePassword = (password) => /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(password);
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Kiểm tra họ và tên
+        if (!username) newErrors.username = "Vui lòng nhập họ và tên.";
+
+        // Kiểm tra email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            newErrors.email = "Vui lòng nhập email.";
+        } else if (!emailRegex.test(email)) {
+            newErrors.email = "Email không hợp lệ.";
+        }
+
+        // Kiểm tra số điện thoại
+        const phoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/; // Định dạng số điện thoại Việt Nam
+        if (!phone) {
+            newErrors.phone = "Vui lòng nhập số điện thoại.";
+        } else if (!phoneRegex.test(phone)) {
+            newErrors.phone = "Số điện thoại không hợp lệ.";
+        } else if (phone.length !== 10) {
+            newErrors.phone = "Số điện thoại phải có đúng 10 chữ số.";
+        }
+
+        // Kiểm tra mật khẩu
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!password) {
+            newErrors.password = "Vui lòng nhập mật khẩu.";
+        } else if (!passwordRegex.test(password)) {
+            newErrors.password =
+                "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ in hoa, số và ký tự đặc biệt.";
+        }
+
+        // Kiểm tra xác nhận mật khẩu
+        if (!confirmPassword) {
+            newErrors.confirmPassword = "Vui lòng nhập xác nhận mật khẩu .";
+        } else if (password && confirmPassword && password !== confirmPassword) {
+            newErrors.confirmPassword = "Mật khẩu xác nhận không khớp.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
+    };
 
     const handleSignUp = async (e) => {
         e.preventDefault();
-        setError("");
-        setIsLoading(true);
+        setErrors({}); // Reset lỗi trước khi kiểm tra
 
-        // if (!validateEmail(email)) {
-        //     setError("Email must be a valid @gmail.com address");
-        //     return;
-        // }
-        // if (!validatePhone(phone)) {
-        //     setError("Phone number must be a valid number");
-        //     return;
-        // }
-        if (!validatePassword(password)) {
-            setError("Mật khẩu phải có ít nhất 8 ký tự, bao gồm 1 chữ hoa và 1 ký tự đặc biệt");
-            setIsLoading(false);
-            return;
+        if (!validateForm()) {
+            return; // Dừng nếu form không hợp lệ
         }
-        if (password !== confirmPassword) {
-            setError("Mật khẩu xác nhận không khớp");
-            setIsLoading(false);
-            return;
-        }
+
+        setIsLoading(true);
 
         try {
             const response = await UserService.getAllAccount();
             const accounts = response.data.accounts;
 
             // validate email or phone exist
-            const isEmailExist = accounts.some(acc => acc.email === email);
-            const isPhoneExist = accounts.some(acc => acc.phone === phone);
+            const isEmailExist = accounts.some((acc) => acc.email === email);
+            const isPhoneExist = accounts.some((acc) => acc.phone === phone);
 
             if (isEmailExist) {
-                setError("Email đã được đăng ký");
+                setErrors({ email: "Email đã được đăng ký." });
                 setIsLoading(false);
                 return;
             }
             if (isPhoneExist) {
-                setError("Số điện thoại đã được đăng ký");
+                setErrors({ phone: "Số điện thoại đã được đăng ký." });
                 setIsLoading(false);
                 return;
             }
@@ -69,47 +94,37 @@ export default function SignUp() {
             await UserService.sendOtp({ email: email, type: "register" });
 
             // save temporary in localStorage
-            localStorage.setItem("tempSignupData", JSON.stringify({
-                username,
-                password,
-                gender,
-                email,
-                phone,
-                role: ["customer"]
-            }));
+            localStorage.setItem(
+                "tempSignupData",
+                JSON.stringify({
+                    username,
+                    password,
+                    gender,
+                    email,
+                    phone,
+                    role: ["customer"],
+                })
+            );
 
             navigate("/otp", { state: { email: email, type: "register" } });
         } catch (err) {
-            setError("Không thể kiểm tra tài khoản hiện có");
+            setErrors({ general: "Không thể kiểm tra tài khoản hiện có." });
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Load temporary data from localStorage when component mounts
-    // useEffect(() => {
-    //     const tempData = JSON.parse(localStorage.getItem("tempSignupData"));
-    //     if (tempData) {
-    //         setUsername(tempData.username);
-    //         setEmail(tempData.email);
-    //         setPhone(tempData.phone);
-    //         setPassword(tempData.password);
-    //         setGender(tempData.gender);
-    //     }
-    // }, []);
-
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
         if (e.target.value !== password) {
-            setConfirmPasswordError("Mật khẩu xác nhận không khớp");
+            setErrors({ ...errors, confirmPassword: "Mật khẩu xác nhận không khớp." });
         } else {
-            setConfirmPasswordError("");
+            setErrors({ ...errors, confirmPassword: "" });
         }
     };
 
     return (
         <div className="relative h-screen">
-
             {/* Background Image */}
             <div className="absolute inset-0 -z-10">
                 <img
@@ -124,43 +139,49 @@ export default function SignUp() {
                         <ArrowLeftIcon className="size-4 mr-2" />
                     </Link>
                     <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">Đăng ký</h1>
-                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                    {errors.general && <p className="text-red-500 text-sm text-center">{errors.general}</p>}
                     {/* Form */}
                     <form className="space-y-5" onSubmit={handleSignUp}>
                         {/* UserName */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Họ & Tên<span className="text-red-600">*</span></label>
+                            <label className="block text-base font-medium text-gray-600 mb-1">
+                                Họ & Tên<span className="text-red-600">*</span>
+                            </label>
                             <Input
                                 type="text"
                                 value={username}
                                 placeholder="Nhập tên người dùng"
                                 onChange={(e) => setUsername(e.target.value)}
-                                required />
+                            />
+                            {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
                         </div>
 
                         {/* Email */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Email<span className="text-red-600">*</span></label>
-
+                            <label className="block text-base font-medium text-gray-600 mb-1">
+                                Email<span className="text-red-600">*</span>
+                            </label>
                             <Input
-                                type="email"
+                                type="text"
                                 value={email}
                                 placeholder="Nhập email"
                                 onChange={(e) => setEmail(e.target.value)}
-
-                                required />
+                            />
+                            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                         </div>
 
                         {/* Phone Number */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Số điện thoại<span className="text-red-600">*</span></label>
-
+                            <label className="block text-base font-medium text-gray-600 mb-1">
+                                Số điện thoại<span className="text-red-600">*</span>
+                            </label>
                             <Input
-                                type="tel"
+                                type="text"
                                 value={phone}
                                 placeholder="Nhập số điện thoại"
                                 onChange={(e) => setPhone(e.target.value)}
-                                required />
+                            />
+                            {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
                         </div>
 
                         {/* Gender Selection */}
@@ -168,7 +189,9 @@ export default function SignUp() {
                             <Button
                                 type="button"
                                 value="male"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "male" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                className={`w-2/6 p-5 rounded-lg font-medium ${
+                                    gender === "male" ? "bg-blue-500 text-white" : "bg-gray-400"
+                                }`}
                                 onClick={(e) => setGender(e.target.value)}
                             >
                                 Nam
@@ -176,7 +199,9 @@ export default function SignUp() {
                             <Button
                                 type="button"
                                 value="female"
-                                className={`w-2/6 p-5 rounded-lg font-medium ${gender == "female" ? "bg-blue-500 text-white" : "bg-gray-400"}`}
+                                className={`w-2/6 p-5 rounded-lg font-medium ${
+                                    gender === "female" ? "bg-blue-500 text-white" : "bg-gray-400"
+                                }`}
                                 onClick={(e) => setGender(e.target.value)}
                             >
                                 Nữ
@@ -185,27 +210,32 @@ export default function SignUp() {
 
                         {/* Password */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Mật khẩu<span className="text-red-600">*</span></label>
-
+                            <label className="block text-base font-medium text-gray-600 mb-1">
+                                Mật khẩu<span className="text-red-600">*</span>
+                            </label>
                             <Input
                                 type="password"
                                 value={password}
                                 placeholder="Nhập mật khẩu"
                                 onChange={(e) => setPassword(e.target.value)}
-                                required />
+                            />
+                            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                         </div>
 
                         {/* Confirm password */}
                         <div>
-                            <label className="block text-base font-medium text-gray-600 mb-1">Xác nhận mật khẩu<span className="text-red-600">*</span></label>
-
+                            <label className="block text-base font-medium text-gray-600 mb-1">
+                                Xác nhận mật khẩu<span className="text-red-600">*</span>
+                            </label>
                             <Input
                                 type="password"
                                 value={confirmPassword}
                                 placeholder="Nhập lại mật khẩu"
                                 onChange={handleConfirmPasswordChange}
-                                required />
-                            {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
+                            />
+                            {errors.confirmPassword && (
+                                <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
+                            )}
                         </div>
 
                         {/* Step Progress Bar */}
