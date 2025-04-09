@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
 import { BrowserRouter, Route, Router, Routes } from 'react-router-dom'
 import Home from './pages/HomePage/Home'
@@ -20,7 +18,6 @@ import MedicineManagerment from './pages/MedicineManagement/Medicine_Managerment
 
 import Calendar from './pages/BookingSchedule/CalendarPage'
 
-import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
 import AdminLayout from './layout/AdminRoutes'
 import ManageBooking from './pages/BookingSchedule/ManageBooking'
 
@@ -30,11 +27,8 @@ import PublicLayout from './layout/PublicRoutes'
 
 import { io } from "socket.io-client";
 import UserProfile from './pages/UserProfile/UserProfile'
-import HistoryBooking from './pages/HistoryBooking/historyBooking'
 import ShoppingCartDetail from "@/pages/shoping-cart/shopping-cart-detail.jsx";
-
 import News_Management from './pages/NewsManagement/News_Management'
-
 import ShoppingCartPayment from "@/pages/shoping-cart/shopping-cart-payment.jsx";
 import PaymentResult from "@/pages/payments/payment-result.jsx";
 import MedicalDetail from './pages/HistoryBooking/MedicalDetail/Medical_Detail'
@@ -45,9 +39,11 @@ import Dashboard from './pages/DashBoard/dash-board'
 import UserOrdersPage from "@/pages/user-order-page/user-orders-page.jsx";
 import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Password'
 import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
-import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx'
+import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx';
+import HistoryBooking from './pages/HistoryBooking/HistoryBooking';
+import OrdersManagement from "@/pages/orders-management/orders-management.jsx";
+// export const socket = io.connect("https://pethospital.onrender.com",);
 export const socket = io.connect("http://localhost:9999",);
-
 function App() {
   return (
     <BrowserRouter>
@@ -83,7 +79,6 @@ function App() {
             <Route path='/Service_Management/:id' element={<Service_Managerment />} />
             <Route path='/Account_Management' element={<AccountManagement />} />
             <Route path='/Schedule' element={<Calendar />} />
-            <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
             <Route path='/Booking_Management' element={<ManageBooking />} />
             <Route path='/News_Management' element={<News_Management />} />
             <Route path='/Dashboard' element={<Dashboard />} />
@@ -91,7 +86,7 @@ function App() {
             <Route path='/MedicalRecord' element={<MedicalRecord />}></Route>
             <Route path="/MedicalRecord/:id" element={< MedicalDetail />} />
             <Route path='admin/profile' element={<UserProfile />} />
-
+            <Route path='/orders_management' element={<OrdersManagement/>} />
           </Route>
         </Route>
       </Routes>

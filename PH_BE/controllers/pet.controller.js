@@ -153,12 +153,11 @@ const deletePetByUser = async (req, res) => {
 
       // Tìm thú cưng theo ID
       const pet = await Pet.findById(id);
-
       // Tìm thú cưng có tồn tại trong lịch đặt không
       const checkBookingExist = await Booking.findOne({ pet_id: id });
 
       // Nếu có tồn tại trong lịch đặt thì không cho xóa
-      if (checkBookingExist.status === "pending" || checkBookingExist.status === "confirm" || checkBookingExist.status === "complete") {  
+      if (checkBookingExist?.status === "pending" || checkBookingExist?.status === "confirm" || checkBookingExist?.status === "complete") {  
           return res.status(400).json({ success: false, message: "Thú cưng này đang có lịch đặt khám" });
       }
       
@@ -168,7 +167,7 @@ const deletePetByUser = async (req, res) => {
       }
 
       // Nếu thú cưng có ảnh trên Cloudinary, xóa ảnh trước
-      if (pet.publicId) {
+      if (pet?.publicId) {
           await cloudinary.uploader.destroy(pet.publicId);
       }
 

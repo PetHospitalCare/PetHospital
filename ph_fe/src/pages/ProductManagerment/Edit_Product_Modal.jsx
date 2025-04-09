@@ -1,28 +1,25 @@
-import { Input } from "@/components/ui/input";
 import React, { useState, useEffect } from "react";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import MultiSelect from "@/components/multi-select";
-import { Dog, Cat } from "lucide-react"
-
-import { ProductService } from "../../services/ProductService";
-import axios from "axios";
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Combobox } from "@/components/Combobox";
+import { Button } from "@/components/ui/button";
+import MultiSelect from "@/components/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ProductService } from "../../services/ProductService";
+import { toast } from "sonner";
+import { XIcon } from "lucide-react";
 
-const frameworksList = [
-    { value: "Dog", label: "Chó", icon: Dog },
-    { value: "Cat", label: "Mèo", icon: Cat },
-];
 
-export default function Edit_Modal({ open, onClose, ProductData }) {
+
+export default function EditProductDialog({ open, onClose, ProductData, onSuccess }) {
     const [name, setName] = useState("");
     const [quantity, setQuantity] = useState(0);
     const [price, setPrice] = useState(0);
@@ -36,7 +33,7 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await ProductService.getAllCategory()
+                const response = await ProductService.getAllCategory();
                 if (response.data.success) {
                     setCategories(
                         response.data.categories.map((category) => ({
@@ -54,55 +51,49 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
     }, []);
 
     // Populate form with product data when modal opens
+    // Populate form with product data when modal opens
     useEffect(() => {
         if (ProductData && open) {
+            // Basic info
             setName(ProductData.name || "");
             setQuantity(ProductData.quantity || 0);
             setPrice(ProductData.price || 0);
             setDescription(ProductData.description || "");
 
-            // Handle category selection
-            setSelectedCategory(categories.find(cat => cat.label === ProductData.category)?.value);
+            // Category
+            // Tìm category trong danh sách categories dựa vào tên
+            const category = categories.find(cat => cat.label === ProductData.category);
+            if (category) {
+                setSelectedCategory(category.value);
+            }
 
-            // Handle type selection - ensure it works with MultiSelect
-            // If type is a string, convert to array, if it's already an array, use it
+            // Pet type
+            if (ProductData.type) {
+                setType(Array.isArray(ProductData.type) ? ProductData.type : [ProductData.type]);
+            }
 
-            //setType(Array.isArray(ProductData.type) ? ProductData.type : [ProductData.type]);
-
-
-            const typeValue = Array.isArray(ProductData.type)
-                ? ProductData.type
-                : ProductData.type ? [ProductData.type] : [];
-            setType(typeValue);
-
-            // Reset images and prepare for potential image editing
-            setImages(ProductData.imageUrl);
+            // Images
+            if (ProductData.imageUrl && Array.isArray(ProductData.imageUrl)) {
+                setImages(ProductData.imageUrl);
+            }
         }
-    }, [ProductData, open]);
-
-    // Create new category
-    const handleCreateCategory = (label) => {
-        if (label.trim() !== "") {
-            const temporaryCategory = {
-                value: `temp-${Date.now()}`,
-                label: label.trim(),
-                isTemporary: true,
-            };
-            setCategories([...categories, temporaryCategory]);
-            setSelectedCategory(temporaryCategory.value);
-        } else {
-            alert("Vui lòng nhập tên danh mục.");
-        }
-    };
+    }, [ProductData, open, categories]);
 
     // Handle image upload
     const handleImageUpload = (event) => {
         const files = Array.from(event.target.files);
         if (files.length + images.length > 9) {
-            alert("Bạn chỉ được tải tối đa 9 ảnh.");
+            toast.error("Bạn chỉ được tải tối đa 9 ảnh.");
             return;
         }
-        setImages([...images, ...files]);
+
+        // Thêm ảnh mới vào danh sách
+        const newImages = files.map((file) => ({
+            url: URL.createObjectURL(file), // Tạo URL tạm thời để hiển thị ảnh
+            file, // Lưu trữ file để gửi lên server
+        }));
+
+        setImages([...images, ...newImages]);
     };
 
     // Remove image
@@ -112,19 +103,60 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
 
     // Submit form to update product
     const handleSubmit = async (event) => {
+        event.preventDefault();
 
+        try {
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("quantity", quantity);
+            formData.append("price", price);
+            formData.append("description", description);
+            formData.append("categoryId", selectedCategory);
+            formData.append("type", JSON.stringify(type));
+
+            // Xử lý ảnh
+            images.forEach((image, index) => {
+                if (image.file) {
+                    // Nếu là ảnh mới
+                    formData.append("images", image.file);
+                } else {
+                    // Nếu là ảnh cũ
+                    formData.append(`existingImages[${index}]`, JSON.stringify({
+                        url: image.url,
+                        publicId: image.publicId
+                    }));
+                }
+            });
+
+            const response = await ProductService.updateProduct(ProductData.id, formData);
+
+            if (response.data.success) {
+                toast.success("Cập nhật sản phẩm thành công!");
+                onSuccess?.(); // Refresh danh sách sản phẩm
+                onClose(); // Đóng modal
+            } else {
+                toast.error("Cập nhật sản phẩm thất bại!");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật sản phẩm:", error);
+            toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
+        }
     };
 
-    if (!open) return null;
-
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
-                <h2 className="text-xl font-bold mb-6 text-left">Chỉnh sửa sản phẩm</h2>
-                <form onSubmit={handleSubmit}>
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="max-w-[900px] w-[90vw] h-auto max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="border-b pb-4">
+                    <DialogTitle className="text-2xl font-bold text-center">Chỉnh sửa sản phẩm</DialogTitle>
+                </DialogHeader>
+
+                <form onSubmit={handleSubmit} className="py-4">
+                    {/* Existing form fields */}
                     <div className="grid grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label htmlFor="pName" className="block text-sm font-medium text-left mb-2">Tên sản phẩm</label>
+                            <label htmlFor="pName" className="block text-sm font-medium text-left mb-2">
+                                Tên sản phẩm
+                            </label>
                             <Input
                                 type="text"
                                 placeholder="Nhập tên sản phẩm"
@@ -134,7 +166,9 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                             />
                         </div>
                         <div>
-                            <label htmlFor="quantity" className="block text-sm font-medium text-left mb-2">Số lượng</label>
+                            <label htmlFor="quantity" className="block text-sm font-medium text-left mb-2">
+                                Số lượng
+                            </label>
                             <Input
                                 type="number"
                                 placeholder="Nhập số lượng"
@@ -144,10 +178,37 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                             />
                         </div>
                     </div>
-
                     <div className="grid grid-cols-2 gap-6 mb-6">
+                        {/* Name field remains the same */}
+
                         <div>
-                            <label htmlFor="price" className="block text-sm font-medium text-left mb-2">Giá tiền</label>
+                            <label htmlFor="category" className="block text-sm font-medium text-left mb-2">
+                                Danh mục
+                            </label>
+                            <Select
+                                value={selectedCategory}
+                                onValueChange={setSelectedCategory}
+                                defaultValue={ProductData?.categoryId?.[0]?._id}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Chọn danh mục" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map((category) => (
+                                        <SelectItem
+                                            key={category.value}
+                                            value={category.value}
+                                        >
+                                            {category.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div>
+                            <label htmlFor="price" className="block text-sm font-medium text-left mb-2">
+                                Giá tiền
+                            </label>
                             <Input
                                 type="number"
                                 placeholder="Nhập giá tiền"
@@ -156,62 +217,66 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                                 required
                             />
                         </div>
-                        <div>
-                            <label htmlFor="category" className="block text-sm font-medium text-left mb-2">Danh mục</label>
-                            <Combobox
-                                options={categories}
-                                selected={selectedCategory}
-                                placeholder="Chọn danh mục"
-                                onChange={(selected) => {
-                                    setSelectedCategory(selected.value);
-                                }}
-                                onCreate={(label) => handleCreateCategory(label)}
-                            />
-                        </div>
                     </div>
 
+
+                    {/* Other fields remain the same until pet type selection */}
                     <div className="grid grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label htmlFor="description" className="block text-sm font-medium text-left mb-2">Mô tả về sản phẩm</label>
+                            <label htmlFor="description" className="block text-sm font-medium text-left mb-2">
+                                Mô tả về sản phẩm
+                            </label>
                             <Textarea
                                 placeholder="Hãy mô tả về sản phẩm của bạn"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
+                                className="h-[120px]"
                             />
                         </div>
-
                         <div>
-                            <label htmlFor="type" className="block text-sm font-medium text-left mb-2">Loài động vật</label>
-                            <MultiSelect
-                                className="text-gray-400"
-                                options={frameworksList}
-                                onValueChange={(selected) => {
-                                    setType(selected);
-                                }}
-                                value={type}
-                                placeholder="Chọn loài động vật"
-                                variant="inverted"
-                                animation={2}
-                                maxCount={2}
-                            />
-
-
+                            <label htmlFor="type" className="block text-sm font-medium text-left mb-2">
+                                Loài động vật
+                            </label>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="dog"
+                                        checked={type.includes("Dog")}
+                                        onCheckedChange={(checked) => {
+                                            const newType = checked
+                                                ? [...type, "Dog"]
+                                                : type.filter(t => t !== "Dog");
+                                            setType(newType);
+                                        }}
+                                    />
+                                    <label htmlFor="dog">Chó</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="cat"
+                                        checked={type.includes("Cat")}
+                                        onCheckedChange={(checked) => {
+                                            const newType = checked
+                                                ? [...type, "Cat"]
+                                                : type.filter(t => t !== "Cat");
+                                            setType(newType);
+                                        }}
+                                    />
+                                    <label htmlFor="cat">Mèo</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
+                    {/* Image upload section remains the same */}
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-left mb-2">Thêm ảnh (tối đa 9 ảnh)</label>
-                        <Input
-                            type="file"
-                            multiple
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                        />
+                        <Input type="file" multiple accept="image/*" onChange={handleImageUpload} />
                         <div className="grid grid-cols-9 gap-4 mt-4">
                             {images.map((image, index) => (
                                 <div key={index} className="relative">
                                     <img
-                                        src={image.url ? image.url : URL.createObjectURL(image)}
+                                        src={image.url || URL.createObjectURL(image.file)}
                                         alt="Uploaded preview"
                                         className="w-32 h-32 object-cover rounded-md"
                                     />
@@ -226,24 +291,26 @@ export default function Edit_Modal({ open, onClose, ProductData }) {
                             ))}
                         </div>
                     </div>
-
-                    <div className="flex justify-between items-center">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="text-red-500 underline"
-                        >
-                            Hủy bỏ
-                        </button>
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white px-6 py-3 rounded"
-                        >
-                            Cập nhật sản phẩm
-                        </button>
-                    </div>
                 </form>
-            </div>
-        </div>
+
+                <DialogFooter className="border-t pt-4 flex justify-end space-x-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onClose}
+                        className="px-4 py-2"
+                    >
+                        Hủy bỏ
+                    </Button>
+                    <Button
+                        type="submit"
+                        onClick={handleSubmit}
+                        className="px-4 py-2 bg-primary text-white hover:bg-primary/90"
+                    >
+                        Cập nhật sản phẩm
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }

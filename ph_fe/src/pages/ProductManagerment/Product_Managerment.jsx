@@ -243,6 +243,7 @@ export default function Product_Managerment() {
                     open={openEdit}
                     onClose={() => setOpenEdit(false)}
                     ProductData={selectedProduct}
+                    onSuccess={fetchData}
                 />
             </div>
             <div className="rounded-md border">

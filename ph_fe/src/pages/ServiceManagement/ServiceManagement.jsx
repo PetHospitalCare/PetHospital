@@ -87,42 +87,12 @@ export default function Service_Managerment() {
     };
 
     const columns = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={
-                            table.getIsAllPageRowsSelected() ||
-                            (table.getIsSomePageRowsSelected() && "indeterminate")
-                        }
-                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                        aria-label="Select all"
-                    />
-                </div>
-            ),
-            cell: ({ row }) => (
-                <div className="text-center">
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                    />
-                </div>
-            ),
-            enableSorting: false,
-            enableHiding: false,
-        },
+
 
         {
             accessorKey: "name",
             header: () => <div className="text-center">Tên dịch vụ</div>,
             cell: ({ row }) => <div className="text-center capitalize">{row.getValue("name")}</div>,
-        },
-        {
-            accessorKey: "duration",
-            header: () => <div className="text-center">thời gian</div>,
-            cell: ({ row }) => <div className="text-center capitalize">{row.getValue("duration")}</div>,
         },
         {
             accessorKey: "price",

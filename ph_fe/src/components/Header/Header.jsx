@@ -1,7 +1,7 @@
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState, useContext, useRef } from "react";
 import ShoppingCartButton from "@/components/shared/shopping-cart-button.jsx";
 import {
@@ -53,6 +53,8 @@ export default function Header() {
     const [categories, setCategories] = useState(tempCategories);
     const [isOpen, setIsOpen] = useState(false);
     const timeoutRef = useRef(null);
+    const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchCategories();
@@ -91,7 +93,19 @@ export default function Header() {
             setIsOpen(false);
         }, 300);
     };
-
+    // Handle navigation to sections
+    const scrollToSection = (sectionId) => {
+        // If we're already on the home page
+        if (location.pathname === '/') {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            // If we're not on the home page, navigate to home page with hash
+            navigate(`/#${sectionId}`);
+        }
+    };
 
     return (
         <header
@@ -104,7 +118,7 @@ export default function Header() {
                         <span className="sr-only">Your Company</span>
                         <img
                             alt=""
-                            src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png"
+                            src="/pethospital.png"
                             className="h-12 w-auto pointer-events-none select-none"
                         // onContextMenu="return false;"
                         // onDrag="retrun false;"
@@ -128,60 +142,20 @@ export default function Header() {
                         Trang chủ
                     </Link>
 
-                    <Link to="/" className="text-sm/6 font-semibold text-gray-900">
+                    <button
+                        onClick={() => scrollToSection('about-section')}
+                        className="text-sm/6 font-semibold text-gray-900 cursor-pointer"
+                    >
                         Giới thiệu
-                    </Link>
-                    <Link to="/" className="text-sm/6 font-semibold text-gray-900">
+                    </button>
+
+                    <button
+                        onClick={() => scrollToSection('services-section')}
+                        className="text-sm/6 font-semibold text-gray-900 cursor-pointer"
+                    >
                         Dịch vụ
-                    </Link>
+                    </button>
 
-                    {/*<div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}*/}
-                    {/*    onClick={() => setIsOpen(!isOpen)}>*/}
-                    {/*    <div className="flex items-center gap-x-1 text-sm font-semibold text-gray-900 cursor-pointer">*/}
-                    {/*        Danh sách sản phẩm*/}
-                    {/*        <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />*/}
-                    {/*    </div>*/}
-
-                    {/*    {isOpen && (*/}
-                    {/*        <div*/}
-                    {/*            className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition-opacity duration-200 ease-out opacity-100"*/}
-                    {/*            onMouseEnter={handleMouseEnter}*/}
-                    {/*            onMouseLeave={handleMouseLeave}*/}
-                    {/*        >*/}
-                    {/*            <div className="p-4">*/}
-                    {/*                <div*/}
-                    {/*                    key="all"*/}
-                    {/*                    className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"*/}
-                    {/*                >*/}
-                    {/*                    <div className="flex-auto">*/}
-                    {/*                        <Link to="/product" className="block font-semibold text-gray-900">*/}
-                    {/*                            Tất cả sản phẩm*/}
-                    {/*                            <span className="absolute inset-0" />*/}
-                    {/*                        </Link>*/}
-                    {/*                        <p className="mt-1 text-gray-600">Xem tất cả sản phẩm</p>*/}
-                    {/*                    </div>*/}
-                    {/*                </div>*/}
-
-                    {/*                {categories?.length > 0 &&*/}
-                    {/*                    categories.map((item) => (*/}
-                    {/*                        <div*/}
-                    {/*                            key={item.name}*/}
-                    {/*                            className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm hover:bg-gray-50"*/}
-                    {/*                        >*/}
-                    {/*                            <div className="flex-auto">*/}
-                    {/*                                <Link to={item.to} className="block font-semibold text-gray-900">*/}
-                    {/*                                    {item.name}*/}
-                    {/*                                    <span className="absolute inset-0" />*/}
-                    {/*                                </Link>*/}
-                    {/*                                <p className="mt-1 text-gray-600">{item.description}</p>*/}
-                    {/*                            </div>*/}
-                    {/*                        </div>*/}
-                    {/*                    ))*/}
-                    {/*                }*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    )}*/}
-                    {/*</div>*/}
 
                     <Link to="/product" className="text-sm/6 font-semibold text-gray-900">
                         Cửa hàng
@@ -283,7 +257,6 @@ export default function Header() {
                     </div>
                 </DialogPanel>
             </Dialog>
-            <div className="h-1 w-full" style={{backgroundColor: '#3f2e2e'}}></div>
         </header>
     );
 }

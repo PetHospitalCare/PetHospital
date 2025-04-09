@@ -10,8 +10,8 @@ const staffSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        shift:{
-            type:String,
+        shift: {
+            type: String,
             required: true
         }
     },
