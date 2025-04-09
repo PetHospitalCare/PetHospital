@@ -18,7 +18,6 @@ import MedicineManagerment from './pages/MedicineManagement/Medicine_Managerment
 
 import Calendar from './pages/BookingSchedule/CalendarPage'
 
-import PetRecordManagement from "@/pages/pet-record-management/pet-record-management.jsx";
 import AdminLayout from './layout/AdminRoutes'
 import ManageBooking from './pages/BookingSchedule/ManageBooking'
 
@@ -42,6 +41,7 @@ import Forgot_Password from './pages/Login&SignUp/Forgot_password/Forgot_Passwor
 import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
 import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx';
 import HistoryBooking from './pages/HistoryBooking/HistoryBooking';
+import OrdersManagement from "@/pages/orders-management/orders-management.jsx";
 // export const socket = io.connect("https://pethospital.onrender.com",);
 export const socket = io.connect("http://localhost:9999",);
 function App() {
@@ -79,7 +79,6 @@ function App() {
             <Route path='/Service_Management/:id' element={<Service_Managerment />} />
             <Route path='/Account_Management' element={<AccountManagement />} />
             <Route path='/Schedule' element={<Calendar />} />
-            <Route path='/PetRecord_Management' element={<PetRecordManagement />} />
             <Route path='/Booking_Management' element={<ManageBooking />} />
             <Route path='/News_Management' element={<News_Management />} />
             <Route path='/Dashboard' element={<Dashboard />} />
@@ -87,7 +86,7 @@ function App() {
             <Route path='/MedicalRecord' element={<MedicalRecord />}></Route>
             <Route path="/MedicalRecord/:id" element={< MedicalDetail />} />
             <Route path='admin/profile' element={<UserProfile />} />
-
+            <Route path='/orders_management' element={<OrdersManagement/>} />
           </Route>
         </Route>
       </Routes>

@@ -8,6 +8,10 @@ const getPaymentsByUserId = (userId) => {
     return axios.get(`/payment/get-payments${userId}`);
 }
 
+const getAllPayments = () => {
+    return axios.get(`/payment/get-all-payments`);
+}
+
 export const PaymentService = {
-    updatePayment, getPaymentsByUserId
+    updatePayment, getPaymentsByUserId, getAllPayments
 };
