@@ -9,7 +9,7 @@ export default function ServiceResultDetail({ service }) {
 
     const result = service.result;
     if (!result) return <div className="text-center py-10 text-gray-500">Không có kết quả cho dịch vụ này</div>;
-
+    console.log(result)
 
     return (
         <div className="bg-white rounded-lg">
@@ -166,6 +166,24 @@ export default function ServiceResultDetail({ service }) {
                     <div>
                         <p className="text-gray-600 text-sm mb-1">Chi tiết chăm sóc</p>
                         <div className="font-medium p-3 rounded">{result.careDetails || "N/A"}</div>
+                    </div>
+                    <div>
+                        <p className="text-gray-600 text-sm mb-1">Ghi chú</p>
+                        <div className="font-medium p-3 rounded">{result.notes || "N/A"}</div>
+                    </div>
+                </div>
+            )}
+
+             {/* Pet care service */}
+             {service.service_id?.name === "Dịch vụ Lưu trú" && (
+                <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                    <div>
+                        <p className="text-gray-600 text-sm mb-1">Hướng dẫn cho ăn</p>
+                        <div className="font-medium p-3 rounded">{result.feedingInstructions || "N/A"}</div>
+                    </div>
+                    <div>
+                        <p className="text-gray-600 text-sm mb-1">Chăm sóc đặc biệt</p>
+                        <div className="font-medium p-3 rounded">{result.specialCare || "N/A"}</div>
                     </div>
                     <div>
                         <p className="text-gray-600 text-sm mb-1">Ghi chú</p>
