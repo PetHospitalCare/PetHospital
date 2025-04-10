@@ -258,6 +258,11 @@ export default function ShoppingCartPayment() {
     const handleSpecificAddressChange = (e) => {
         const value = e.target.value;
         setSpecificAddress(value);
+
+        if (value) {
+            setSelectedAddress("");
+        }
+
         if (!value && !selectedAddress) {
             setAddressError("Vui lòng nhập địa chỉ giao hàng");
         } else {
@@ -268,6 +273,11 @@ export default function ShoppingCartPayment() {
     const handleSelectedAddressChange = (e) => {
         const value = e.target.value;
         setSelectedAddress(value);
+
+        if (value) {
+            setSpecificAddress("");
+        }
+
         if (!value && !specificAddress) {
             setAddressError("Vui lòng nhập địa chỉ giao hàng");
         } else {
@@ -397,7 +407,7 @@ export default function ShoppingCartPayment() {
             const districtName = districts.find(d => d.DistrictID.toString() === selectedDistrict)?.DistrictName || "";
             const wardName = wards.find(w => w.WardCode.toString() === selectedWard)?.WardName || "";
 
-            const fullAddress = `${specificAddress}, ${selectedAddress},  ${wardName}, ${districtName}, ${provinceName}`;
+            const fullAddress = `${specificAddress || selectedAddress || ''},  ${wardName || ''}, ${districtName || ''}, ${provinceName || ''}`;
 
             const orderInfo = {
                 userId: user._id,
@@ -547,6 +557,7 @@ export default function ShoppingCartPayment() {
                                         className={`w-full border p-2 rounded outline-none focus:border-blue-500 focus:border-2 ${showValidation && addressError && !specificAddress ? 'border-red-500' : ''}`}
                                         value={selectedAddress}
                                         onChange={handleSelectedAddressChange}
+                                        disabled={!!specificAddress}
                                     >
                                         <option value="">Chọn địa chỉ</option>
                                         {user && user.address && (
@@ -565,6 +576,7 @@ export default function ShoppingCartPayment() {
                                         className={`w-full border p-2 rounded outline-none focus:border-blue-500 focus:border-2 ${showValidation && addressError && !selectedAddress ? 'border-red-500' : ''}`}
                                         value={specificAddress}
                                         onChange={handleSpecificAddressChange}
+                                        disabled={!!selectedAddress}
                                     />
                                     <div className="h-5 mt-1">
                                         {showValidation && addressError && !selectedAddress && !specificAddress && <p className="text-red-500 text-sm absolute">{addressError}</p>}

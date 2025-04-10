@@ -45,7 +45,9 @@ import { PaymentService } from "@/services/PaymentService.js";
 
 export default function OrdersManagement() {
     const [data, setData] = useState([]);
-    const [sorting, setSorting] = useState([]);
+    const [sorting, setSorting] = useState([
+        { id: "createdAt", desc: true }
+    ]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState({});
     const [rowSelection, setRowSelection] = useState({});
@@ -82,6 +84,19 @@ export default function OrdersManagement() {
         return (statusOrder[statusA] || 0) - (statusOrder[statusB] || 0);
     };
 
+
+    const dateSortingFn = (rowA, rowB, columnId) => {
+        const dateA = parseDate(rowA.getValue(columnId));
+        const dateB = parseDate(rowB.getValue(columnId));
+
+        return dateA.getTime() - dateB.getTime();
+    };
+
+    const parseDate = (dateStr) => {
+        const [day, month, year] = dateStr.split('/').map(Number);
+        return new Date(year, month - 1, day);
+    };
+
     const fetchData = async () => {
         try {
             const response = await PaymentService.getAllPayments();
@@ -106,6 +121,8 @@ export default function OrdersManagement() {
                         year: 'numeric'
                     });
 
+                    const timestamp = date.getTime();
+
                     return {
                         id: payment._id,
                         email: payment.email || "Không có email",
@@ -114,7 +131,8 @@ export default function OrdersManagement() {
                         shipFee: payment.shipFee,
                         address: shippingAddress,
                         status: payment.status,
-                        createdAt: formattedDate
+                        createdAt: formattedDate,
+                        timestamp: timestamp
                     };
                 });
 
@@ -324,6 +342,12 @@ export default function OrdersManagement() {
                 </div>
             ),
             cell: ({ row }) => <div className="text-center">{row.getValue("createdAt")}</div>,
+            sortingFn: dateSortingFn,
+        },
+        {
+            accessorKey: "timestamp",
+            header: "Timestamp",
+            enableHiding: true,
         },
         {
             id: "actions",
@@ -413,6 +437,12 @@ export default function OrdersManagement() {
                 pageSize: pageSize,
             },
         },
+        initialState: {
+            columnVisibility: {
+                timestamp: false
+            }
+        },
+        manualPagination: false,
     });
 
     useEffect(() => {
