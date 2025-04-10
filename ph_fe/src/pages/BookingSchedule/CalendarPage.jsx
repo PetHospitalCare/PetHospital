@@ -243,19 +243,14 @@ export default function Calendar() {
                                                                 <span className="font-medium">BS:</span> {event.doctor}
                                                             </div>
                                                             {event.status ? (
-                                                                <TooltipProvider>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger>
-                                                                            <div className="flex items-center gap-1 text-xs text-green-700 mt-2 font-medium bg-green-50 p-1.5 rounded-md">
-                                                                                <CheckCircle2 className="w-4 h-4" />
-                                                                                <span>Đã khám xong</span>
-                                                                            </div>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            <p>Hoàn thành khám bệnh</p>
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </TooltipProvider>
+
+                                                                <div className="flex items-center gap-1 text-xs text-green-700 mt-2 font-medium bg-green-50 p-1.5 rounded-md">
+                                                                    <CheckCircle2 className="w-4 h-4" />
+                                                                    <span>Đã khám xong</span>
+                                                                </div>
+
+
+
                                                             ) : (
                                                                 isEventToday(event.date) ? (
                                                                     <Button
@@ -278,22 +273,14 @@ export default function Calendar() {
                                                                         {loading ? "Đang tải..." : "Khám bệnh"}
                                                                     </Button>
                                                                 ) : (
-                                                                    <TooltipProvider>
-                                                                        <Tooltip>
-                                                                            <TooltipTrigger>
-                                                                                <div className="flex items-center gap-1 text-xs text-yellow-700 mt-2 font-medium bg-yellow-50 p-1.5 rounded-md">
-                                                                                    <Clock className="w-4 h-4" />
-                                                                                    <span>Chờ khám</span>
-                                                                                </div>
-                                                                            </TooltipTrigger>
-                                                                            <TooltipContent>
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <AlertCircle className="w-4 h-4" />
-                                                                                    <p>Chưa đến ngày khám</p>
-                                                                                </div>
-                                                                            </TooltipContent>
-                                                                        </Tooltip>
-                                                                    </TooltipProvider>
+
+                                                                    <div className="flex items-center gap-1 text-xs text-yellow-700 mt-2 font-medium bg-yellow-50 p-1.5 rounded-md">
+                                                                        <Clock className="w-4 h-4" />
+                                                                        <span>Chờ khám</span>
+                                                                    </div>
+
+
+
                                                                 )
                                                             )}
                                                             {/* <Button
