@@ -36,6 +36,7 @@ export default function PetInfo() {
         weight: "",
         dateOfBirth: ""
     });
+    const [originalPetData, setOriginalPetData] = React.useState(null); // State lưu dữ liệu ban đầu
 
     // Lấy dữ liệu của thú cưng
     const fetchPetData = async () => {
@@ -91,6 +92,25 @@ export default function PetInfo() {
             weight: pet.weight?.toString() || "",
             dateOfBirth: pet.dateOfBirth ? new Date(pet.dateOfBirth).toISOString().split('T')[0] : ""
         });
+    };
+
+    // Xử lý khi nhấn nút "Hủy"
+    const handleCancelEdit = () => {
+        if (originalPetData) {
+            // Khôi phục dữ liệu ban đầu
+            setPetFormData({
+                name: originalPetData.name || "",
+                type: originalPetData.type || "",
+                gender: originalPetData.gender?.toString() || "",
+                species: originalPetData.species || "",
+                weight: originalPetData.weight?.toString() || "",
+                dateOfBirth: originalPetData.dateOfBirth
+                    ? new Date(originalPetData.dateOfBirth).toISOString().split('T')[0]
+                    : ""
+            });
+        }
+        setErrors({}); // Reset lỗi
+        setEditPetId(null); // Thoát chế độ chỉnh sửa
     };
 
     // Xử lý thay đổi dữ liệu form thú cưng
@@ -370,7 +390,7 @@ export default function PetInfo() {
                                                 </Button>
                                                 <Button
                                                     variant="outline"
-                                                    onClick={() => setEditPetId(null)}
+                                                    onClick={handleCancelEdit} // Gọi hàm khi nhấn nút "Hủy"
                                                 >
                                                     Hủy
                                                 </Button>

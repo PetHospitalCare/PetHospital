@@ -40,7 +40,7 @@ export default function NewDetail() {
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
                 </div>
             ) : data ? (
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-5xl mx-auto h-[calc(100vh-4rem)] overflow-y-auto">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden max-w-5xl mx-auto">
                     {data.images && data.images.url && (
                         <div className="w-full h-80 overflow-hidden">
                             <img 

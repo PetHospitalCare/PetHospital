@@ -97,6 +97,9 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         } else if (formData.expiry_date < today) {
             newErrors.expiry_date = "Ngày hết hạn không thể là ngày trong quá khứ";
         }
+        if (!formData.images.length) {
+            newErrors.images = "Vui lòng tải lên ít nhất một ảnh";
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -194,10 +197,18 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                 <Label>Hình ảnh (Tối đa 1 ảnh)</Label>
                 <div className="grid grid-cols-1 gap-2">
                     {formData.images.map((image, index) => (
-                        <div key={index} className="relative">
-                            <img src={image.url} alt="Medicine" className="w-full h-24 object-cover rounded-md" />
-                            <Button size="icon" className="absolute top-1 right-1 bg-red-500" onClick={handleRemoveImage}>
-                                <Trash2 size={12} />
+                        <div key={index} className="relative w-32 h-32"> {/* tăng kích thước khung ảnh */}
+                            <img
+                                src={image.url}
+                                alt="Medicine"
+                                className="w-full h-full object-cover rounded-md"
+                            />
+                            <Button
+                                size="icon"
+                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600"
+                                onClick={() => handleRemoveImage(index)} // nhớ truyền index nếu cần xóa đúng ảnh
+                            >
+                                <Trash2 size={16} /> {/* tăng size icon nếu muốn */}
                             </Button>
                         </div>
                     ))}
@@ -205,6 +216,7 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                 {formData.images.length < 1 && (
                     <input type="file" accept="image/*" onChange={handleImageChange} />
                 )}
+                {errors.images && <p className="text-red-500">{errors.images}</p>}
                 <SheetFooter>
                     <Button onClick={handleSubmit} disabled={isLoading}>
                         {isLoading ? "Đang xử lý..." : "Lưu thay đổi"}

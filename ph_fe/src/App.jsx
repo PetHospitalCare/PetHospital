@@ -42,6 +42,7 @@ import ResetPassword from './pages/Login&SignUp/Forgot_password/Reset_Password'
 import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx';
 import HistoryBooking from './pages/HistoryBooking/HistoryBooking';
 import OrdersManagement from "@/pages/orders-management/orders-management.jsx";
+import News from './pages/NewDetail/News'
 // export const socket = io.connect("https://pethospital.onrender.com",);
 export const socket = io.connect("http://localhost:9999",);
 function App() {
@@ -57,6 +58,7 @@ function App() {
           <Route path='/change-password' element={<ResetPassword />} />
           <Route path='/otp' element={<OTP_Input />} />
           <Route path='/change-email' element={<ChangeEmail />} />
+          <Route path='/news' element={<News />} />
           <Route path='/new-detail/:id' element={<NewDetail />} />
           <Route path="/loading" element={<LoadingScreen />} />
           <Route path='/signup-success' element={<SignupSuccess />} />
