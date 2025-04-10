@@ -24,13 +24,16 @@ export function NavProjects({
   const { isMobile } = useSidebar()
 
   return (
-    (<SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Pet Hospital</SidebarGroupLabel>
+    (<SidebarGroup>
+      <SidebarGroupLabel className="flex items-center gap-3 text-lg font-semibold mb-4">
+        <img src="/pethospital.png" alt="Pet Hospital Logo" className="w-8 h-8" />
+        Pet Hospital
+      </SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
+          <SidebarMenuItem key={item.name} >
             <SidebarMenuButton asChild>
-              <Link to={item.url}>
+              <Link to={item.url} title={item.name}>
                 <item.icon />
                 <span>{item.name}</span>
               </Link>
@@ -70,6 +73,7 @@ export function NavProjects({
           </SidebarMenuButton>
         </SidebarMenuItem> */}
       </SidebarMenu>
+
     </SidebarGroup>)
   );
 }

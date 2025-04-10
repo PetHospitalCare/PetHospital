@@ -122,8 +122,37 @@ export default function BookingDialog({ open, onClose }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!formData.name || !formData.phone || !formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId || (!formData.pet_id && !formData.type)) {
-            toast.error("Vui lòng nhập đầy đủ thông tin!");
+        let missingFields = [];
+
+        // Regex kiểm tra email hợp lệ
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!formData.name) missingFields.push("Họ và tên");
+        if (!formData.email) {
+            missingFields.push("Email");
+        } else if (!emailRegex.test(formData.email)) {
+            toast.error("Email không hợp lệ!");
+            return;
+        }
+        const phoneRegex = /^(0[2-9][0-9]{8}|84[2-9][0-9]{8})$/;
+
+        if (!formData.phone) {
+            missingFields.push("Số điện thoại");
+        } else if (!phoneRegex.test(formData.phone)) {
+            toast.error("Số điện thoại không hợp lệ!");
+            return;
+        }
+        if (!formData.scheduleDate) missingFields.push("Ngày hẹn");
+        if (!formData.scheduleTime) missingFields.push("Giờ hẹn");
+        if (!formData.scheduleType) missingFields.push("Loại lịch hẹn");
+        if (!formData.subServiceId) missingFields.push("Dịch vụ chi tiết");
+        if (!formData.pet_id && !formData.type) missingFields.push("Thông tin thú cưng");
+        if (formData.note && formData.note.length > 255) {
+            toast.error("Ghi chú không được vượt quá 255 ký tự!");
+            return;
+        }
+        if (missingFields.length > 0) {
+            toast.error(`Vui lòng nhập: ${missingFields.join(", ")}`);
             return;
         }
         try {

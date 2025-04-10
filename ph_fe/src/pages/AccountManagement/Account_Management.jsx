@@ -172,7 +172,7 @@ export default function AccountManagement() {
             <SheetDemo open={openEdit} onOpenChange={setOpenEdit} account={selectedAccount} onsuccess={fetchData} />
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Tìm kiếm sản phẩm..."
+                    placeholder="Tìm kiếm tài khoản..."
                     value={(table.getColumn("username")?.getFilterValue()) ?? ""}
                     onChange={(e) => table.getColumn("username")?.setFilterValue(e.target.value)}
                     className="max-w-sm"
@@ -222,9 +222,10 @@ export default function AccountManagement() {
                     </TableBody>
                 </Table>
             </div>
+
             <div className="flex items-center justify-between py-4">
                 <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-700">Số tài khoản mỗi trang:</span>
+                    <span className="text-sm text-gray-700">Số sản phẩm mỗi trang:</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="h-8 px-2">

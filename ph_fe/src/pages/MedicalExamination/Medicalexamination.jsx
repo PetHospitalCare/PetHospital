@@ -45,10 +45,9 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
     const [medicineTotalPrice, setMedicineTotalPrice] = useState(0);
     const [services, setServices] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [loading, setLoading] = useState(true);
     const [petInfo, setpetInfo] = useState({});
     const [isEditing, setIsEditing] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         // Reset states when appointment changes
         setSelectedSubServices([]);
@@ -65,6 +64,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
     // Then replace the existing useEffect with this version
     useEffect(() => {
         async function loadAllData() {
+            if (!appointment || !open) return;
             setIsLoading(true);
             try {
                 // Load services
@@ -130,7 +130,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         }
 
         loadAllData();
-    }, [appointment, onOpenChange]);
+    }, [appointment, open]);
     const handleSubServiceToggle = (subService) => {
         if (!subService || !subService?._id) {
             console.error("Invalid sub-service:", subService);
@@ -388,21 +388,6 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
 
     return (
         <Dialog modal={false} open={open} onOpenChange={(isOpen) => {
-            // if (!isOpen) {
-            //     // Clean up when closing
-            //     setSelectedSubServices([]);
-            //     setFormData({});
-            //     setActiveTab("examination");
-            //     setConclusion({
-            //         generalHealth: "",
-            //         diagnosis: "",
-            //         treatment: "",
-            //         followUp: "",
-            //         notes: "",
-            //     });
-            //     setIsEditing(false);
-            //     setSearchTerm(""); // Also reset search term
-            // }
             onOpenChange(isOpen);
         }}>
             <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">

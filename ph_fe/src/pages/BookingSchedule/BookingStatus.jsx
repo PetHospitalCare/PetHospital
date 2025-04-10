@@ -10,9 +10,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import axios from "axios";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Pen, Trash2, CalendarCheck, FileText, Wallet } from "lucide-react";
-
+import { ChevronDown } from "lucide-react";
 import {
     flexRender,
     getCoreRowModel,
@@ -53,7 +53,8 @@ export default function BookingStatus({ status, setCount }) {
     const [medicalRecord, setMedicalRecord] = useState([]);
     const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
     const [selectedPaymentBooking, setSelectedPaymentBooking] = useState(null);
-
+    const [pageSize, setPageSize] = useState(5);
+    const [currentPageIndex, setCurrentPageIndex] = useState(0);
     const statusMapping = {
         pending: { label: "Chờ xác nhận", color: "bg-yellow-500 text-white" },
         confirm: { label: "Chờ khám", color: "bg-blue-500 text-white" },
@@ -282,13 +283,14 @@ export default function BookingStatus({ status, setCount }) {
                     accessorKey: "payment",
                     header: "Thanh toán",
                     cell: ({ row }) => {
-                        // Find the medical record for this booking
                         const record = medicalRecord.find(
                             record => record.booking_id._id === row.original._id
                         );
+                        const isPaid = record?.booking_id?.payment?.status;
+
                         return (
-                            <div className="font-medium">
-                                {record?.booking_id?.payment?.status ? "Đã thanh toán" : "Chưa thanh toán"}
+                            <div className={`font-medium ${isPaid ? "text-green-600" : "text-red-600"}`}>
+                                {isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
                             </div>
                         );
                     }
@@ -394,8 +396,34 @@ export default function BookingStatus({ status, setCount }) {
             columnFilters,
             columnVisibility,
             rowSelection,
+            pagination: {
+                pageIndex: currentPageIndex,
+                pageSize: pageSize,
+            },
+        },
+        initialState: {
+            pagination: {
+                pageSize: pageSize,
+            },
         },
     });
+    useEffect(() => {
+        setCurrentPageIndex(0);
+        table.setPageSize(pageSize);
+    }, [pageSize]);
+
+    // Thêm handlers cho nút next/previous
+    const handleNextPage = () => {
+        if (table.getCanNextPage()) {
+            setCurrentPageIndex(prev => prev + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (table.getCanPreviousPage()) {
+            setCurrentPageIndex(prev => prev - 1);
+        }
+    };
 
     return (
 
@@ -472,23 +500,47 @@ export default function BookingStatus({ status, setCount }) {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Previous
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next
-                </Button>
+            <div className="flex items-center justify-between py-4">
+                <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-700">Số sản phẩm mỗi trang:</span>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 px-2">
+                                {pageSize}
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {[5, 10, 15, 20].map((size) => (
+                                <DropdownMenuItem key={size} onClick={() => setPageSize(size)}>
+                                    {size}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="flex-1 text-sm text-gray-700">
+                        {`Trang ${table.getState().pagination.pageIndex + 1} / ${table.getPageCount()}`}
+                    </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePreviousPage}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        Trước
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleNextPage}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        Sau
+                    </Button>
+                </div>
             </div>
             <MedicalExaminationDialog
                 open={isViewDialogOpen}
