@@ -240,6 +240,11 @@ export default function TestimonialAndNews() {
                                     </div>
                                 </Link>
                             ))}
+                            <div className="text-center mt-6">
+                                <Link to="/news" className="text-center text-blue-600 font-semibold hover:underline">
+                                    Xem thêm bài viết khác
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
