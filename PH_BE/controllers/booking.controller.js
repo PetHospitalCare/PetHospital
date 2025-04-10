@@ -118,7 +118,7 @@ const AssignDoctor = async (req, res) => {
                         </div>
         
                         <p style="margin-top: 20px; text-align: center; font-size: 12px; color: #7f8c8d;">
-                            PetCare Clinic - Hotline: 0123-456-789
+                            Pet Hospital - Hotline: 0123-456-789
                         </p>
         
                         <!-- Footer -->

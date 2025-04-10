@@ -67,11 +67,10 @@ const CustomerChat = () => {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-28 right-4 w-16 h-16 bg-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-all z-50"
+                className="fixed bottom-28 right-4 w-16 h-16 bg-[#3F2E2E]  text-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary/90 transition-all z-50"
                 aria-label="Mở hỗ trợ trực tuyến"
             >
                 <MessageCircle size={28} />
-
             </button>
         );
     }
@@ -83,7 +82,7 @@ const CustomerChat = () => {
                 {/* Chat window */}
                 <div className="fixed bottom-24 right-4 w-80 bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col z-50">
                     {/* Header */}
-                    <div className="bg-indigo-600 text-white p-3 rounded-t-lg flex justify-between items-center">
+                    <div className="bg-primary text-white p-3 rounded-t-lg flex justify-between items-center">
                         <div className="flex items-center">
                             <span>Hỗ trợ khách hàng</span>
                         </div>
@@ -103,7 +102,7 @@ const CustomerChat = () => {
                         </p>
                         <button
                             onClick={redirectToLogin}
-                            className="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors"
+                            className="bg-[#3F2E2E] text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors"
                         >
                             Đăng nhập ngay
                         </button>
@@ -113,7 +112,7 @@ const CustomerChat = () => {
                 {/* Close button as a fallback */}
                 <button
                     onClick={() => setIsOpen(false)}
-                    className="fixed bottom-6 right-6 w-16 h-16 bg-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-all z-40"
+                    className="fixed bottom-6 right-6 w-16 h-16 bg-[#3F2E2E] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-all z-40"
                     aria-label="Đóng hỗ trợ trực tuyến"
                 >
                     <X size={24} />
@@ -127,7 +126,7 @@ const CustomerChat = () => {
         <>
             <div className="fixed bottom-32 right-24 w-80 bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col z-50" style={{ maxHeight: '500px' }}>
                 {/* Header */}
-                <div className="bg-indigo-600 text-white p-3 rounded-t-lg flex justify-between items-center">
+                <div className="bg-[#3F2E2E] text-white p-3 rounded-t-lg flex justify-between items-center">
                     <div className="flex items-center">
                         <Headset></Headset>
                         {/* <div className={`w-3 h-3 rounded-full mr-2 ${isOnline ? 'bg-green-400' : 'bg-gray-400'}`}></div> */}
@@ -155,8 +154,9 @@ const CustomerChat = () => {
                             >
                                 <div
                                     className={`max-w-xs px-4 py-2 rounded-lg ${msg.sender === user._id
-                                        ? 'bg-indigo-500 text-white rounded-br-none'
-                                        : 'bg-gray-100 text-gray-800 rounded-bl-none'}`}
+                                        ? 'bg-primary text-white rounded-br-none'
+                                        : 'bg-gray-100 text-gray-800 rounded-bl-none'
+                                        }`}
                                 >
                                     <p className="text-sm">{msg.content}</p>
                                     <p className="text-xs mt-1 opacity-70 text-right">
@@ -185,8 +185,9 @@ const CustomerChat = () => {
                             onClick={handleSend}
                             disabled={!message.trim()}
                             className={`p-2 rounded-full ${message.trim()
-                                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                                ? 'bg-primary text-white hover:bg-primary/90'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                }`}
                         >
                             <Send size={18} />
                         </button>
@@ -200,7 +201,7 @@ const CustomerChat = () => {
             {/* Chat icon visible behind the chat window */}
             <button
                 onClick={() => setIsOpen(false)}
-                className="fixed bottom-28 right-4 w-16 h-16 bg-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-all z-40"
+                className="fixed bottom-28 right-4 w-16 h-16 bg-[#3F2E2E] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-all z-40"
                 aria-label="Đóng hỗ trợ trực tuyến"
             >
                 <X size={24} />
