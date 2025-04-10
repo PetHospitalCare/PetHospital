@@ -47,14 +47,15 @@ export default function OrdersManagement() {
             if (response.data.success) {
                 const formattedData = response.data.payments.map((payment) => ({
                     id: payment._id,
-                    orderNumber: `ĐH-${payment._id.slice(-6).toUpperCase()}`,
+                    orderNumber: `ĐH-${payment._id}`,
                     items: payment.items,
                     totalPrice: payment.totalPrice,
                     shipFee: payment.shipFee,
-                    address: payment.address,
+                    address: '',
                     status: payment.status,
                     createdAt: new Date(payment.createdAt).toLocaleDateString()
                 }));
+
                 setData(formattedData);
             }
         } catch (error) {

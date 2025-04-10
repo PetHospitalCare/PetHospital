@@ -391,21 +391,24 @@ export default function ShoppingCartPayment() {
         }
 
         if (cart && cart?.items?.length > 0) {
+            setIsLoading(true);
+
             const provinceName = provinces.find(p => p.ProvinceID.toString() === selectedProvince)?.ProvinceName || "";
             const districtName = districts.find(d => d.DistrictID.toString() === selectedDistrict)?.DistrictName || "";
             const wardName = wards.find(w => w.WardCode.toString() === selectedWard)?.WardName || "";
 
-            const fullAddress = `${specificAddress || selectedAddress}, ${wardName}, ${districtName}, ${provinceName}`;
+            const fullAddress = `${specificAddress}, ${selectedAddress},  ${wardName}, ${districtName}, ${provinceName}`;
 
             const orderInfo = {
                 userId: user._id,
                 email: email,
                 address: fullAddress,
                 phoneNumber: phoneNumber,
-                city: provinceName,
+                province: provinceName,
                 district: districtName,
                 ward: wardName,
-                specificAddress: specificAddress || selectedAddress,
+                inputAddress: specificAddress,
+                selectedAddress: selectedAddress,
                 items: cart.items,
                 totalPrice: cart.totalPrice,
                 shipFee: cart.shipFee || 0,
@@ -418,32 +421,46 @@ export default function ShoppingCartPayment() {
 
                     if (response && response.status === 200) {
                         toast.success("Đặt hàng thành công!");
-
-                        localStorage.removeItem("cart");
-                        setCart(null);
-                        setDataCartContext(0);
-                        setDataIsChangeCartContext(!isChangeCart);
-
-                        setTimeout(() => {
-                            navigate('/');
-                        }, 200);
                     } else {
                         toast.error("Có lỗi xảy ra khi đặt hàng!");
                     }
+
+                    localStorage.removeItem("cart");
+                    setCart(null);
+                    setDataCartContext(0);
+                    setDataIsChangeCartContext(!isChangeCart);
+                    setIsLoading(false);
+
+                    setTimeout(() => {
+                        navigate('/');
+                    }, 200);
                 } catch (error) {
+                    localStorage.removeItem("cart");
+                    setCart(null);
+                    setDataCartContext(0);
+                    setDataIsChangeCartContext(!isChangeCart);
+                    setIsLoading(false);
                     console.error("Error creating COD order:", error);
                     toast.error("Có lỗi xảy ra khi đặt hàng!");
+
+                    setTimeout(() => {
+                        navigate('/');
+                    }, 200);
                 }
             } else {
                 try {
                     const response = await ShoppingCartService.paymentShoppingCartByUserId(user._id, orderInfo);
 
                     if (response && response.status === 200 && response.data.paymentUrl) {
+                        setIsLoading(false);
                         window.location.href = response.data.paymentUrl;
                     } else {
                         toast.error("Có lỗi xảy ra khi thanh toán online!");
                     }
+
+                    setIsLoading(false);
                 } catch (error) {
+                    setIsLoading(false);
                     console.error("Error processing online payment:", error);
                     toast.error("Có lỗi xảy ra khi thanh toán online!");
                 }
@@ -493,7 +510,7 @@ export default function ShoppingCartPayment() {
         <div className="w-full h-full" style={{ backgroundColor: "#fef6e9", minHeight: "calc(-100px + 100vh)" }}>
             <div className="container mx-auto px-4 py-8 pt-32" style={{ backgroundColor: "#fef6e9" }}>
                 <div className="flex flex-col lg:flex-row gap-6">
-                    <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow flex flex-col" style={{ height: "auto", minHeight: "530px" }}>
+                    <div className="w-full lg:w-2/3 bg-white p-6 rounded-lg shadow flex flex-col" style={{ height: "590px" }}>
                         <h2 className="text-xl font-bold mb-4">Thanh toán</h2>
 
                         <div className="flex-1 overflow-y-auto pr-2 h-[310px]">
@@ -648,7 +665,7 @@ export default function ShoppingCartPayment() {
                         </div>
                     </div>
 
-                    <div className="w-full lg:w-1/3 bg-white p-6 rounded-lg shadow flex flex-col" style={{ height: "530px" }}>
+                    <div className="w-full lg:w-1/3 bg-white p-6 rounded-lg shadow flex flex-col" style={{ height: "590px" }}>
                         <h2 className="text-xl font-bold mb-4">Giỏ hàng</h2>
 
                         <div className="flex-1 overflow-y-auto pr-2">

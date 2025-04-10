@@ -14,43 +14,61 @@ const transporter = nodemailer.createTransport({
 const paymentVNPay = async (req, res) => {
     try {
         const { userId } = req.params;
-        const data = req.body;
-        let payment;
-        let shoppingCart;
+        const orderInfo = req.body;
+        let payment = null;
+        let shoppingCart = null;
+        let savedPayment = null;
 
-        if (userId && userId !== 'contact_infor') {
-            shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
+        if (!userId) {
+            console.log('UserId không được cung cấp');
 
-            if (!shoppingCart) {
-                console.log('Không tìm thấy cart')
-
-                return res.status(500).json({
-                    message: "Lỗi hệ thống Back-end"
-                });
-            }
-
-            payment = new Payment({
-                userId: shoppingCart.userId,
-                contactInfo: '',
-                items: shoppingCart.items,
-                totalPrice: shoppingCart.totalPrice,
-                shipFee: shoppingCart.shipFee,
-                address: shoppingCart.address,
-                status: 0
-            });
-        } else if (userId && userId === 'contact_infor') {
-            payment = new Payment({
-                userId: '',
-                contactInfo: userId,
-                items: data.items,
-                totalPrice: data.totalPrice,
-                shipFee: data.shipFee,
-                address: data.address,
-                status: 0
+            return res.status(400).json({
+                success: false,
+                message: 'UserId không được cung cấp'
             });
         }
 
-        const savedPayment = await payment.save();
+        if (userId) {
+            shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
+
+            if (!shoppingCart) {
+                console.log('Không tìm thấy cart');
+
+                return res.status(404).json({
+                    success: false,
+                    message: "Không tìm thấy giỏ hàng của người dùng"
+                });
+            }
+
+            const addressObject = {
+                selectedAddress: orderInfo.selectedAddress || '',
+                inputAddress: orderInfo.inputAddress || '',
+                province: orderInfo.province || '',
+                district: orderInfo.district || '',
+                ward: orderInfo.ward || '',
+            }
+
+            payment = new Payment({
+                userId: shoppingCart.userId || orderInfo.userId,
+                items: shoppingCart.items || orderInfo.items,
+                totalPrice: shoppingCart.totalPrice || orderInfo.totalPrice,
+                shipFee: shoppingCart.shipFee || orderInfo.shipFee,
+                address: addressObject,
+                phone: orderInfo.phoneNumber,
+                email: orderInfo.email,
+                status: 0,
+                method: orderInfo.paymentMethod || 'online'
+            });
+        }
+
+        if (payment) {
+            savedPayment = await payment.save();
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: "Không thể tạo đơn hàng"
+            });
+        }
 
         const vnpay = new VNPay({
             tmnCode: 'RCS7ES46',
@@ -99,9 +117,10 @@ const updatePayment = async (req, res) => {
     try {
         const data = req.body;
         let paymentSaved;
+        let payment;
 
         if (data.paymentId) {
-            let payment = await db.payment.findOne({ _id: String(data.paymentId) });
+            payment = await db.payment.findOne({ _id: String(data.paymentId) });
 
             if (payment) {
                 if (data.vnp_ResponseCode === '00') {
@@ -120,6 +139,18 @@ const updatePayment = async (req, res) => {
         }
 
         if (paymentSaved.status === 1) {
+            const updateResult = await updateProductQuantity(payment.items);
+
+            if (!updateResult.success) {
+                payment.status = -1;
+                paymentSaved = await payment.save();
+
+                return res.status(400).json({
+                    success: false,
+                    message: updateResult.message
+                });
+            }
+
             const emailResult = await sendEmailSuccessPayment(paymentSaved, paymentSaved.userId);
 
             if (!emailResult.success) {
@@ -180,30 +211,48 @@ const getPaymentsByUserId = async (req, res) => {
 const paymentCodPay = async (req, res) => {
     try {
         const { userId } = req.params;
-        const data = req.body;
+        const orderInfo = req.body;
         let payment = null;
         let shoppingCart;
         let savedPayment = null;
 
-        if (userId && userId !== 'contact_infor') {
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'UserId không được cung cấp'
+            });
+        }
+
+        if (userId) {
             shoppingCart = await db.shoppingcart.findOne({ userId: String(userId) });
 
             if (!shoppingCart) {
                 console.log('Không tìm thấy cart');
+
                 return res.status(404).json({
                     success: false,
                     message: "Không tìm thấy giỏ hàng của người dùng"
                 });
             }
 
+            const addressObject = {
+                selectedAddress: orderInfo.selectedAddress || '',
+                inputAddress: orderInfo.inputAddress || '',
+                province: orderInfo.province || '',
+                district: orderInfo.district || '',
+                ward: orderInfo.ward || '',
+            }
+
             payment = new Payment({
-                userId: shoppingCart.userId,
-                contactInfo: '',
-                items: shoppingCart.items,
-                totalPrice: shoppingCart.totalPrice,
-                shipFee: shoppingCart.shipFee,
-                address: shoppingCart.address,
-                status: 1
+                userId: shoppingCart.userId || orderInfo.userId,
+                items: shoppingCart.items || orderInfo.items,
+                totalPrice: shoppingCart.totalPrice || orderInfo.totalPrice,
+                shipFee: shoppingCart.shipFee || orderInfo.shipFee,
+                address: addressObject,
+                phone: orderInfo.phoneNumber,
+                email: orderInfo.email,
+                status: 1,
+                method: orderInfo.paymentMethod || 'cod'
             });
         }
 
@@ -218,6 +267,18 @@ const paymentCodPay = async (req, res) => {
 
         if (shoppingCart) {
             await shoppingCart.deleteOne({ userId: String(userId) });
+        }
+
+        const updateResult = await updateProductQuantity(shoppingCart.items || orderInfo.items);
+
+        if (!updateResult.success) {
+            payment.status = -1;
+            savedPayment = await payment.save();
+
+            return res.status(400).json({
+                success: false,
+                message: updateResult.message
+            });
         }
 
         const emailResult = await sendEmailSuccessPayment(savedPayment, userId);
@@ -276,8 +337,18 @@ const sendEmailSuccessPayment = async (paymentInput, userKeyInput) => {
             </tr>
         `).join('');
 
+        const addressParts = [];
+
+        if (paymentInput.address.inputAddress) addressParts.push(paymentInput.address.inputAddress);
+        if (paymentInput.address.selectedAddress) addressParts.push(paymentInput.address.selectedAddress);
+        if (paymentInput.address.ward) addressParts.push(paymentInput.address.ward);
+        if (paymentInput.address.district) addressParts.push(paymentInput.address.district);
+        if (paymentInput.address.province) addressParts.push(paymentInput.address.province);
+
+        const fullAddress = addressParts.join(', ');
+
         await transporter.sendMail({
-            to: user.email,
+            to: paymentInput.email || user.email,
             subject: "Thông tin đơn hàng - PetCare",
             html: `
                 <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
@@ -295,7 +366,7 @@ const sendEmailSuccessPayment = async (paymentInput, userKeyInput) => {
                         <div style="background: #ecf7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                             <p><strong>Mã đơn hàng:</strong> #${paymentInput._id}</p>
                             <p><strong>Ngày đặt:</strong> ${new Date(paymentInput.createdAt).toLocaleDateString('vi-VN')}</p>
-                            <p><strong>Địa chỉ giao hàng:</strong> ${paymentInput.address}</p>
+                            <p><strong>Địa chỉ giao hàng:</strong> ${fullAddress}</p>
                             <p><strong>Phí vận chuyển:</strong> ${new Intl.NumberFormat('vi-VN', {
                 style: 'currency',
                 currency: 'VND'
@@ -379,6 +450,52 @@ const getAllPayments = async (req, res) => {
             success: false,
             message: "Lỗi hệ thống Back-end"
         });
+    }
+};
+
+const updateProductQuantity = async (productsInput) => {
+    try {
+        const notFoundProducts = [];
+
+        for (const item of productsInput) {
+            const product = await db.product.findById(item.productId);
+
+            if (!product) {
+                console.log(`Không tìm thấy sản phẩm với ID: ${item.productId}`);
+                notFoundProducts.push(item.productId);
+                continue;
+            }
+
+            if (product.quantity < item.quantity) {
+                throw new Error(`Sản phẩm ${product.name || product._id} không đủ số lượng trong kho`);
+            }
+
+            const newQuantity = product.quantity - item.quantity;
+
+            await db.product.findByIdAndUpdate(
+                item.productId,
+                { quantity: newQuantity },
+                { new: true }
+            );
+        }
+
+        if (notFoundProducts.length > 0) {
+            return {
+                success: false,
+                message: `Không tìm thấy sản phẩm với ID: ${notFoundProducts.join(', ')}`
+            };
+        }
+
+        return {
+            success: true,
+            message: 'Cập nhật số lượng sản phẩm thành công'
+        };
+    } catch (error) {
+        console.log('Lỗi khi cập nhật số lượng sản phẩm:', error);
+        return {
+            success: false,
+            message: error.message || 'Lỗi khi cập nhật số lượng sản phẩm'
+        };
     }
 };
 

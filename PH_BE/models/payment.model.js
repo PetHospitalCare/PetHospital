@@ -9,8 +9,8 @@ const cartItemSchema = new mongoose.Schema({
 });
 
 const addressSchema = new mongoose.Schema({
-    selected: { type: String },
-    input: { type: String },
+    selectedAddress: { type: String },
+    inputAddress: { type: String },
     province: { type: String },
     district: { type: String },
     ward: { type: String },
