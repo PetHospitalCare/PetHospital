@@ -89,6 +89,9 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
 
         if (!formData.name) newErrors.name = "Vui lòng nhập tên thuốc";
+        if (!formData.description) newErrors.description = "Vui lòng nhập mô tả";
+        if (!formData.dosage) newErrors.dosage = "Vui lòng nhập liều lượng";
+        if (!formData.unit) newErrors.unit = "Vui lòng nhập đơn vị";
         if (!formData.price) newErrors.price = "Vui lòng nhập giá thuốc";
         if (!formData.quantity) newErrors.quantity = "Vui lòng nhập số lượng";
         if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
@@ -161,16 +164,19 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                         {errors.name && <p className="text-red-500">{errors.name}</p>}
                         <Label htmlFor="description">Mô tả</Label>
                         <Input id="description" name="description" value={formData.description} onChange={handleInputChange} />
+                        {errors.description && <p className="text-red-500">{errors.description}</p>}
                         <Label htmlFor="type">Loại</Label>
                         <Input id="type" name="type" value={formData.type} onChange={handleInputChange} />
                         <Label htmlFor="dosage">Liều lượng</Label>
                         <Input id="dosage" name="dosage" value={formData.dosage} onChange={handleInputChange} />
+                        {errors.dosage && <p className="text-red-500">{errors.dosage}</p>}
                         <Label htmlFor="manufacturer">Nhà sản xuất</Label>
                         <Input id="manufacturer" name="manufacturer" value={formData.manufacturer} onChange={handleInputChange} />
                     </div>
                     <div>
                         <Label htmlFor="unit">Đơn vị</Label>
                         <Input id="unit" name="unit" value={formData.unit} onChange={handleInputChange} />
+                        {errors.unit && <p className="text-red-500">{errors.unit}</p>}
                         <Label htmlFor="price">Giá</Label>
                         <Input id="price" name="price" type="number" value={formData.price} onChange={handleInputChange} />
                         {errors.price && <p className="text-red-500">{errors.price}</p>}
