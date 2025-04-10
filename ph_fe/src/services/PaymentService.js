@@ -12,6 +12,10 @@ const getAllPayments = () => {
     return axios.get(`/payment/get-all-payments`);
 }
 
+const cancelOrder = (paymentId) => {
+    return axios.post(`/payment/cancel-order${paymentId}`);
+}
+
 export const PaymentService = {
-    updatePayment, getPaymentsByUserId, getAllPayments
+    updatePayment, getPaymentsByUserId, getAllPayments, cancelOrder
 };

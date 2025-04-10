@@ -499,4 +499,78 @@ const updateProductQuantity = async (productsInput) => {
     }
 };
 
-module.exports = { paymentVNPay, updatePayment, getPaymentsByUserId, paymentCodPay, getAllPayments };
+const restoreProductQuantity = async (productsInput) => {
+    try {
+        for (const item of productsInput) {
+            const product = await db.product.findById(item.productId);
+
+            if (!product) {
+                console.log(`Không tìm thấy sản phẩm với ID: ${item.productId}`);
+                continue;
+            }
+
+            const newQuantity = product.quantity + item.quantity;
+
+            await db.product.findByIdAndUpdate(
+                item.productId,
+                { quantity: newQuantity },
+                { new: true }
+            );
+        }
+
+
+        return {
+            success: true,
+            message: 'Khôi phục số lượng sản phẩm thành công',
+        };
+    } catch (error) {
+        console.log('Lỗi khi khôi phục số lượng sản phẩm:', error);
+
+        return {
+            success: false,
+            message: error.message || 'Lỗi khi khôi phục số lượng sản phẩm'
+        };
+    }
+};
+
+const cancelOrder = async (req, res) => {
+    try {
+        const { paymentId } = req.params;
+        let paymentSaved;
+        let payment;
+
+        if (paymentId) {
+            payment = await db.payment.findOne({ _id: String(paymentId) });
+
+            if (payment) {
+                payment.status = -2;
+                paymentSaved = await payment.save();
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Cập nhật payment không thành công',
+                });
+            }
+
+            const updateResult = await restoreProductQuantity(payment.items);
+
+            if (!updateResult.success) {
+                console.log('Cảnh báo: ' + updateResult.message);
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Huỷ order thành công',
+            paymentSaved,
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
+module.exports = { paymentVNPay, updatePayment, getPaymentsByUserId, paymentCodPay, getAllPayments, cancelOrder };
