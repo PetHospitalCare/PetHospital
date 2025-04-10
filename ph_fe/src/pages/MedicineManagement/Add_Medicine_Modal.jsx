@@ -88,7 +88,9 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
         } else if (formData.expiry_date < today) {
             newErrors.expiry_date = "Ngày hết hạn không thể là ngày trong quá khứ";
         }
-
+        if (!formData.images.length) {
+            newErrors.images = "Vui lòng tải lên ít nhất một ảnh";
+        }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -205,6 +207,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                                 </div>
                             ))}
                         </div>
+                        {errors.images && <p className="text-red-500">{errors.images}</p>}
                     </div>
                 </div>
                 <DialogFooter>
