@@ -48,6 +48,13 @@ export default function OTP_Input() {
     const handleVerifyOTP = async (e) => {
         e.preventDefault();
         setError("");
+
+        // Kiểm tra nếu OTP bị bỏ trống
+        if (!otp.trim()) {
+            setError("Vui lòng nhập mã OTP.");
+            return;
+        }
+
         try {
             const storedEmail = JSON.parse(localStorage.getItem("tempSignupData"))?.email;
             const email = state?.email || storedEmail;
@@ -61,7 +68,6 @@ export default function OTP_Input() {
                 else if (response.data.type == "register") {
                     navigate("/loading");
                 }
-
             } else {
                 throw new Error("Mã OTP không hợp lệ");
             }
@@ -105,15 +111,19 @@ export default function OTP_Input() {
                             </label>
                             <Input
                                 type="text"
-                                required
                                 className="w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
                                 onChange={(e) => setOtp(e.target.value)}
                             />
+                            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                         </div>
 
                         {/* Change email / Send Again */}
                         <div className="flex justify-between text-sm">
-                            <Link to="/change-email" state={{ email: state?.email }} className="text-red-500 font-medium underline">
+                            <Link
+                                to="/change-email"
+                                state={{ email: state?.email }}
+                                className="text-red-500 font-medium underline"
+                            >
                                 Thay đổi Email
                             </Link>
                             <button
@@ -126,12 +136,9 @@ export default function OTP_Input() {
                             </button>
                         </div>
 
-                        {error && <p className="text-red-500">{error}</p>}
-
                         {/* Step Progress Bar */}
                         <div hidden={state?.type == "forgotPassword"} className="mb-4"> 
                             <StepProgressBar step={2} />
-
                         </div>
 
                         {/* Next */}

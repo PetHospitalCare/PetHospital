@@ -128,7 +128,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Thêm thuốc mới</DialogTitle>
                     <DialogDescription>Nhập thông tin để thêm thuốc mới vào kho.</DialogDescription>

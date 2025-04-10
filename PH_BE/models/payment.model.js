@@ -8,15 +8,25 @@ const cartItemSchema = new mongoose.Schema({
     name: { type: String },
 });
 
+const addressSchema = new mongoose.Schema({
+    selectedAddress: { type: String },
+    inputAddress: { type: String },
+    province: { type: String },
+    district: { type: String },
+    ward: { type: String },
+});
+
 const paymentSchema = new mongoose.Schema(
     {
         userId: { type: String },
-        contactInfo: { type: String },
         items: [cartItemSchema],
         totalPrice: { type: Number, default: 0 },
         shipFee: { type: Number, default: 20000 },
-        address: { type: String },
+        address: addressSchema,
+        phone: { type: Number },
+        email: { type: String },
         status: { type: Number, default: 0 },
+        method: { type: String, default: 'cod' },
     },
     { timestamps: true }
 );

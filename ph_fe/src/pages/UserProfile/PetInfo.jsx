@@ -27,6 +27,7 @@ export default function PetInfo() {
     const [editPetId, setEditPetId] = React.useState(null);
     const [isLoading, setIsLoading] = React.useState(false);
     const [currentPetId, setCurrentPetId] = React.useState(null);
+    const [errors, setErrors] = React.useState({});
     const [petFormData, setPetFormData] = React.useState({
         name: "",
         type: "",
@@ -108,11 +109,36 @@ export default function PetInfo() {
         });
     };
 
-    // Lưu thông tin thú cưng
+    // Xử lý lưu thông tin thú cưng
     const handleSavePet = async (petId) => {
-        // Kiểm tra các trường bắt buộc
-        if (!petFormData.name.trim() || !petFormData.type.trim() || !petFormData.species.trim()) {
-            toast.error("Vui lòng điền đầy đủ các trường bắt buộc: Tên, Loài động vật, và Giống.");
+        const newErrors = {};
+
+        // Biểu thức regex chỉ cho phép chữ cái và khoảng trắng
+        const nameAndSpeciesRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
+
+        // Kiểm tra tên thú cưng
+        if (!petFormData.name.trim()) {
+            newErrors.name = "Vui lòng nhập tên thú cưng.";
+        } else if (!nameAndSpeciesRegex.test(petFormData.name)) {
+            newErrors.name = "Tên thú cưng không được chứa số hoặc ký tự đặc biệt.";
+        }
+
+        // Kiểm tra giống loài
+        if (!petFormData.species.trim()) {
+            newErrors.species = "Vui lòng nhập giống loài.";
+        } else if (!nameAndSpeciesRegex.test(petFormData.species)) {
+            newErrors.species = "Giống loài không được chứa số hoặc ký tự đặc biệt.";
+        }
+
+        // Kiểm tra cân nặng
+        if (!petFormData.weight.trim()) {
+            newErrors.weight = "Vui lòng nhập cân nặng.";
+        }
+
+        setErrors(newErrors);
+
+        // Nếu có lỗi, dừng việc lưu
+        if (Object.keys(newErrors).length > 0) {
             return;
         }
 
@@ -246,6 +272,7 @@ export default function PetInfo() {
                                                             onChange={handlePetFormChange}
                                                             className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500"
                                                         />
+                                                        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                                                     </div>
                                                     <div>
                                                         <Label className="text-gray-600">Ngày sinh</Label>
@@ -296,6 +323,7 @@ export default function PetInfo() {
                                                             onChange={handlePetFormChange}
                                                             className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500"
                                                         />
+                                                        {errors.species && <p className="text-red-500 text-sm mt-1">{errors.species}</p>}
                                                     </div>
                                                     <div>
                                                         <Label className="text-gray-600">Cân nặng (kg)</Label>
@@ -306,6 +334,7 @@ export default function PetInfo() {
                                                             onChange={handlePetFormChange}
                                                             className="border-b-2 border-gray-400 focus:outline-none focus:border-blue-500"
                                                         />
+                                                        {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
                                                     </div>
                                                 </div>
                                             ) : (

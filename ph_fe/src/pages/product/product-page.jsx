@@ -5,7 +5,6 @@ import { useSearchParams } from "react-router-dom";
 import BookingDialog from "@/components/Booking-modal.jsx";
 
 export default function ProductPage() {
-    const location = useLocation();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [searchText, setSearchText] = useState('');
@@ -28,11 +27,7 @@ export default function ProductPage() {
     const [categoryVisibleCounts, setCategoryVisibleCounts] = useState({});
     const [categoryLoadingStates, setCategoryLoadingStates] = useState({});
     const [sortedCategoryProducts, setSortedCategoryProducts] = useState({});
-
-    const sidebarImages = [
-        { src: "/thucung001.jpg", alt: "Thức ăn thú cưng" },
-        { src: "/thucung002.jpg", alt: "Phụ kiện thú cưng" }
-    ];
+    const [isProcessingFilters, setIsProcessingFilters] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -46,34 +41,23 @@ export default function ProductPage() {
 
     useEffect(() => {
         const isAnyFilterApplied =
-            (searchText !== '' && searchText !== null) ||
-            (selectedType !== '' && selectedType !== null);
+            searchText !== '' ||
+            selectedType !== '' ||
+            selectedCategory !== '';
 
         setIsFiltering(isAnyFilterApplied);
+    }, [searchText, selectedType, selectedCategory]);
 
-        if (selectedCategory && !isAnyFilterApplied) {
-            const categoryProducts = products.filter(product =>
-                product.category_id && product.category_id.some(cat => cat && cat._id === selectedCategory)
-            );
+    useEffect(() => {
+        if (isProcessingFilters || products.length === 0) return;
 
-            let sortedProducts = [...categoryProducts];
-            if (sortOrder === 'price-asc') {
-                sortedProducts.sort((a, b) => (a.price || 0) - (b.price || 0));
-            } else if (sortOrder === 'price-desc') {
-                sortedProducts.sort((a, b) => (b.price || 0) - (a.price || 0));
-            }
+        setIsProcessingFilters(true);
 
-            setFilteredProducts(sortedProducts);
-            setDisplayedProducts(sortedProducts.slice(0, productsPerPage));
-            setCurrentPage(1);
-            setHasMore(sortedProducts.length > productsPerPage);
-        } else if (isAnyFilterApplied || selectedCategory) {
-            setDisplayedProducts(filteredProducts.slice(0, productsPerPage));
-            setCurrentPage(1);
-            setHasMore(filteredProducts.length > productsPerPage);
+        if (isFiltering) {
+            setDisplayedProducts(filteredProducts.slice(0, productsPerPage * currentPage));
+            setHasMore(filteredProducts.length > productsPerPage * currentPage);
         } else {
             setDisplayedProducts([]);
-            setCurrentPage(1);
             setHasMore(false);
 
             const initialCounts = {};
@@ -84,19 +68,15 @@ export default function ProductPage() {
 
             applySortingToAllCategories();
         }
-    }, [filteredProducts, selectedCategory, productsPerPage, products, searchText, selectedType, sortOrder, categories]);
+
+        setIsProcessingFilters(false);
+    }, [isFiltering, filteredProducts]);
 
     useEffect(() => {
-        if (products.length > 0 && categories.length > 0) {
-            const initialCounts = {};
-            categories.forEach(category => {
-                initialCounts[category.id] = productsPerPage;
-            });
-            setCategoryVisibleCounts(initialCounts);
-
+        if (products.length > 0 && categories.length > 0 && !isProcessingFilters) {
             applySortingToAllCategories();
         }
-    }, [products, categories, productsPerPage, sortOrder]);
+    }, [products, categories, sortOrder]);
 
     const applySortingToAllCategories = () => {
         const sorted = {};
@@ -200,31 +180,33 @@ export default function ProductPage() {
         const search = searchParams.get('search');
         const sort = searchParams.get('sort');
 
+        let categoryToSet = '';
+        let typeToSet = '';
+        let searchToSet = '';
+        let sortToSet = '';
+
         if (categoryId) {
-            setSelectedCategory(categoryId);
-        } else {
-            setSelectedCategory('');
+            categoryToSet = categoryId;
         }
 
         if (type) {
-            setSelectedType(type);
-        } else {
-            setSelectedType('');
+            typeToSet = type;
         }
 
         if (search) {
-            setSearchText(search);
-        } else {
-            setSearchText('');
+            searchToSet = search;
         }
 
         if (sort) {
-            setSortOrder(sort);
-        } else {
-            setSortOrder('');
+            sortToSet = sort;
         }
 
-        applyAllFilters(search || '', categoryId || '', type || '', sort || '');
+        setSelectedCategory(categoryToSet);
+        setSelectedType(typeToSet);
+        setSearchText(searchToSet);
+        setSortOrder(sortToSet);
+
+        applyAllFilters(searchToSet, categoryToSet, typeToSet, sortToSet);
     };
 
     const applyAllFilters = (search, categoryId, type, sort) => {
@@ -255,11 +237,11 @@ export default function ProductPage() {
             sortedProducts.sort((a, b) => (a.price || 0) - (b.price || 0));
         } else if (sort === 'price-desc') {
             sortedProducts.sort((a, b) => (b.price || 0) - (a.price || 0));
-        } else {
-            sortedProducts = tempProducts;
         }
 
         setFilteredProducts(sortedProducts);
+        setDisplayedProducts(sortedProducts.slice(0, productsPerPage));
+        setCurrentPage(1);
         setHasMore(sortedProducts.length > productsPerPage);
     };
 
@@ -338,33 +320,35 @@ export default function ProductPage() {
     };
 
     const loadMoreProducts = () => {
+        if (isLoading) return;
+
         setIsLoading(true);
 
         setTimeout(() => {
             const nextPage = currentPage + 1;
-            const startIndex = displayedProducts.length;
-            const endIndex = startIndex + productsPerPage;
+            const endIndex = nextPage * productsPerPage;
 
-            let productsToAdd = [];
-            if (isFiltering || selectedCategory) {
-                productsToAdd = filteredProducts.slice(startIndex, endIndex);
+            if (isFiltering) {
+                setDisplayedProducts(filteredProducts.slice(0, endIndex));
                 setHasMore(endIndex < filteredProducts.length);
-            } else {
-                const allProducts = products.filter(product =>
-                    !selectedCategory || (product.category_id && product.category_id.some(cat => cat && (cat._id === selectedCategory || cat.id === selectedCategory)))
+            } else if (selectedCategory) {
+                const categoryProducts = products.filter(product =>
+                    product.category_id && product.category_id.some(cat =>
+                        cat && (cat._id === selectedCategory || cat.id === selectedCategory)
+                    )
                 );
-                productsToAdd = allProducts.slice(startIndex, endIndex);
-                setHasMore(endIndex < allProducts.length);
+                setDisplayedProducts(categoryProducts.slice(0, endIndex));
+                setHasMore(endIndex < categoryProducts.length);
             }
 
-            const newDisplayedProducts = [...displayedProducts, ...productsToAdd];
-            setDisplayedProducts(newDisplayedProducts);
             setCurrentPage(nextPage);
             setIsLoading(false);
         }, 500);
     };
 
     const loadMoreProductsForCategory = (categoryId) => {
+        if (categoryLoadingStates[categoryId]) return;
+
         setCategoryLoadingStates(prev => ({
             ...prev,
             [categoryId]: true
@@ -657,7 +641,7 @@ export default function ProductPage() {
                             {isFiltering ? (
                                 <div className="mb-12">
                                     <div className="mb-4">
-                                        <h3 className="inline-block text-xl font-semibold px-4 py-2 text-white border border-brown-700 rounded-t-lg shadow-sm" style={{backgroundColor: 'brown'}}>
+                                        <h3 className="inline-block text-xl font-semibold px-4 py-2 text-white border border-brown-700 rounded-t-lg shadow-sm" style={{ backgroundColor: 'brown' }}>
                                             Sản phẩm
                                         </h3>
                                     </div>
@@ -728,11 +712,10 @@ export default function ProductPage() {
                                             <button
                                                 onClick={loadMoreProducts}
                                                 disabled={isLoading}
-                                                className={`px-5 py-2 rounded-md font-medium border ${
-                                                    isLoading
+                                                className={`px-5 py-2 rounded-md font-medium border ${isLoading
                                                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
                                                         : 'bg-blue-500 text-white hover:bg-blue-600 border-blue-600'
-                                                }`}
+                                                    }`}
                                             >
                                                 {isLoading ? (
                                                     <span className="flex items-center justify-center">
@@ -766,7 +749,7 @@ export default function ProductPage() {
                                     return (
                                         <div key={category.id} className="mb-12">
                                             <div className="mb-4">
-                                                <h3 className="inline-block text-xl font-semibold px-4 py-2 text-white border border-brown-700 rounded-t-lg shadow-sm" style={{backgroundColor: 'brown'}}>
+                                                <h3 className="inline-block text-xl font-semibold px-4 py-2 text-white border border-brown-700 rounded-t-lg shadow-sm" style={{ backgroundColor: 'brown' }}>
                                                     {category.name}
                                                 </h3>
                                             </div>
@@ -846,11 +829,10 @@ export default function ProductPage() {
                                                     <button
                                                         onClick={loadMoreProducts}
                                                         disabled={isLoading}
-                                                        className={`px-5 py-2 rounded-md font-medium border ${
-                                                            isLoading
+                                                        className={`px-5 py-2 rounded-md font-medium border ${isLoading
                                                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
                                                                 : 'bg-blue-500 text-white hover:bg-blue-600 border-blue-600'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {isLoading ? (
                                                             <span className="flex items-center justify-center">
@@ -873,16 +855,16 @@ export default function ProductPage() {
                                     product.category_id && product.category_id.some(cat => cat && (cat._id === category.id || cat.id === category.id))
                                 ).length > 0
                             ) && (
-                                <div className="text-center py-12 bg-white rounded-lg shadow-md">
-                                    <p className="text-xl text-gray-500">Không tìm thấy sản phẩm phù hợp với bộ lọc.</p>
-                                    <button
-                                        onClick={clearFilters}
-                                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors border border-blue-600"
-                                    >
-                                        Xóa bộ lọc
-                                    </button>
-                                </div>
-                            )}
+                                    <div className="text-center py-12 bg-white rounded-lg shadow-md">
+                                        <p className="text-xl text-gray-500">Không tìm thấy sản phẩm phù hợp với bộ lọc.</p>
+                                        <button
+                                            onClick={clearFilters}
+                                            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors border border-blue-600"
+                                        >
+                                            Xóa bộ lọc
+                                        </button>
+                                    </div>
+                                )}
                         </div>
                     </div>
                 </div>
