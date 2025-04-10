@@ -356,8 +356,7 @@ export default function OrdersManagement() {
                 const statusCode = row.original.status;
                 return (
                     <div className="flex items-center justify-center space-x-3">
-                        {/* Delete button - Only show for orders NOT in "Chờ giao hàng" status */}
-                        {statusCode !== 1 && (
+                        {statusCode !== 1 && statusCode !== 2 && (
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
