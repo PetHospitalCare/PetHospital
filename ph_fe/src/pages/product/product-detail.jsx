@@ -27,7 +27,6 @@ export default function ProductDetail() {
             if (response.data.success) {
                 if (response.data.productData) {
                     setProduct(response.data.productData);
-                    console.log('response.data.productData: ', response.data.productData);
                 }
             }
         } catch (error) {

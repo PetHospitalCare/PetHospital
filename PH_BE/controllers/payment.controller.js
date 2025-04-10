@@ -557,6 +557,13 @@ const cancelOrder = async (req, res) => {
             if (!updateResult.success) {
                 console.log('Cảnh báo: ' + updateResult.message);
             }
+        } else {
+            console.log('Không có paymentId');
+
+            return res.status(400).json({
+                success: false,
+                message: "Đã có lỗi xảy ra"
+            });
         }
 
         return res.status(200).json({
@@ -573,4 +580,83 @@ const cancelOrder = async (req, res) => {
     }
 };
 
-module.exports = { paymentVNPay, updatePayment, getPaymentsByUserId, paymentCodPay, getAllPayments, cancelOrder };
+const deleteOrder = async (req, res) => {
+    try {
+        const { paymentId } = req.params;
+
+
+        if (paymentId) {
+            const result = await db.payment.deleteOne({ _id: String(paymentId) });
+
+            if (result.deletedCount === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Không tìm thấy đơn hàng để xóa"
+                });
+            }
+        } else {
+            console.log('Không có paymentId');
+
+            return res.status(400).json({
+                success: false,
+                message: "Đã có lỗi xảy ra"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Xóa order thành công',
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
+const updatePaymentStatus = async (req, res) => {
+    try {
+        const data = req.body;
+        let paymentSaved;
+        let payment;
+
+        if (data.paymentId) {
+            payment = await db.payment.findOne({ _id: String(data.paymentId) });
+
+            if (payment) {
+                payment.status = data.status;
+
+                paymentSaved = await payment.save();
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Cập nhật payment không thành công',
+                });
+            }
+        } else {
+            console.log('Không có paymentId');
+
+            return res.status(400).json({
+                success: false,
+                message: "Đã có lỗi xảy ra"
+            });
+        }
+
+
+        return res.status(200).json({
+            success: true,
+            message: 'Cập nhật payment thành công',
+            paymentSaved,
+        });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json({
+            message: "Lỗi hệ thống Back-end"
+        });
+    }
+};
+
+module.exports = { paymentVNPay, updatePayment, getPaymentsByUserId, paymentCodPay, getAllPayments, cancelOrder, deleteOrder, updatePaymentStatus };
