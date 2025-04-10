@@ -4,10 +4,11 @@ import { UserService } from "../../services/UserService";
 import { UserContext } from "../../contexts/UserContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+
 export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
-  const { loginContext, user } = useContext(UserContext)
+  const [errors, setErrors] = useState({}); // State để lưu lỗi
+  const { loginContext, user } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -20,25 +21,42 @@ export default function Login() {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" }); // Xóa lỗi khi người dùng nhập
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = "Vui lòng nhập email.";
+    }
+    if (!formData.password) {
+      newErrors.password = "Vui lòng nhập mật khẩu.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setErrors({}); // Reset lỗi trước khi kiểm tra
+
+    if (!validateForm()) {
+      return; // Dừng nếu form không hợp lệ
+    }
+
     setIsLoading(true);
 
     try {
       const response = await UserService.signInService(formData);
-      if (response.status == 200) {
-        loginContext()
+      if (response.status === 200) {
+        loginContext();
         toast.success("Đăng nhập thành công!");
         navigate("/");
       } else {
-        setError("Vui Lòng kiểm tra lại tài khoản và mật khẩu!!!");
+        setErrors({ general: "Vui lòng kiểm tra lại tài khoản và mật khẩu!" });
       }
-
     } catch (error) {
-      setError(error.message);
+      setErrors({ general: error.message || "Đã xảy ra lỗi. Vui lòng thử lại." });
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +76,8 @@ export default function Login() {
             <div className="p-8">
               <h1 className="text-2xl font-bold mb-10 text-left">Đăng nhập</h1>
 
-              {error && <p className="text-red-500">{error}</p>}
+              {/* Hiển thị lỗi chung */}
+              {errors.general && <p className="text-red-500 mb-4">{errors.general}</p>}
 
               <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
@@ -69,8 +88,9 @@ export default function Login() {
                     value={formData.email}
                     onChange={handleInputChange}
                     className="w-full p-2 bg-gray-100 border rounded"
-                    required
                   />
+                  {/* Hiển thị lỗi email */}
+                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
@@ -81,8 +101,9 @@ export default function Login() {
                     value={formData.password}
                     onChange={handleInputChange}
                     className="w-full p-2 bg-gray-100 border rounded"
-                    required
                   />
+                  {/* Hiển thị lỗi mật khẩu */}
+                  {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
                   <div className="text-right mt-1">
                     <Link to="/forgot-password" className="text-sm text-blue-500 underline">
                       Quên mật khẩu?
@@ -102,7 +123,7 @@ export default function Login() {
               </form>
 
               <p className="mt-4 text-sm text-center">
-                Bạn chưa có tài khoản?{' '}
+                Bạn chưa có tài khoản?{" "}
                 <Link to="/SignUp" className="text-blue-500 underline">
                   Đăng ký
                 </Link>

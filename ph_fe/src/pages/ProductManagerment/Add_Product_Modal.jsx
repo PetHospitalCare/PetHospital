@@ -1,19 +1,8 @@
 
 import { Input } from "@/components/ui/input";
 import React, { useState, useEffect } from "react";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import MultiSelect from "@/components/multi-select";
 import { Dog, Cat } from "lucide-react"
-
-import axios from "axios";
 import { Textarea } from "@/components/ui/textarea";
 import { Combobox } from "@/components/Combobox";
 import { ProductService } from "../../services/ProductService";
@@ -34,6 +23,17 @@ export default function Add_Modal({ open, onClose, onSuccess }) {
     const [quantity, setQuantity] = useState("");
     const [type, setType] = useState([]);
     const [loading, setLoading] = useState(false);
+    const handleClose = () => {
+        // Reset tất cả state về giá trị ban đầu
+        setImages([]);
+        setSelectedCategory("");
+        setProductName("");
+        setProductDescription("");
+        setPrice("");
+        setQuantity("");
+        setType([]);
+        onClose();
+    };
     // Lấy dữ liệu danh mục từ backend
     useEffect(() => {
         const fetchCategories = async () => {
@@ -70,14 +70,25 @@ export default function Add_Modal({ open, onClose, onSuccess }) {
         }
     };
 
-
-    //xử lý lỗi ảnh up quá 9 ảnh
+    const validImageTypes = ["image/jpeg", "image/png", "image/webp"];
     const handleImageUpload = (event) => {
         const files = Array.from(event.target.files);
+
+        // Kiểm tra tổng số ảnh không vượt quá 9
         if (files.length + images.length > 9) {
-            alert("Bạn chỉ được tải tối đa 9 ảnh.");
+            toast.error("Vui lòng chỉ tải lên tối đa 9 ảnh.");
             return;
         }
+
+        // Kiểm tra định dạng ảnh
+
+        const invalidFiles = files.filter(file => !validImageTypes.includes(file.type));
+
+        if (invalidFiles.length > 0) {
+            toast.error("Chỉ được tải lên các file ảnh (JPG, PNG, webp).");
+            return;
+        }
+
         setImages([...images, ...files]);
     };
 
@@ -89,9 +100,18 @@ export default function Add_Modal({ open, onClose, onSuccess }) {
     //function xác nhận tạo sản phẩm
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!productName || !selectedCategory || !productDescription || !type.length || !images.length) {
-            toast.error("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
-            //alert("Vui lòng nhập đầy đủ thông tin và tải lên ít nhất một ảnh.");
+        let missingFields = [];
+
+        if (!productName) missingFields.push("Tên sản phẩm");
+        if (!selectedCategory) missingFields.push("Danh mục");
+        if (!productDescription) missingFields.push("Mô tả sản phẩm");
+        if (!type.length) missingFields.push("Loại sản phẩm (chó, mèo)");
+        if (!images.length) missingFields.push("Hình ảnh (tối thiểu 1 ảnh)");
+        if (!price) missingFields.push("Giá");
+        if (!quantity) missingFields.push("Số lượng");
+
+        if (missingFields.length > 0) {
+            toast.error(`Vui lòng nhập: ${missingFields.join(", ")}`);
             return;
         }
 
@@ -134,9 +154,8 @@ export default function Add_Modal({ open, onClose, onSuccess }) {
             const response = await ProductService.createProduct(formData);
             if (response.data.message === "Tạo sản phẩm thành công") {
                 toast.success("Sản phẩm đã được thêm!");
-
-                onSuccess();
-                onClose();
+                handleClose();
+                onSuccess?.();
             }
         } catch (error) {
             console.error("Lỗi khi thêm sản phẩm:", error);
@@ -162,14 +181,14 @@ export default function Add_Modal({ open, onClose, onSuccess }) {
                         </div>
                         <div>
                             <label htmlFor="quantity" className="block text-sm font-medium text-left mb-2">Số lượng</label>
-                            <Input type="number" placeholder="Nhập số lượng" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                            <Input type="number" placeholder="Nhập số lượng" min={0} value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-6 mb-6">
                         <div>
                             <label htmlFor="price" className="block text-sm font-medium text-left mb-2">Giá tiền</label>
-                            <Input type="number" placeholder="Nhập giá tiền" value={price} onChange={(e) => setPrice(e.target.value)} />
+                            <Input type="number" placeholder="Nhập giá tiền" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
                         </div>
                         <div>
                             <label htmlFor="category" className="block text-sm font-medium text-left mb-2">Danh mục</label>
@@ -216,7 +235,13 @@ export default function Add_Modal({ open, onClose, onSuccess }) {
                     </div>
 
                     <div className="flex justify-between items-center">
-                        <button type="button" onClick={onClose} className="text-red-500 underline">Hủy bỏ</button>
+                        <button
+                            type="button"
+                            onClick={handleClose} // Sử dụng handleClose
+                            className="text-red-500 underline"
+                        >
+                            Hủy bỏ
+                        </button>
                         <Button type="submit" className="bg-blue-500 text-white px-6 py-3 rounded flex items-center justify-center" disabled={loading}>
                             {loading ? (
                                 <>

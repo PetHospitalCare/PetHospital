@@ -80,17 +80,56 @@ export default function EditProductDialog({ open, onClose, ProductData, onSucces
     }, [ProductData, open, categories]);
 
     // Handle image upload
+    const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+    // Cập nhật hàm handleImageUpload
     const handleImageUpload = (event) => {
         const files = Array.from(event.target.files);
+
+        // Kiểm tra số lượng ảnh
         if (files.length + images.length > 9) {
             toast.error("Bạn chỉ được tải tối đa 9 ảnh.");
             return;
         }
 
+        // Validate từng file
+        const invalidFiles = files.filter(
+            file => !ACCEPTED_IMAGE_TYPES.includes(file.type)
+        );
+
+        // Kiểm tra kích thước file
+        const oversizedFiles = files.filter(
+            file => file.size > MAX_FILE_SIZE
+        );
+
+        // Thông báo lỗi nếu có file không hợp lệ
+        if (invalidFiles.length > 0) {
+            toast.error(
+                "Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG hoặc WEBP"
+            );
+            return;
+        }
+
+        // Thông báo lỗi nếu có file quá lớn
+        if (oversizedFiles.length > 0) {
+            toast.error(
+                "Kích thước ảnh không được vượt quá 5MB"
+            );
+            return;
+        }
+
+        // Xử lý files hợp lệ
+        const validFiles = files.filter(
+            file =>
+                ACCEPTED_IMAGE_TYPES.includes(file.type) &&
+                file.size <= MAX_FILE_SIZE
+        );
+
         // Thêm ảnh mới vào danh sách
-        const newImages = files.map((file) => ({
-            url: URL.createObjectURL(file), // Tạo URL tạm thời để hiển thị ảnh
-            file, // Lưu trữ file để gửi lên server
+        const newImages = validFiles.map((file) => ({
+            url: URL.createObjectURL(file),
+            file,
         }));
 
         setImages([...images, ...newImages]);
@@ -104,7 +143,20 @@ export default function EditProductDialog({ open, onClose, ProductData, onSucces
     // Submit form to update product
     const handleSubmit = async (event) => {
         event.preventDefault();
+        let missingFields = [];
 
+        if (!name) missingFields.push("Tên sản phẩm");
+        if (!selectedCategory) missingFields.push("Danh mục");
+        if (!description) missingFields.push("Mô tả sản phẩm");
+        if (!type.length) missingFields.push("Loại sản phẩm (chó, mèo)");
+        if (!images.length) missingFields.push("Hình ảnh (tối thiểu 1 ảnh)");
+        if (!price || price < 0) missingFields.push("Giá phải lớn hơn 0");
+        if (quantity === undefined || quantity < 0) missingFields.push("Số lượng phải lớn hơn hoặc bằng 0"); // Sửa lại điều kiện này
+
+        if (missingFields.length > 0) {
+            toast.error(`Vui lòng nhập: ${missingFields.join(", ")}`);
+            return;
+        }
         try {
             const formData = new FormData();
             formData.append("name", name);
@@ -171,6 +223,7 @@ export default function EditProductDialog({ open, onClose, ProductData, onSucces
                             </label>
                             <Input
                                 type="number"
+                                min={0}
                                 placeholder="Nhập số lượng"
                                 value={quantity}
                                 onChange={(e) => setQuantity(Number(e.target.value))}
@@ -213,6 +266,7 @@ export default function EditProductDialog({ open, onClose, ProductData, onSucces
                                 type="number"
                                 placeholder="Nhập giá tiền"
                                 value={price}
+                                min={0}
                                 onChange={(e) => setPrice(Number(e.target.value))}
                                 required
                             />
@@ -221,8 +275,8 @@ export default function EditProductDialog({ open, onClose, ProductData, onSucces
 
 
                     {/* Other fields remain the same until pet type selection */}
-                    <div className="grid grid-cols-2 gap-6 mb-6">
-                        <div>
+                    <div className="grid grid-cols-3 gap-6 mb-6">
+                        <div className="col-span-2">
                             <label htmlFor="description" className="block text-sm font-medium text-left mb-2">
                                 Mô tả về sản phẩm
                             </label>
@@ -230,7 +284,7 @@ export default function EditProductDialog({ open, onClose, ProductData, onSucces
                                 placeholder="Hãy mô tả về sản phẩm của bạn"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="h-[120px]"
+                                className="h-[150px]"
                             />
                         </div>
                         <div>
