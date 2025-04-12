@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserContext } from "@/contexts/UserContext";
 import { socket } from "../App"
+import { MessageService } from '@/services/MessageService';
 
 const ChatContext = createContext();
 
@@ -14,9 +15,9 @@ const ChatProvider = ({ children }) => {
         if (!socket || !user) return;
 
         // Load messages
-        const res = await fetch(`http://localhost:9999/message/${conversationId}`);
-        const data = await res.json();
-        setMessages(data);
+        // Load messages using service
+        const response = await MessageService.getMessagesByConversationId(conversationId);
+        setMessages(response.data);
 
         // Join room
         socket.emit('join-conversation', conversationId);

@@ -31,13 +31,6 @@ const ProtectedRoute = ({ allowedRoles }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const jwtToken = Cookies.get("access_token");
-                if (!jwtToken) {
-                    console.log("Không có token, chuyển hướng về login");
-                    setUser(null);
-                    setCheckingAuth(false);
-                    return;
-                }
                 const response = await UserService.getCurrentUser();
                 if (response.data.success) {
                     setUser({

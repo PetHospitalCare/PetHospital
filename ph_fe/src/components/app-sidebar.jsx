@@ -175,9 +175,9 @@ export function AppSidebar({
 
   const data = {
     user: {
-      name: user.username,
-      email: user.email,
-      avatar: user.url || "/profile.png",
+      name: user?.username,
+      email: user?.email,
+      avatar: user?.url || "/profile.png",
     },
     navMain: getRoleBasedNavigation(),
     projects: getRoleBasedProjects(),
