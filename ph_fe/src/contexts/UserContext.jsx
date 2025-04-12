@@ -42,7 +42,8 @@ const UserProvider = ({ children }) => {
         }
     };
     useEffect(() => {
-        const jwtToken = Cookies.get("access_token");
+        const jwtToken = Cookies.get("access_token", { secure: true, sameSite: 'none' });
+        console.log("jwtToken", jwtToken);
         if (jwtToken) {
             try {
                 fetchUserData();
