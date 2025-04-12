@@ -74,12 +74,16 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
         setImageFiles([]);
     };
 
-    // Trường kiểm tra thông tin
     const validateForm = () => {
         let newErrors = {};
         const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
 
         if (!formData.name) newErrors.name = "Vui lòng nhập tên thuốc";
+        if (!formData.description) newErrors.description = "Vui lòng nhập mô tả";
+        if (!formData.dosage) newErrors.dosage = "Vui lòng nhập liều lượng";
+        if (!formData.unit) newErrors.unit = "Vui lòng nhập đơn vị";
+        if (!formData.manufacturer) newErrors.manufacturer = "Vui lòng nhập nhà sản xuất";
+        if (!formData.type) newErrors.type = "Vui lòng nhập loại thuốc";
         if (!formData.price) newErrors.price = "Vui lòng nhập giá thuốc";
         if (!formData.quantity) newErrors.quantity = "Vui lòng nhập số lượng";
         if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
@@ -88,10 +92,14 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
         } else if (formData.expiry_date < today) {
             newErrors.expiry_date = "Ngày hết hạn không thể là ngày trong quá khứ";
         }
+        if (!formData.images.length) {
+            newErrors.images = "Vui lòng tải lên ít nhất một ảnh";
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
 
     // Thực hiện add
     const handleSubmit = async () => {
@@ -142,22 +150,27 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                     <div>
                         <Label htmlFor="type">Loại</Label>
                         <Input id="type" value={formData.type} onChange={handleInputChange} />
+                        {errors.type && <p className="text-red-500">{errors.type}</p>}
                     </div>
                     <div className="col-span-2">
                         <Label htmlFor="description">Mô tả</Label>
                         <Textarea id="description" value={formData.description} onChange={handleInputChange} />
+                        {errors.description && <p className="text-red-500">{errors.description}</p>}
                     </div>
                     <div>
                         <Label htmlFor="dosage">Liều lượng</Label>
                         <Input id="dosage" value={formData.dosage} onChange={handleInputChange} />
+                        {errors.dosage && <p className="text-red-500">{errors.dosage}</p>}
                     </div>
                     <div>
                         <Label htmlFor="manufacturer">Nhà sản xuất</Label>
                         <Input id="manufacturer" value={formData.manufacturer} onChange={handleInputChange} />
+                        {errors.manufacturer && <p className="text-red-500">{errors.manufacturer}</p>}
                     </div>
                     <div>
                         <Label htmlFor="unit">Đơn vị</Label>
                         <Input id="unit" value={formData.unit} onChange={handleInputChange} />
+                        {errors.unit && <p className="text-red-500">{errors.unit}</p>}
                     </div>
                     <div>
                         <Label htmlFor="price">Giá</Label>
@@ -205,6 +218,7 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                                 </div>
                             ))}
                         </div>
+                        {errors.images && <p className="text-red-500">{errors.images}</p>}
                     </div>
                 </div>
                 <DialogFooter>

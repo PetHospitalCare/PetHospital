@@ -89,6 +89,9 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
 
         if (!formData.name) newErrors.name = "Vui lòng nhập tên thuốc";
+        if (!formData.description) newErrors.description = "Vui lòng nhập mô tả";
+        if (!formData.dosage) newErrors.dosage = "Vui lòng nhập liều lượng";
+        if (!formData.unit) newErrors.unit = "Vui lòng nhập đơn vị";
         if (!formData.price) newErrors.price = "Vui lòng nhập giá thuốc";
         if (!formData.quantity) newErrors.quantity = "Vui lòng nhập số lượng";
         if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
@@ -96,6 +99,9 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
             newErrors.expiry_date = "Vui lòng nhập ngày hết hạn";
         } else if (formData.expiry_date < today) {
             newErrors.expiry_date = "Ngày hết hạn không thể là ngày trong quá khứ";
+        }
+        if (!formData.images.length) {
+            newErrors.images = "Vui lòng tải lên ít nhất một ảnh";
         }
 
         setErrors(newErrors);
@@ -158,16 +164,19 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                         {errors.name && <p className="text-red-500">{errors.name}</p>}
                         <Label htmlFor="description">Mô tả</Label>
                         <Input id="description" name="description" value={formData.description} onChange={handleInputChange} />
+                        {errors.description && <p className="text-red-500">{errors.description}</p>}
                         <Label htmlFor="type">Loại</Label>
                         <Input id="type" name="type" value={formData.type} onChange={handleInputChange} />
                         <Label htmlFor="dosage">Liều lượng</Label>
                         <Input id="dosage" name="dosage" value={formData.dosage} onChange={handleInputChange} />
+                        {errors.dosage && <p className="text-red-500">{errors.dosage}</p>}
                         <Label htmlFor="manufacturer">Nhà sản xuất</Label>
                         <Input id="manufacturer" name="manufacturer" value={formData.manufacturer} onChange={handleInputChange} />
                     </div>
                     <div>
                         <Label htmlFor="unit">Đơn vị</Label>
                         <Input id="unit" name="unit" value={formData.unit} onChange={handleInputChange} />
+                        {errors.unit && <p className="text-red-500">{errors.unit}</p>}
                         <Label htmlFor="price">Giá</Label>
                         <Input id="price" name="price" type="number" value={formData.price} onChange={handleInputChange} />
                         {errors.price && <p className="text-red-500">{errors.price}</p>}
@@ -194,10 +203,18 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                 <Label>Hình ảnh (Tối đa 1 ảnh)</Label>
                 <div className="grid grid-cols-1 gap-2">
                     {formData.images.map((image, index) => (
-                        <div key={index} className="relative">
-                            <img src={image.url} alt="Medicine" className="w-full h-24 object-cover rounded-md" />
-                            <Button size="icon" className="absolute top-1 right-1 bg-red-500" onClick={handleRemoveImage}>
-                                <Trash2 size={12} />
+                        <div key={index} className="relative w-32 h-32"> {/* tăng kích thước khung ảnh */}
+                            <img
+                                src={image.url}
+                                alt="Medicine"
+                                className="w-full h-full object-cover rounded-md"
+                            />
+                            <Button
+                                size="icon"
+                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600"
+                                onClick={() => handleRemoveImage(index)} // nhớ truyền index nếu cần xóa đúng ảnh
+                            >
+                                <Trash2 size={16} /> {/* tăng size icon nếu muốn */}
                             </Button>
                         </div>
                     ))}
@@ -205,6 +222,7 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                 {formData.images.length < 1 && (
                     <input type="file" accept="image/*" onChange={handleImageChange} />
                 )}
+                {errors.images && <p className="text-red-500">{errors.images}</p>}
                 <SheetFooter>
                     <Button onClick={handleSubmit} disabled={isLoading}>
                         {isLoading ? "Đang xử lý..." : "Lưu thay đổi"}

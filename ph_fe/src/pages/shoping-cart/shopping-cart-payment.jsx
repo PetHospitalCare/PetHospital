@@ -42,8 +42,13 @@ export default function ShoppingCartPayment() {
     useEffect(() => {
         makeData();
 
-        if (user && user.email) {
-            setEmail(user.email);
+        if (user) {
+            if (user.email) {
+                setEmail(user.email);
+            }
+            if (user.phone) {
+                setPhoneNumber(user.phone);
+            }
         }
 
         fetchProvinces();

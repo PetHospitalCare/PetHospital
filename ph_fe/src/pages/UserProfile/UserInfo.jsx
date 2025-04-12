@@ -65,7 +65,7 @@ export default function UserInfo({ ...props }) {
         }
         if (!formData.phone.trim()) {
             newErrors.phone = "Vui lòng nhập số điện thoại.";
-        }else if(!formData.phone.length !== 10){
+        } else if (formData.phone.length !== 10) {
             newErrors.phone = "Số điện thoại phải có đúng 10 chữ số.";
         }
         if (!formData.address.trim()) {

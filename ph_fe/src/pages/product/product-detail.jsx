@@ -149,15 +149,15 @@ export default function ProductDetail() {
         <div className="bg-gray-100" style={{ backgroundColor: "#fef6e9" }}>
             <div className="container mx-auto px-4 py-8 pt-40">
                 {product && (
-                    <>
+                    <div className="border border-gray-200 rounded-lg shadow-2xl p-2">
                         <nav className="text-lg px-4 mb-8">
                             <ul className="flex space-x-2">
                                 <li>
-                                    <a href="/" className="text-blue-500 hover:underline">Trang chủ</a>
+                                    <a href="/" className="text-gray-500 hover:underline">Trang chủ</a>
                                 </li>
                                 <li>&gt;</li>
                                 <li>
-                                    <a href="/product" className="text-blue-500 hover:underline">Cửa hàng</a>
+                                    <a href="/product" className="text-gray-500 hover:underline">Cửa hàng</a>
                                 </li>
                                 <li>&gt;</li>
 
@@ -169,7 +169,7 @@ export default function ProductDetail() {
                                 <img
                                     src={product.images?.[0]?.url}
                                     alt="Sản phẩm"
-                                    className="w-full max-w-[736px] h-auto max-h-[500px] object-contain rounded-lg shadow-md mb-4"
+                                    className="w-full max-w-[736px] h-auto max-h-[500px] object-contain rounded-lg shadow-md mb-4 bg-white"
                                     id="mainImage"
                                 />
 
@@ -232,9 +232,8 @@ export default function ProductDetail() {
 
                                             <button
                                                 onClick={handleIncrease}
-                                                className={`w-10 h-8 flex items-center justify-center bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300 ${
-                                                    isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''
-                                                }`}
+                                                className={`w-10 h-8 flex items-center justify-center bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''
+                                                    }`}
                                                 disabled={isOutOfStock}
                                             >
                                                 +
@@ -242,18 +241,18 @@ export default function ProductDetail() {
                                         </div>
 
                                         <button
-                                            className={`flex gap-2 items-center px-6 py-2 rounded-md transition-transform duration-300 focus:outline-none ${
-                                                isOutOfStock
+                                            className={`flex gap-2 items-center px-6 py-2 rounded-md transition-transform duration-300 focus:outline-none ${isOutOfStock
                                                     ? 'bg-red-600 text-white cursor-not-allowed'
-                                                    : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-                                            }`}
+                                                    : 'text-white hover:scale-105 focus:ring-2 focus:ring-offset-2'
+                                                }`}
                                             onClick={isOutOfStock ? undefined : addToCardFunction}
                                             disabled={isOutOfStock}
+                                            style={!isOutOfStock ? { backgroundColor: '#3f2e2e' } : undefined}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                 strokeWidth="1.5" stroke="currentColor" className="size-6">
+                                                strokeWidth="1.5" stroke="currentColor" className="size-6">
                                                 <path strokeLinecap="round" strokeLinejoin="round"
-                                                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                                                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                             </svg>
                                             {isOutOfStock ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
                                         </button>
@@ -271,7 +270,7 @@ export default function ProductDetail() {
                                 </div>
                             </div>
                         </div>
-                    </>
+                    </div>
                 )}
             </div>
         </div>
