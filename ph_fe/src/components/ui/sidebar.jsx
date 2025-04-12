@@ -165,7 +165,8 @@ const Sidebar = React.forwardRef((
           className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
           style={
             {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE
+              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              backgroundColor: "rgba(255, 255, 255, 1)", // Đảm bảo nền sidebar không bị mờ
             }
           }
           side={side}>

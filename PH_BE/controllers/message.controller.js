@@ -1,17 +1,18 @@
 const db = require("../models");
 const Message = db.message
 const Conversation = db.conversation
+const Account = db.account
 
 const GetOrCreateConversation = async (req, res) => {
     try {
         let conversation = await Conversation.findOne({
             customerId: req.params.customerId
         }).populate('staffParticipants', 'username avatar');
-
-        if (!conversation) {
+        const account = await Account.findById(req.params.customerId);
+        const isCustomer = account?.role.includes('customer');
+        if (!conversation && !isCustomer) {
             conversation = await Conversation.create({
                 customerId: req.params.customerId,
-                staffParticipants: [] // Ban đầu chưa có nhân viên
             });
         }
 

@@ -13,7 +13,7 @@ import { read, utils } from 'xlsx';
 import { font } from "./font"
 import { format } from "date-fns"
 import { toast } from "sonner"
-export function LabTestForm({ petInfo, formData, onChange, subService }) {
+export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnly }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(formData.fileUrl || null);
     const [showPreview, setShowPreview] = useState(false);
@@ -282,6 +282,7 @@ export function LabTestForm({ petInfo, formData, onChange, subService }) {
                             onClick={handlePreviewClick}
                             variant="outline"
                             disabled={!selectedFile && !formData.fileUrl}
+
                         >
                             <Printer className="h-4 w-4 mr-2" />
                             Kết quả
@@ -300,7 +301,14 @@ export function LabTestForm({ petInfo, formData, onChange, subService }) {
                             className="cursor-pointer"
                             onChange={handleFileChange}
                             accept=".xls,.xlsx"
-                            onClick={(e) => e.target.value = ''} // Reset input on click
+                            disabled={isReadOnly}
+                            onClick={(e) => {
+                                if (isReadOnly) {
+                                    e.preventDefault();
+                                    return;
+                                }
+                                e.target.value = ''; // Reset input on click
+                            }}
                         />
                         <p className="text-sm text-muted-foreground">
                             Chỉ chấp nhận file Excel (.xls, .xlsx)
@@ -321,6 +329,7 @@ export function LabTestForm({ petInfo, formData, onChange, subService }) {
                     <Textarea
                         id="interpretation"
                         value={formData.interpretation || ""}
+                        disabled={isReadOnly}
                         onChange={(e) => onChange("interpretation", e.target.value)}
                     />
                 </div>
@@ -328,6 +337,7 @@ export function LabTestForm({ petInfo, formData, onChange, subService }) {
                     <Label htmlFor="results">Kết luận</Label>
                     <Textarea
                         id="results"
+                        disabled={isReadOnly}
                         value={formData.results || ""}
                         onChange={(e) => onChange("results", e.target.value)}
                         rows={4}

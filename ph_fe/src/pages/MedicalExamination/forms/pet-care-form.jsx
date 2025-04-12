@@ -18,6 +18,7 @@ export function PetCareForm({ formData, onChange, subService, isReadOnly }) {
                     <Textarea
                         id="careDetails"
                         value={formData.careDetails || ""}
+                        disabled={isReadOnly}
                         onChange={(e) => onChange("careDetails", e.target.value)}
                         rows={3}
                     />
@@ -25,7 +26,8 @@ export function PetCareForm({ formData, onChange, subService, isReadOnly }) {
 
                 <div className="space-y-2">
                     <Label htmlFor="careNotes">Ghi chú</Label>
-                    <Textarea id="careNotes" value={formData.notes || ""} onChange={(e) => onChange("notes", e.target.value)} />
+                    <Textarea disabled={isReadOnly} id="careNotes" value={formData.notes || ""} onChange={(e) => onChange("notes", e.target.value)} />
+
                 </div>
             </CardContent>
         </Card>
