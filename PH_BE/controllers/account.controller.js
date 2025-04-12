@@ -52,7 +52,7 @@ const signin = async (req, res) => {
       path: "/",
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: "none",
       maxAge: 86400000 //1 ngày 
       // maxAge: 60000 // 1 phút
     });
