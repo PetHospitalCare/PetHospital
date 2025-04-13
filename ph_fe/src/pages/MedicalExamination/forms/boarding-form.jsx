@@ -18,6 +18,7 @@ export function BoardingForm({ formData, onChange, subService, isReadOnly }) {
         <div className="space-y-2">
           <Label htmlFor="feedingInstructions">Hướng dẫn cho ăn</Label>
           <Textarea
+            disabled={isReadOnly}
             id="feedingInstructions"
             value={formData.feedingInstructions || ""}
             onChange={(e) => onChange("feedingInstructions", e.target.value)}
@@ -27,6 +28,7 @@ export function BoardingForm({ formData, onChange, subService, isReadOnly }) {
         <div className="space-y-2">
           <Label htmlFor="specialCare">Chăm sóc đặc biệt</Label>
           <Textarea
+            disabled={isReadOnly}
             id="specialCare"
             value={formData.specialCare || ""}
             onChange={(e) => onChange("specialCare", e.target.value)}
@@ -36,6 +38,7 @@ export function BoardingForm({ formData, onChange, subService, isReadOnly }) {
         <div className="space-y-2">
           <Label htmlFor="boardingNotes">Ghi chú</Label>
           <Textarea
+            disabled={isReadOnly}
             id="boardingNotes"
             value={formData.notes || ""}
             onChange={(e) => onChange("notes", e.target.value)}

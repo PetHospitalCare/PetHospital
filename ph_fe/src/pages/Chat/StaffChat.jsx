@@ -4,6 +4,7 @@ import { UserContext } from '@/contexts/UserContext';
 import { Send, ChevronRight, User, Users, MessageSquare, Bell } from 'lucide-react';
 import { socket } from "../../App";
 import { MessageService } from '@/services/MessageService';
+import { UserService } from '@/services/UserService';
 
 export const StaffChat = () => {
     const { user } = useContext(UserContext);
@@ -22,13 +23,53 @@ export const StaffChat = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showNotifications, setShowNotifications] = useState(false);
     const messagesEndRef = useRef(null);
-
+    const [userNames, setUserNames] = useState({});
+    const [userAvatars, setUserAvatars] = useState({});
     // Request notification permission on component mount
     useEffect(() => {
         if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
             Notification.requestPermission();
         }
     }, []);
+    useEffect(() => {
+        const fetchUserNames = async () => {
+            const uniqueUserIds = [...new Set(filteredMessages.map(msg => msg.sender))];
+
+            for (const userId of uniqueUserIds) {
+                if (!userNames[userId] && userId !== user._id) {
+                    try {
+                        const userData = await UserService.getAccountbyId(userId);
+                        // Check if roles array includes 'customer'
+                        const isCustomer = userData.data.account.role.includes('customer');
+                        let displayName;
+
+                        if (isCustomer) {
+                            displayName = `Khách hàng - ${userData.data.account.username}`;
+                        } else {
+                            const roleDisplay = userData.data.account.role.includes('admin') ? 'Admin' : 'Nhân viên';
+                            displayName = `${roleDisplay} - ${userData.data.account.username}`;
+                        }
+
+                        setUserNames(prev => ({
+                            ...prev,
+                            [userId]: displayName
+                        }));
+                        // Add avatar if exists
+                        if (userData?.data?.account?.url) {
+                            setUserAvatars(prev => ({
+                                ...prev,
+                                [userId]: userData?.data?.account?.url
+                            }));
+                        }
+                    } catch (error) {
+                        console.error('Error fetching user name:', error);
+                    }
+                }
+            }
+        };
+
+        fetchUserNames();
+    }, [filteredMessages]);
 
     // Filter messages by current conversation
     useEffect(() => {
@@ -61,6 +102,7 @@ export const StaffChat = () => {
     // Socket listeners for real-time updates
     useEffect(() => {
         const handleConversationUpdate = (conversation) => {
+            console.log("Conversation update received:", conversation); // Debug log
             setConversations(prevConversations => {
                 return prevConversations.map(conv => {
                     if (conv._id === conversation.conversationId) {
@@ -77,6 +119,7 @@ export const StaffChat = () => {
         };
 
         const handleNewConversation = (newConversation) => {
+            console.log("New conversation received:", newConversation); // Debug log
             setConversations(prevConversations => {
                 // Check if the conversation already exists
                 const exists = prevConversations.some(conv => conv._id === newConversation._id);
@@ -115,6 +158,24 @@ export const StaffChat = () => {
     const handleSend = () => {
         if (message.trim() && currentConversation) {
             sendMessage(message);
+
+            // Đưa conversation hiện tại lên đầu khi gửi tin nhắn
+            setConversations(prevConversations => {
+                // Tìm conversation hiện tại
+                const currentConv = prevConversations.find(conv => conv._id === currentConversation);
+                const otherConvs = prevConversations.filter(conv => conv._id !== currentConversation);
+
+                // Cập nhật thông tin của conversation hiện tại
+                const updatedCurrentConv = {
+                    ...currentConv,
+                    lastMessage: message,
+                    updatedAt: new Date().toISOString()
+                };
+
+                // Đặt conversation hiện tại lên đầu danh sách
+                return [updatedCurrentConv, ...otherConvs];
+            });
+
             setMessage('');
         }
     };
@@ -127,6 +188,20 @@ export const StaffChat = () => {
     };
 
     const handleJoinConversation = (conversationId) => {
+        // Cập nhật UI ngay lập tức
+        setConversations(prevConversations =>
+            prevConversations.map(conv => {
+                if (conv._id === conversationId) {
+                    return {
+                        ...conv,
+                        unread: false
+                    };
+                }
+                return conv;
+            })
+        );
+
+        // Gọi các hàm xử lý khác
         joinConversation(conversationId);
         clearNotifications(conversationId);
         setShowNotifications(false);
@@ -158,7 +233,7 @@ export const StaffChat = () => {
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-semibold flex items-center">
                             <MessageSquare className="mr-2" size={20} />
-                            Trò Chuyện
+                            Conversations
                         </h2>
                     </div>
                     <div className="mt-3 relative">
@@ -234,12 +309,34 @@ export const StaffChat = () => {
                                 filteredMessages.map((msg, index) => (
                                     <div
                                         key={msg._id || index}
-                                        className={`mb-3 flex ${msg.sender === user._id ? 'justify-end' : 'justify-start'}`}
+                                        className={`mb-3 flex items-start ${msg.sender === user._id ? 'justify-end' : 'justify-start'
+                                            }`}
                                     >
+                                        {/* Avatar and name for customer messages */}
+                                        {msg.sender !== user._id && (
+                                            <div className="flex flex-col items-center mr-2">
+                                                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+                                                    {userAvatars[msg.sender] ? (
+                                                        <img
+                                                            src={userAvatars[msg.sender]}
+                                                            alt="avatar"
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <User size={16} className="text-gray-500" />
+                                                    )}
+                                                </div>
+                                                <span className="text-xs text-gray-500 mt-1">
+                                                    {userNames[msg.sender]}
+                                                </span>
+                                            </div>
+                                        )}
+
                                         <div
                                             className={`max-w-xs px-4 py-2 rounded-lg ${msg.sender === user._id
                                                 ? 'bg-indigo-500 text-white rounded-br-none'
-                                                : 'bg-white text-gray-800 rounded-bl-none shadow-sm'}`}
+                                                : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
+                                                }`}
                                         >
                                             <p className="text-sm">{msg.content}</p>
                                             <p className="text-xs mt-1 opacity-70 text-right">
@@ -249,6 +346,31 @@ export const StaffChat = () => {
                                                 })}
                                             </p>
                                         </div>
+
+                                        {/* Avatar and name for staff messages */}
+                                        {msg.sender === user._id && (
+                                            <div className="flex flex-col items-center ml-2">
+                                                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-indigo-100">
+                                                    {user.avatar ? (
+                                                        <img
+                                                            src={user.avatar}
+                                                            alt="staff avatar"
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <User size={16} className="text-indigo-500" />
+                                                    )}
+                                                </div>
+                                                <span className="text-xs text-gray-500 mt-1">
+                                                    {user.role === 'staff'
+                                                        ? `Nhân viên - ${user.username}`
+                                                        : user.role === 'admin'
+                                                            ? `Admin - ${user.username}`
+                                                            : user.username || 'Staff'
+                                                    }
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 ))
                             )}

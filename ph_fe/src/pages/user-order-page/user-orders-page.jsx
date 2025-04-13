@@ -266,7 +266,7 @@ const UserOrdersPage = () => {
                 <nav className="text-lg px-4 mb-8">
                     <ul className="flex space-x-2">
                         <li>
-                            <a href="/" className="text-blue-500 hover:underline">Trang chủ</a>
+                            <a href="/" className="text-gray-500 hover:underline">Trang chủ</a>
                         </li>
                         <li>&gt;</li>
                         <li className="text-gray-500">Đơn hàng</li>

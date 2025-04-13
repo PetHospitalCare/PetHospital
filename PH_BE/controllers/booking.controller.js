@@ -104,7 +104,7 @@ const AssignDoctor = async (req, res) => {
                             <p><strong>Bác sĩ phụ trách:</strong> ${booking.doctor_id.username}</p>
                             <p><strong>Ngày khám:</strong> ${new Date(booking.date).toLocaleDateString('vi-VN')}</p>
                             <p><strong>Thời gian:</strong> ${booking?.hour}</p>
-                            <p><strong>Địa điểm:</strong> PetCare Hospital - Hòa Lạch, Hà Nội</p>
+                            <p><strong>Địa điểm:</strong> PetCare Hospital - Hòa Lạc, Hà Nội</p>
                         </div>
         
                         <p style="color: #555;">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.</p>
@@ -118,7 +118,7 @@ const AssignDoctor = async (req, res) => {
                         </div>
         
                         <p style="margin-top: 20px; text-align: center; font-size: 12px; color: #7f8c8d;">
-                            PetCare Clinic - Hotline: 0123-456-789
+                            Pet Hospital - Hotline: 0123-456-789
                         </p>
         
                         <!-- Footer -->

@@ -205,59 +205,67 @@ export default function Header() {
                             <XMarkIcon aria-hidden="true" className="size-6" />
                         </button>
                     </div>
+
                     <div className="mt-6 flow-root">
                         <div className="-my-6 divide-y divide-gray-500/10">
                             <div className="space-y-2 py-6">
-                                <Disclosure as="div" className="-mx-3">
-                                    <DisclosureButton className="group flex w-full items-center justify-between rounded-lg py-2 pl-3 pr-3.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">
-                                        Product
-                                        <ChevronDownIcon aria-hidden="true" className="size-5 flex-none group-data-[open]:rotate-180" />
-                                    </DisclosureButton>
-                                    <DisclosurePanel className="mt-2 space-y-2">
-                                        {[...products, ...callsToAction].map((item) => (
-                                            <DisclosureButton
-                                                key={item.name}
-                                                as="Link"
-                                                to={item.to}
-                                                className="block rounded-lg py-2 pl-6 pr-3 text-sm/7 font-semibold text-gray-900 hover:bg-gray-50"
-                                            >
-                                                {item.name}
-                                            </DisclosureButton>
-                                        ))}
-                                    </DisclosurePanel>
-                                </Disclosure>
                                 <Link
                                     to="/"
                                     className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
                                 >
-                                    About us
+                                    Trang chủ
                                 </Link>
-                                <Link
-                                    to="/"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+
+                                <button
+                                    onClick={() => {
+                                        scrollToSection('about-section');
+                                        setMobileMenuOpen(false);
+                                    }}
+                                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 w-full text-left"
                                 >
-                                    Our services
-                                </Link>
-                                <Link
-                                    to="/"
-                                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                    Giới thiệu
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        scrollToSection('services-section');
+                                        setMobileMenuOpen(false);
+                                    }}
+                                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 w-full text-left"
                                 >
-                                    Comunity
-                                </Link>
+                                    Dịch vụ
+                                </button>
+
                                 <Link
-                                    to="/"
+                                    to="/product"
                                     className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                    onClick={() => setMobileMenuOpen(false)}
                                 >
-                                    Contact
+                                    Cửa hàng
                                 </Link>
+
+                                <button
+                                    onClick={() => {
+                                        scrollToSection('contact-section');
+                                        setMobileMenuOpen(false);
+                                    }}
+                                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 w-full text-left"
+                                >
+                                    Liên hệ
+                                </button>
                             </div>
                             <div className="py-6">
-                                <Link
-                                    to="/Login"
-                                    className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
-                                >
-                                    Đăng nhập
-                                </Link>
+                                {user ? (
+                                    <DropdownMenuDemo user={user} />
+                                ) : (
+                                    <Link
+                                        to="/Login"
+                                        className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Đăng nhập
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </div>

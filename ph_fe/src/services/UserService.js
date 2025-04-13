@@ -49,6 +49,9 @@ const updateUserAccount = (data) => {
 const uploadAvatar = (data) => {
   return axios.post(`/account/upload-avatar`, data);
 }
+const getAccountbyId = (id) => {
+  return axios.get(`/account/get-account-by-id/${id}`);
+}
 export const UserService = {
   signInService,
   signUpService,
@@ -64,5 +67,6 @@ export const UserService = {
   getAllDoctor,
   getCurrentUser,
   updateUserAccount,
-  uploadAvatar
+  uploadAvatar,
+  getAccountbyId
 };

@@ -10,7 +10,7 @@ import { useState } from "react"
 import { jsPDF } from "jspdf"
 import { font } from "./font"
 import { format } from "date-fns"
-export function CheckupForm({ petInfo, formData, onChange, subService }) {
+export function CheckupForm({ petInfo, formData, onChange, subService, isReadOnly }) {
   const [pdfUrl, setPdfUrl] = useState(null);
 
   const loadImage = (url) => {
@@ -190,6 +190,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
           <div className="space-y-2">
             <Label htmlFor="temperature">Nhiệt độ (°C)</Label>
             <Input
+              disabled={isReadOnly}
               id="temperature"
               value={formData.temperature || ""}
               onChange={(e) => onChange("temperature", e.target.value)}
@@ -198,6 +199,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
           <div className="space-y-2">
             <Label htmlFor="heartRate">Nhịp tim (bpm)</Label>
             <Input
+              disabled={isReadOnly}
               id="heartRate"
               value={formData.heartRate || ""}
               onChange={(e) => onChange("heartRate", e.target.value)}
@@ -206,6 +208,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
           <div className="space-y-2">
             <Label htmlFor="respiratoryRate">Nhịp thở (bpm)</Label>
             <Input
+              disabled={isReadOnly}
               id="respiratoryRate"
               value={formData.respiratoryRate || ""}
               onChange={(e) => onChange("respiratoryRate", e.target.value)}
@@ -220,7 +223,8 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="hydration">Tình trạng nước</Label>
-              <Select value={formData.hydration || ""} onValueChange={(value) => onChange("hydration", value)}>
+              <Select disabled={isReadOnly}
+                value={formData.hydration || ""} onValueChange={(value) => onChange("hydration", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn" />
                 </SelectTrigger>
@@ -234,7 +238,8 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="bodyCondition">Thể trạng</Label>
-              <Select value={formData.bodyCondition || ""} onValueChange={(value) => onChange("bodyCondition", value)}>
+              <Select disabled={isReadOnly}
+                value={formData.bodyCondition || ""} onValueChange={(value) => onChange("bodyCondition", value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn" />
                 </SelectTrigger>
@@ -261,6 +266,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
               id="description"
               value={formData.description || ""}
               onChange={(e) => onChange("description", e.target.value)}
+              disabled={isReadOnly}
             />
           </div>
 
@@ -270,6 +276,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
               id="prediction"
               value={formData.prediction || ""}
               onChange={(e) => onChange("prediction", e.target.value)}
+              disabled={isReadOnly}
             />
           </div>
 
@@ -279,6 +286,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService }) {
               id="treatment"
               value={formData.treatment || ""}
               onChange={(e) => onChange("treatment", e.target.value)}
+              disabled={isReadOnly}
             />
           </div>
 

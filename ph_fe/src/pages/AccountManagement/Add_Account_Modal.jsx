@@ -75,10 +75,21 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
                 phone: formData.phone,
                 role: formData.roles
             });
+
             if (response.status === 201) {
                 toast.success("Tạo tài khoản thành công!");
-                onSuccess();
+                // Đóng modal trước khi fetch data mới
                 onOpenChange(false);
+                // Reset form
+                setFormData({
+                    username: "",
+                    password: "",
+                    email: "",
+                    phone: "",
+                    roles: []
+                });
+                // Gọi callback để refresh data
+                await onSuccess();
             } else {
                 toast.error(response.data.error);
             }

@@ -136,12 +136,13 @@ const changePassword = async (req, res) => {
 // Lấy tất cả tài khoản
 const getallAccount = async (req, res) => {
   try {
-    const accounts = await Account.find();
+    const accounts = await Account.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, accounts });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 // Tạo tài khoản mới
 const createNewAccount = async (req, res) => {
@@ -343,6 +344,20 @@ const uploadAvatar = async (req, res) => {
     res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
+const getAccountbyId = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const account = await Account.findById(id).select("-password");
+    return res.status(200).json({
+      success: true,
+      message: "Lấy thông tin tài khoản thành công",
+      account
+    });
+  } catch (error) {
+    console.error("Lỗi khi upload ảnh đại diện:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
 module.exports = {
   signup,
   signin,
@@ -356,5 +371,6 @@ module.exports = {
   getAllDoctor,
   getCurrentUser,
   updateUserAccount,
-  uploadAvatar
+  uploadAvatar,
+  getAccountbyId
 };

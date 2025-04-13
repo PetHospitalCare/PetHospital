@@ -24,6 +24,7 @@ import {
 import AddProfileDialog from "./Add_Account_Modal";
 import SheetDemo from "./Edit_Management";
 import { UserService } from "@/services/UserService";
+import { toast } from "sonner";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 export default function AccountManagement() {
@@ -39,11 +40,14 @@ export default function AccountManagement() {
     const [pageSize, setPageSize] = useState(5); // Mặc định hiển thị 5 sản phẩm mỗi trang
     const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
+    // Sửa lại hàm fetchData trong Account_Management.jsx
     const fetchData = async () => {
         try {
             const response = await UserService.getAllAccount();
             if (response.data.success) {
-                const sortedAccounts = response.data.accounts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                // Sắp xếp accounts theo createdAt mới nhất
+                const sortedAccounts = response.data.accounts
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 setData(sortedAccounts);
             }
         } catch (error) {
@@ -62,7 +66,7 @@ export default function AccountManagement() {
                 toast.success("Xóa tài khoản thành công!");
             } catch (error) {
                 console.error("Lỗi khi xóa tài khoản:", error);
-                alert("Đã xảy ra lỗi. Vui lòng thử lại.");
+                toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
             }
         }
     };

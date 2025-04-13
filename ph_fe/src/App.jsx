@@ -62,7 +62,6 @@ function App() {
           <Route path='/new-detail/:id' element={<NewDetail />} />
           <Route path="/loading" element={<LoadingScreen />} />
           <Route path='/signup-success' element={<SignupSuccess />} />
-          <Route path='/unauthorized' element={<Unauthorized />} />
           <Route path='/product' element={<ProductPage />} />
           <Route path='/profile' element={<UserProfile />} />
           <Route path='/history-booking' element={<HistoryBooking />} />
@@ -74,26 +73,41 @@ function App() {
           <Route path='/orders' element={<UserOrdersPage />} />
         </Route>
         {/* Trang dành cho admin */}
-        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-          <Route element={<AdminLayout />}> {/* Bọc toàn bộ route admin */}
-            <Route path='/Product_Management' element={<ProductManagerment />} />
-            <Route path='/Medicine_Management' element={<MedicineManagerment />} />
-            <Route path='/Service_Management/:id' element={<Service_Managerment />} />
-            <Route path='/Account_Management' element={<AccountManagement />} />
-            <Route path='/Schedule' element={<Calendar />} />
-            <Route path='/Booking_Management' element={<ManageBooking />} />
-            <Route path='/News_Management' element={<News_Management />} />
-            <Route path='/Dashboard' element={<Dashboard />} />
-            <Route path='/chat' element={<StaffChat />} />
-            <Route path='/MedicalRecord' element={<MedicalRecord />}></Route>
-            <Route path="/MedicalRecord/:id" element={< MedicalDetail />} />
-            <Route path='admin/profile' element={<UserProfile />} />
-            <Route path='/orders_management' element={<OrdersManagement/>} />
-          </Route>
-          <Route path='/*' element={<Notfound />} />
-        </Route>
-      </Routes>
+        <Route>
+          <Route element={<AdminLayout />}>
+            {/* Routes cho Admin - có quyền truy cập tất cả */}
+            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+              <Route path='/Account_Management' element={<AccountManagement />} />
+              <Route path='/Dashboard' element={<Dashboard />} />
+            </Route>
 
+            {/* Routes cho Staff */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'staff']} />}>
+              <Route path='/chat' element={<StaffChat />} />
+              <Route path='/Booking_Management' element={<ManageBooking />} />
+              <Route path='/orders_management' element={<OrdersManagement />} />
+              <Route path='/Service_Management/:id' element={<Service_Managerment />} />
+              <Route path='/News_Management' element={<News_Management />} />
+              <Route path='/Product_Management' element={<ProductManagerment />} />
+              <Route path='/Medicine_Management' element={<MedicineManagerment />} />
+            </Route>
+
+            {/* Routes cho Doctor */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'doctor']} />}>
+              <Route path='/Schedule' element={<Calendar />} />
+            </Route>
+
+            {/* Routes chung cho tất cả roles trong admin layout */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'staff', "doctor"]} />}>
+              <Route path='admin/profile' element={<UserProfile />} />
+              <Route path='/MedicalRecord' element={<MedicalRecord />} />
+              <Route path="/MedicalRecord/:id" element={<MedicalDetail />} />
+            </Route>
+          </Route>
+        </Route>
+        <Route path='/*' element={<Notfound />} />
+        <Route path='/unauthorized' element={<Unauthorized />} />
+      </Routes>
     </BrowserRouter>
   )
 }

@@ -206,8 +206,84 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            const formDataToSubmit = new FormData();
+            // Validate selected services
+            if (selectedSubServices.length === 0) {
+                toast.error("Vui lòng chọn ít nhất một dịch vụ!");
+                return;
+            }
 
+            // Validate required fields for each service
+            for (const subService of selectedSubServices) {
+                const serviceData = formData[subService?.id] || {};
+
+                switch (subService?.parentType) {
+                    case "vaccination":
+                        if (!serviceData.name || !serviceData.batchNumber) {
+                            toast.error(`${subService.name}: Vui lòng điền đầy đủ thông tin loại vaccin và số lô!`);
+                            return;
+                        }
+                        break;
+
+                    case "labTest":
+                        if (!serviceData.fileData && !serviceData.fileUrl) {
+                            toast.error(`${subService.name}: Vui lòng tải lên file kết quả xét nghiệm!`);
+                            return;
+                        }
+                        if (!serviceData.results) {
+                            toast.error(`${subService.name}: Vui lòng nhập kết luận xét nghiệm!`);
+                            return;
+                        }
+                        break;
+
+                    case "imaging":
+                        if (!serviceData.images || serviceData.images.length === 0) {
+                            toast.error(`${subService.name}: Vui lòng tải lên ít nhất một hình ảnh!`);
+                            return;
+                        }
+                        if (!serviceData.results) {
+                            toast.error(`${subService.name}: Vui lòng nhập kết luận!`);
+                            return;
+                        }
+                        break;
+
+                    case "checkup":
+                        if (!serviceData.temperature || !serviceData.heartRate ||
+                            !serviceData.respiratoryRate || !serviceData.hydration ||
+                            !serviceData.bodyCondition) {
+                            toast.error(`${subService.name}: Vui lòng điền đầy đủ thông số khám!`);
+                            return;
+                        }
+                        if (!serviceData.prediction || !serviceData.treatment) {
+                            toast.error(`${subService.name}: Vui lòng nhập chuẩn đoán và phương pháp điều trị!`);
+                            return;
+                        }
+                        break;
+
+                    case "surgery":
+                        if (!serviceData.procedureNotes || !serviceData.results || !serviceData.postOpCare) {
+                            toast.error(`${subService.name}: Vui lòng điền đầy đủ thông tin phẫu thuật!`);
+                            return;
+                        }
+                        break;
+                }
+            }
+
+            // Validate conclusion
+            if (!conclusion.generalConclusion) {
+                toast.error("Vui lòng nhập kết luận tổng thể!");
+                return;
+            }
+
+            // Validate prescription if exists
+            if (conclusion.prescription && conclusion.prescription.length > 0) {
+                for (const item of conclusion.prescription) {
+                    if (!item.medicine_id || !item.quantity || !item.instructions) {
+                        toast.error("Vui lòng điền đầy đủ thông tin trong đơn thuốc!");
+                        return;
+                    }
+                }
+            }
+            const formDataToSubmit = new FormData();
             const medicalRecordData = {
                 booking_id: appointment?.id,
                 services: selectedSubServices.map(subService => {

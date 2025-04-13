@@ -24,56 +24,20 @@ import { UserContext } from "../contexts/UserContext";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { UserService } from "@/services/UserService";
-
 const ProtectedRoute = ({ allowedRoles }) => {
     const { user, setUser } = useContext(UserContext);
     const [checkingAuth, setCheckingAuth] = useState(true);
     const location = useLocation();
-    const fetchUserData = async () => {
-        try {
-            const response = await UserService.getCurrentUser();
-            if (response.data.success) {
-                setUser({
-                    _id: response.data.account._id,
-                    role: response.data.account.role,
-                    email: response.data.account.email,
-                    username: response.data.account.username,
-                    phone: response.data.account.phone
-                });
-            }
-        } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
-            toast.error("Không thể tải thông tin người dùng");
-        }
-    };
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const jwtToken = Cookies.get("access_token");
-
                 if (!jwtToken) {
                     console.log("Không có token, chuyển hướng về login");
                     setUser(null);
                     setCheckingAuth(false);
                     return;
                 }
-
-                // Optional: Validate token first
-                // try {
-                //     const decodedToken = jwtDecode(jwtToken);
-                //     if (decodedToken.exp * 1000 < Date.now()) {
-                //         console.log("Token hết hạn");
-                //         setUser(null);
-                //         setCheckingAuth(false);
-                //         return;
-                //     }
-                // } catch (error) {
-                //     console.error("Token không hợp lệ:", error);
-                //     setUser(null);
-                //     setCheckingAuth(false);
-                //     return;
-                // }
-
                 const response = await UserService.getCurrentUser();
                 if (response.data.success) {
                     setUser({
@@ -81,7 +45,8 @@ const ProtectedRoute = ({ allowedRoles }) => {
                         role: response.data.account.role,
                         email: response.data.account.email,
                         username: response.data.account.username,
-                        phone: response.data.account.phone
+                        phone: response.data.account.phone,
+                        url: response.data?.account?.url,
                     });
                 } else {
                     // Handle unsuccessful but non-error responses
@@ -97,7 +62,6 @@ const ProtectedRoute = ({ allowedRoles }) => {
                 setCheckingAuth(false);
             }
         };
-
         fetchUserData();
     }, [location.pathname, setUser]);
 
@@ -108,14 +72,16 @@ const ProtectedRoute = ({ allowedRoles }) => {
         </div>
     </div>;
 
+    // Kiểm tra user và roles
     if (!user || !user._id) {
-        return <Navigate to="/Login" />;
+        return <Navigate to="/Login" state={{ from: location }} replace />;
     }
 
-    if (!allowedRoles.some(role => user.role?.includes(role))) {
-        return <Navigate to="/unauthorized" />;
+    // Kiểm tra quyền truy cập
+    const hasRequiredRole = allowedRoles.some(role => user.role?.includes(role));
+    if (!hasRequiredRole) {
+        return <Navigate to="/unauthorized" state={{ from: location }} replace />;
     }
-
     return <Outlet />;
 };
 
