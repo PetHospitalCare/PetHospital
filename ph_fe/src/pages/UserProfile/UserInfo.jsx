@@ -133,6 +133,17 @@ export default function UserInfo({ ...props }) {
 
         setIsLoading(true);
         try {
+            const responses = await UserService.getAllAccount();
+            const accounts = responses.data.accounts;
+
+            // validate email or phone exist
+            const isPhoneExist = accounts.some((acc) => acc.phone === formData.phone && acc._id !== user._id);
+
+            if (isPhoneExist) {
+                setErrors({ phone: "Số điện thoại đã được đăng ký." });
+                setIsLoading(false);
+                return;
+            }
             const updatedUser = {
                 username: formData.username,
                 phone: formData.phone,
