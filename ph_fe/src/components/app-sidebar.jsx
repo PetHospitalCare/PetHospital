@@ -120,13 +120,6 @@ export function AppSidebar({
     }
 
     // Staff specific projects
-    if (hasRole(roles, ['staff'])) {
-      projects.push({
-        name: "Quản lí lịch hẹn",
-        url: "/Booking_Management",
-        icon: PieChart,
-      });
-    }
 
     // Doctor specific projects
     if (hasRole(roles, ['doctor'])) {
@@ -143,7 +136,12 @@ export function AppSidebar({
         name: "Trò chuyện",
         url: "/chat",
         icon: MessageSquare,
-      });
+      },
+        {
+          name: "Quản lí lịch hẹn",
+          url: "/Booking_Management",
+          icon: PieChart,
+        });
     }
     projects.push(
       {

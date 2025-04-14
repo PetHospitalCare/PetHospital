@@ -45,10 +45,7 @@ export default function AccountManagement() {
         try {
             const response = await UserService.getAllAccount();
             if (response.data.success) {
-                // Sắp xếp accounts theo createdAt mới nhất
-                const sortedAccounts = response.data.accounts
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                setData(sortedAccounts);
+                setData(response.data.accounts);
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
