@@ -61,6 +61,11 @@ export default function ShoppingCartDetail() {
     }
 
     const goToPayment = () => {
+        if (!user || !user._id) {
+            toast.warning('Vui lòng đăng nhập để mua hàng!');
+            return;
+        }
+
         if (cart && cart?.items?.length > 0) {
             navigate("/shopping-cart-payment");
         } else {
