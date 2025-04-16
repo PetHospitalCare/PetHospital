@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
     Table,
     TableBody,
@@ -10,9 +12,17 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Pen, Trash2, CalendarCheck, FileText, Wallet } from "lucide-react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, CalendarIcon, Calendar } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
     flexRender,
     getCoreRowModel,
@@ -61,35 +71,64 @@ export default function BookingStatus({ status, setCount }) {
         complete: { label: "Đã khám", color: "bg-green-500 text-white" },
         cancel: { label: "Đã hủy", color: "bg-red-500 text-white" },
     };
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDoctor, setSelectedDoctor] = useState("all");
+    const [allData, setAllData] = useState([]);
     const handlePaymentClick = (booking) => {
         setSelectedPaymentBooking(booking);
         setIsPaymentDialogOpen(true);
     };
     const fetchBookings = async () => {
         try {
+            setIsLoading(true);
             if (status === "complete") {
                 const response = await MeidicalServices.getAllMedicalRecords();
                 const complete = response?.data?.data?.filter(record => record.booking_id?.status === status);
-                const bookings = complete.map(record => record.booking_id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                setMedicalRecord(complete);
+                const bookings = complete.map(record => record.booking_id)
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setAllData(bookings);
                 setData(bookings);
+                setMedicalRecord(complete);
             } else {
                 const response = await BookingServices.getAllBookingByStatus(status);
                 const sortedData = response?.data?.sort((a, b) => {
                     return new Date(b.createdAt) - new Date(a.createdAt);
                 });
+                setAllData(sortedData);
                 setData(sortedData);
                 if (status === "pending") {
                     setCount(response?.data.length);
                 }
             }
-
-
-
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu booking:", error);
+            toast.error("Không thể tải dữ liệu lịch hẹn");
+        } finally {
+            setIsLoading(false);
         }
     };
+    const filterData = () => {
+        let filteredData = [...allData];
+
+        if (selectedDoctor && selectedDoctor !== "all") {
+            filteredData = filteredData.filter(booking =>
+                booking.doctor_id?._id === selectedDoctor
+            );
+        }
+
+        if (selectedDate) {
+            const dateString = format(selectedDate, 'yyyy-MM-dd');
+            filteredData = filteredData.filter(booking =>
+                booking.date.startsWith(dateString)
+            );
+        }
+
+        setData(filteredData);
+    };
+    useEffect(() => {
+        filterData();
+    }, [selectedDoctor, selectedDate, allData]);
+
     const getAllService = async () => {
         try {
             const res = await Services.getAllService();
@@ -436,21 +475,85 @@ export default function BookingStatus({ status, setCount }) {
             </EditBookingDialog>
             <AssignDoctor open={openAssignDoctor} onOpenChange={setOpenAssignDoctor} booking={selectedBooking} onUpdate={fetchBookings} />
             <div className="flex items-center py-4">
-                <Input
-                    placeholder="Tìm kiếm khách hàng..."
-                    value={(table.getColumn("guest_name")?.getFilterValue()) ?? ""}
-                    onChange={(e) => table.getColumn("guest_name")?.setFilterValue(e.target.value)}
-                    className="max-w-sm"
-                />
-                {status === "pending" && (
-                    <>
-                        <div className="text-center ml-auto">
-                            <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white" >
-                                Thêm lịch mới
+                <div className="flex flex-1 gap-2 items-center">
+                    <Input
+                        placeholder="Tìm kiếm khách hàng..."
+                        value={(table.getColumn("guest_name")?.getFilterValue()) ?? ""}
+                        onChange={(e) => table.getColumn("guest_name")?.setFilterValue(e.target.value)}
+                        className="max-w-sm"
+                    />
+
+                    {/* Date filter */}
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className="w-full justify-start text-left font-normal"
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {selectedDate ? (
+                                    format(selectedDate, "dd/MM/yyyy")
+                                ) : (
+                                    <span>Lọc theo ngày</span>
+                                )}
                             </Button>
-                            <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
-                        </div>
-                    </>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={setSelectedDate}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+
+                    {/* Doctor filter */}
+                    <Select
+                        value={selectedDoctor}
+                        onValueChange={(value) => {
+                            setSelectedDoctor(value);
+                            setCurrentPageIndex(0);
+                        }}
+                    >
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Lọc theo bác sĩ" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả bác sĩ</SelectItem>
+                            {doctor.map((doc) => (
+                                <SelectItem key={doc._id} value={doc._id}>
+                                    {doc.username}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* Reset filters button */}
+                    {(selectedDate || selectedDoctor !== "all") && (
+                        <Button
+                            variant="ghost"
+                            onClick={() => {
+                                setSelectedDate(null);
+                                setSelectedDoctor("all");
+                                setCurrentPageIndex(0);
+                                setData(allData);
+                            }}
+                            className="h-8 px-2"
+                        >
+                            Xóa bộ lọc
+                        </Button>
+                    )}
+                </div>
+
+                {/* Keep existing "Thêm lịch mới" button */}
+                {status === "pending" && (
+                    <div className="text-center ml-auto">
+                        <Button onClick={() => setOpen(true)} className="p-2 font-semibold text-white">
+                            Thêm lịch mới
+                        </Button>
+                        <BookingDialog open={open} onClose={() => setOpen(false)} onUpdate={fetchBookings} />
+                    </div>
                 )}
             </div>
 

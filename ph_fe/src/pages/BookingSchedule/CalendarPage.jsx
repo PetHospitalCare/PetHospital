@@ -39,12 +39,22 @@ export default function Calendar() {
     const fetchBookings = async () => {
         try {
             setLoading(true);
-            const response = await BookingServices.GetAllBooking();
-            const bookings = response.data.filter(booking => booking.status !== "pending");
 
-            const formattedAppointments = bookings.map(booking => {
+            const response = await BookingServices.GetAllBooking();
+
+            const formattedAppointments = response.data.map(booking => {
                 const subService = getSubService(booking.service_id, booking.sub_service_id);
-                const color = booking.payment.status == true ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                let color;
+                let status;
+
+                if (booking.status === 'cancel') {
+                    color = "bg-red-100 text-red-700";
+                    status = 'cancel';
+                } else {
+                    color = booking.payment.status ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700";
+                    status = booking.payment.status;
+                }
+
                 return {
                     id: booking._id,
                     owner: booking?.guest_name || "Không có tên",
@@ -54,7 +64,7 @@ export default function Calendar() {
                     duration: subService?.duration || 30,
                     color: color,
                     date: new Date(booking.date),
-                    status: booking.payment.status
+                    status: status
                 };
             });
             setAppointments(formattedAppointments);
@@ -118,6 +128,7 @@ export default function Calendar() {
             event.getFullYear() === today.getFullYear()
         );
     };
+    console.log(appointments);
     return (
         <div className="container mx-auto p-4">
             {loading ? (
@@ -151,6 +162,10 @@ export default function Calendar() {
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 bg-yellow-100 rounded"></div>
                                 <span className="text-sm text-gray-600">Chờ khám</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 bg-red-100 rounded"></div>
+                                <span className="text-sm text-gray-600">Đã hủy</span>
                             </div>
                         </div>
                     </div>
@@ -242,15 +257,16 @@ export default function Calendar() {
                                                             <div className="text-xs mt-1 italic border-t pt-1 truncate">
                                                                 <span className="font-medium">BS:</span> {event.doctor}
                                                             </div>
-                                                            {event.status ? (
-
+                                                            {event.status === 'cancel' ? (
+                                                                <div className="flex items-center gap-1 text-xs text-red-700 mt-2 font-medium bg-red-50 p-1.5 rounded-md">
+                                                                    <AlertCircle className="w-4 h-4" />
+                                                                    <span>Đã hủy</span>
+                                                                </div>
+                                                            ) : event.status ? (
                                                                 <div className="flex items-center gap-1 text-xs text-green-700 mt-2 font-medium bg-green-50 p-1.5 rounded-md">
                                                                     <CheckCircle2 className="w-4 h-4" />
                                                                     <span>Đã khám xong</span>
                                                                 </div>
-
-
-
                                                             ) : (
                                                                 isEventToday(event.date) ? (
                                                                     <Button
@@ -273,14 +289,10 @@ export default function Calendar() {
                                                                         {loading ? "Đang tải..." : "Khám bệnh"}
                                                                     </Button>
                                                                 ) : (
-
                                                                     <div className="flex items-center gap-1 text-xs text-yellow-700 mt-2 font-medium bg-yellow-50 p-1.5 rounded-md">
                                                                         <Clock className="w-4 h-4" />
                                                                         <span>Chờ khám</span>
                                                                     </div>
-
-
-
                                                                 )
                                                             )}
                                                             {/* <Button

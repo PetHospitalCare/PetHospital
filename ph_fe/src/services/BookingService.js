@@ -30,8 +30,11 @@ const CreatePaymentBooking = (id) => {
 const UpdatePayByCash = (id) => {
     return axios.get(`/booking/pay-by-cash/${id}`);
 }
+const GetAllBookingView = (id) => {
+    return axios.get(`/booking/get-all-view`);
+}
 export const BookingServices = {
 
     CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, GetBookingbyId, GetHistoryBooking, CancelBooking,
-    getAllBookingByStatus, CreatePaymentBooking, UpdatePayByCash
+    getAllBookingByStatus, CreatePaymentBooking, UpdatePayByCash, GetAllBookingView
 };

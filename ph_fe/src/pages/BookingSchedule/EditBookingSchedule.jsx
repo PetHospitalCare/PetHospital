@@ -33,7 +33,7 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
     // Fetch services and pets
     const fetchService = async () => {
         try {
-            const response = await Services.getAllService("http://localhost:9999/service/get-all");
+            const response = await Services.getAllService();
             if (response.data.success) {
                 setService(response.data.services);
             }

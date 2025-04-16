@@ -8,7 +8,7 @@ const db = require("./models");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const http = require("http");
-
+const { initScheduledTasks } = require("./utils/scheduledTask");
 
 
 
@@ -63,8 +63,12 @@ exports.io = io;
 require("./sockets")(io);
 
 // Kết nối database
-db.connect();
-
+db.connect().then(() => {
+    // Khởi động scheduled tasks sau khi kết nối DB thành công
+    initScheduledTasks();
+}).catch(err => {
+    console.error("❌ Lỗi kết nối database:", err);
+});
 // Lắng nghe trên cổng Render cung cấp
 const port = process.env.PORT || 9999;
 server.listen(port, () => {

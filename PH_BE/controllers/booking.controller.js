@@ -71,7 +71,22 @@ const CreateNewBooking = async (req, res) => {
 
 const GetAllBooking = async (req, res) => {
     try {
-        const bookings = await Booking.find().populate("doctor_id").populate("pet_id")
+        const userId = req.userId;
+        const bookings = await Booking.find({ status: { $ne: "pending" }, doctor_id: userId }).populate("doctor_id").populate("pet_id")
+        return res.status(200).json(bookings);
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+    }
+}
+const GetAllBookingByStaffandAdmin = async (req, res) => {
+    try {
+        const bookings = await Booking.find({
+            status: { $ne: "pending" },
+            doctor_id: { $ne: null, $exists: true }
+        })
+            .populate("doctor_id")
+            .populate("pet_id")
+            .sort({ createdAt: -1 });
         return res.status(200).json(bookings);
     } catch (error) {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
@@ -307,6 +322,7 @@ const UpdateBookingPaymentCash = async (req, res) => {
 }
 module.exports = {
     CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, getBookingByUser, getBookingbyId, CancelBookingById,
-    GetAllBookingByStatus, CreatePaymentBooking, receivehook, UpdateBookingPaymentCash
+    GetAllBookingByStatus, CreatePaymentBooking, receivehook, UpdateBookingPaymentCash,
+    GetAllBookingByStaffandAdmin
 };
 
