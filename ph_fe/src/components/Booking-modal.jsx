@@ -41,7 +41,7 @@ export default function BookingDialog({ open, onClose }) {
     const minDate = today.toISOString().split('T')[0]
     const fetchService = async () => {
         try {
-            const response = await Services.getAllService("http://localhost:9999/service/get-all");
+            const response = await Services.getAllService();
             if (response.data.success) {
                 setService(response.data.services);
             }

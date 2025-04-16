@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
+import { Services } from "@/services/Services";
 
 export default function EditModal({ open, onClose, ServiceData, onUpdateService }) {
     const { id } = useParams();
@@ -55,10 +56,11 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
             if (!ServiceData?._id) {
                 throw new Error("Missing service or sub-service ID");
             }
-            const response = await axios.put(
-                `http://localhost:9999/service/${id}/sub-service/${ServiceData._id}`,
-                updateData
-            );
+            const response = await Services.EditSubService(id, ServiceData._id, updateData);
+            // const response = await axios.put(
+            //     `http://localhost:9999/service/${id}/sub-service/${ServiceData._id}`,
+            //     updateData
+            // );
 
             if (response.data.success) {
                 alert("Cập nhật dịch vụ con thành công!");
@@ -101,7 +103,7 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
                                 <Input
                                     type="number"
                                     placeholder="Giá cho chó"
-                                    value={price.dog}
+                                    value={price?.dog.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "dog")}
                                     className="pl-9 pr-16"
                                     min="0"
@@ -119,7 +121,7 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
                                 <Input
                                     type="number"
                                     placeholder="Giá cho mèo"
-                                    value={price.cat.toLocaleString("vi-VN")}
+                                    value={price?.cat.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "cat")}
                                     className="pl-9 pr-16"
                                     min="0"

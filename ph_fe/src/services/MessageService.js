@@ -9,11 +9,14 @@ const getNotification = () => {
 const MarkNotificationAsRead = () => {
     return axios.put("/notification/mark-as-read");
 }
-
+const getMessagesByConversationId = (conversationId) => {
+    return axios.get(`/message/${conversationId}`);
+}
 
 export const MessageService = {
     fetchConversations,
     getConversationById,
     getNotification,
-    MarkNotificationAsRead
+    MarkNotificationAsRead,
+    getMessagesByConversationId
 };

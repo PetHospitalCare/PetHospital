@@ -158,7 +158,7 @@ export function AppSidebar({
     const fetchData = async () => {
       if (hasRole(user?.role, ['admin', 'staff'])) {
         try {
-          const response = await Services.getAllService("http://localhost:9999/service/get-all");
+          const response = await Services.getAllService();
           if (response.data.success) {
             setService(response.data.services);
           }
