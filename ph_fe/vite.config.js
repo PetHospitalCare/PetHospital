@@ -12,8 +12,9 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../ph_fe/dist', // Đảm bảo đúng đường dẫn
-    emptyOutDir: true,
-  },
+    outDir: '../PH_BE/public',
+    emptyOutDir: false
+  }
+  ,
   base: '/',
 });
