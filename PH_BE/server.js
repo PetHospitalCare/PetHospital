@@ -61,7 +61,7 @@ app.use("/notification", NotificationRoute)
 
 exports.io = io;
 require("./sockets")(io);
-const distPath = path.join(__dirname, "../../ph_fe/dist"); // Điều chỉnh path cho Render
+const distPath = path.join(__dirname, "../ph_fe/dist"); // Điều chỉnh path cho Render
 if (fs.existsSync(distPath)) {
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
