@@ -4,11 +4,12 @@
   "scripts": {
     "install-be": "cd PH_BE && npm install",
     "install-fe": "cd ph_fe && npm install",
-    "build-fe": "cd ph_fe && npm run build",
+    "build-fe": "cd ph_fe && npm run build && cp -a ph_fe/dist PH_BE/public",
     "start": "cd PH_BE && node server.js",
     "dev": "concurrently \"cd PH_BE && npm run dev\" \"cd ph_fe && npm run dev\"",
     "install": "npm run install-be && npm run install-fe",
-    "build": "npm run build-fe"
+    "build": "npm run install-fe && npm run build-fe",
+    "render-build": "npm run install && npm run build && cd PH_BE && npm install"
   },
   "engines": {
     "node": ">=16.0.0"

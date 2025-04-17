@@ -61,24 +61,10 @@ app.use("/notification", NotificationRoute)
 
 exports.io = io;
 require("./sockets")(io);
-const distPath = path.join(__dirname, "../ph_fe/dist"); // Điều chỉnh path cho Render
-if (fs.existsSync(distPath)) {
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-        const indexPath = path.join(distPath, "index.html");
-        if (fs.existsSync(indexPath)) {
-            res.sendFile(indexPath);
-        } else {
-            res.status(404).send("Frontend not built yet");
-        }
-    });
-} else {
-    console.log("Warning: Frontend dist directory not found");
-}
-console.log("Current directory:", __dirname);
-console.log("Looking for dist at:", distPath);
-console.log("Directory exists:", fs.existsSync(distPath));
-// Kiểm tra cấu trúc thư mục
+const publicPath = path.join(__dirname, 'public');
+app.get('*', (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+});
 
 // Kết nối database
 db.connect().then(() => {
