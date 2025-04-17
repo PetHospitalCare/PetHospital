@@ -61,20 +61,62 @@ app.use("/notification", NotificationRoute)
 
 exports.io = io;
 require("./sockets")(io);
-const distPath = path.join(__dirname, "../ph_fe/dist");
-if (fs.existsSync(distPath)) {
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-        const indexPath = path.join(distPath, "index.html");
-        if (fs.existsSync(indexPath)) {
-            res.sendFile(indexPath);
-        } else {
-            res.status(404).send("Frontend not built yet");
-        }
-    });
-} else {
-    console.log("Warning: Frontend dist directory not found");
+// const distPath = path.join(__dirname, "../ph_fe/dist");
+// if (fs.existsSync(distPath)) {
+//     app.use(express.static(distPath));
+//     app.get("*", (req, res) => {
+//         const indexPath = path.join(distPath, "index.html");
+//         if (fs.existsSync(indexPath)) {
+//             res.sendFile(indexPath);
+//         } else {
+//             res.status(404).send("Frontend not built yet");
+//         }
+//     });
+// } else {
+//     console.log("Warning: Frontend dist directory not found");
+// }
+// Kiểm tra cấu trúc thư mục
+console.log('===== PROJECT STRUCTURE =====');
+console.log('Current directory:', __dirname);
+console.log('Parent directory:', path.resolve(__dirname, '..'));
+
+// Kiểm tra thư mục frontend
+const frontendPath = path.resolve(__dirname, '../ph_fe');
+console.log('\nFrontend directory exists:', fs.existsSync(frontendPath));
+if (fs.existsSync(frontendPath)) {
+    console.log('Frontend directory contents:', fs.readdirSync(frontendPath));
 }
+
+// Kiểm tra thư mục dist
+const distPath = path.resolve(__dirname, '../ph_fe/dist');
+console.log('\nDist directory exists:', fs.existsSync(distPath));
+if (fs.existsSync(distPath)) {
+    console.log('Dist directory contents:', fs.readdirSync(distPath));
+
+    // Kiểm tra file index.html
+    const indexPath = path.join(distPath, 'index.html');
+    console.log('\nindex.html exists:', fs.existsSync(indexPath));
+}
+
+// Kiểm tra đường dẫn tuyệt đối trên Render
+const renderProjectPath = '/opt/render/project/src';
+if (fs.existsSync(renderProjectPath)) {
+    console.log('\nRender project directory exists and contains:', fs.readdirSync(renderProjectPath));
+
+    const renderFrontendPath = path.join(renderProjectPath, 'ph_fe');
+    if (fs.existsSync(renderFrontendPath)) {
+        console.log('\nRender frontend directory exists and contains:', fs.readdirSync(renderFrontendPath));
+
+        const renderDistPath = path.join(renderFrontendPath, 'dist');
+        if (fs.existsSync(renderDistPath)) {
+            console.log('\nRender dist directory exists and contains:', fs.readdirSync(renderDistPath));
+        } else {
+            console.log('\nRender dist directory does not exist at:', renderDistPath);
+        }
+    }
+}
+
+console.log('===== END PROJECT STRUCTURE =====');
 // Kết nối database
 db.connect().then(() => {
     // Khởi động scheduled tasks sau khi kết nối DB thành công

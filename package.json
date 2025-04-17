@@ -4,7 +4,7 @@
   "scripts": {
     "install-be": "cd PH_BE && npm install",
     "install-fe": "cd ph_fe && npm install",
-    "build-fe": "cd ph_fe && npm run build && echo '===== BUILD INFO =====' && echo 'Dist directory path:' && cd dist && pwd && echo 'Dist directory contents:' && ls -la",
+    "build-fe": "cd ph_fe && npm run build",
     "start": "cd PH_BE && node server.js",
     "dev": "concurrently \"cd PH_BE && npm run dev\" \"cd ph_fe && npm run dev\"",
     "install": "npm run install-be && npm run install-fe",
