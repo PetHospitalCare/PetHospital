@@ -18,6 +18,10 @@ import { toast } from "sonner";
 
 export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
     const petTypes = ["Dog", "Cat"];
+    // Gợi ý cho các ô input
+    const typeExamples = "Kháng sinh, Thuốc giảm đau, Thuốc trị nấm, Thuốc trị ký sinh trùng, Vitamin";
+    const unitExamples = "Viên, Ống, Gói, Lọ, Chai";
+
     const [formData, setFormData] = useState({
         name: "",
         images: [],
@@ -88,12 +92,36 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         let newErrors = {};
         const today = new Date().toISOString().split("T")[0]; // Lấy ngày hôm nay (YYYY-MM-DD)
 
+        // Regex patterns
+        const lettersAndSpacesOnly = /^[A-Za-zÀ-ỹ\s]+$/; // Chỉ chấp nhận chữ cái và khoảng trắng (bao gồm tiếng Việt)
+
         if (!formData.name) newErrors.name = "Vui lòng nhập tên thuốc";
         if (!formData.description) newErrors.description = "Vui lòng nhập mô tả";
         if (!formData.dosage) newErrors.dosage = "Vui lòng nhập liều lượng";
-        if (!formData.unit) newErrors.unit = "Vui lòng nhập đơn vị";
-        if (!formData.price) newErrors.price = "Vui lòng nhập giá thuốc";
-        if (!formData.quantity) newErrors.quantity = "Vui lòng nhập số lượng";
+
+        if (!formData.unit) {
+            newErrors.unit = "Vui lòng nhập đơn vị";
+        } else if (!lettersAndSpacesOnly.test(formData.unit)) {
+            newErrors.unit = "Đơn vị không được chứa số hoặc ký tự đặc biệt";
+        }
+
+        if (!formData.manufacturer) {
+            newErrors.manufacturer = "Vui lòng nhập nhà sản xuất";
+        } else if (!lettersAndSpacesOnly.test(formData.manufacturer)) {
+            newErrors.manufacturer = "Nhà sản xuất không được chứa số hoặc ký tự đặc biệt";
+        }
+
+        if (!formData.type) newErrors.type = "Vui lòng nhập loại thuốc";
+        if (!formData.price && formData.price !== 0) {
+            newErrors.price = "Vui lòng nhập giá thuốc";
+        } else if (formData.price <= 0) {
+            newErrors.price = "Giá thuốc phải lớn hơn 0";
+        }
+        if (!formData.quantity){
+            newErrors.quantity = "Vui lòng nhập số lượng";
+        } else if (formData.quantity <= 0) {
+            newErrors.quantity = "Số lượng thuốc phải lớn hơn 0";
+        }
         if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
         if (!formData.expiry_date) {
             newErrors.expiry_date = "Vui lòng nhập ngày hết hạn";
@@ -160,28 +188,85 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                 <div className="grid grid-cols-2 gap-4 py-4">
                     <div>
                         <Label htmlFor="name">Tên thuốc</Label>
-                        <Input id="name" name="name" value={formData.name} onChange={handleInputChange} />
+                        <Input
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            placeholder="Nhập tên thuốc"
+                        />
                         {errors.name && <p className="text-red-500">{errors.name}</p>}
                         <Label htmlFor="description">Mô tả</Label>
-                        <Input id="description" name="description" value={formData.description} onChange={handleInputChange} />
+                        <Input
+                            id="description"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            placeholder="Nhập mô tả thuốc"
+                            title="Mô tả thuốc"
+                        />
                         {errors.description && <p className="text-red-500">{errors.description}</p>}
                         <Label htmlFor="type">Loại</Label>
-                        <Input id="type" name="type" value={formData.type} onChange={handleInputChange} />
+                        <Input
+                            id="type"
+                            name="type"
+                            value={formData.type}
+                            onChange={handleInputChange}
+                            title={typeExamples}
+                            placeholder="Ví dụ: Kháng sinh, Thuốc giảm đau..."
+                        />
+                        {errors.type && <p className="text-red-500">{errors.type}</p>}
                         <Label htmlFor="dosage">Liều lượng</Label>
-                        <Input id="dosage" name="dosage" value={formData.dosage} onChange={handleInputChange} />
+                        <Input
+                            id="dosage"
+                            name="dosage"
+                            value={formData.dosage}
+                            onChange={handleInputChange}
+                            placeholder="Nhập liều lượng thuốc"
+                        />
                         {errors.dosage && <p className="text-red-500">{errors.dosage}</p>}
                         <Label htmlFor="manufacturer">Nhà sản xuất</Label>
-                        <Input id="manufacturer" name="manufacturer" value={formData.manufacturer} onChange={handleInputChange} />
+                        <Input
+                            id="manufacturer"
+                            name="manufacturer"
+                            value={formData.manufacturer}
+                            onChange={handleInputChange}
+                            title="Chỉ nhập chữ cái và khoảng trắng"
+                        />
+                        {errors.manufacturer && <p className="text-red-500">{errors.manufacturer}</p>}
                     </div>
                     <div>
                         <Label htmlFor="unit">Đơn vị</Label>
-                        <Input id="unit" name="unit" value={formData.unit} onChange={handleInputChange} />
+                        <Input
+                            id="unit"
+                            name="unit"
+                            value={formData.unit}
+                            onChange={handleInputChange}
+                            title={unitExamples}
+                            placeholder="Ví dụ: Viên, Ống, Gói, Lọ..."
+                        />
                         {errors.unit && <p className="text-red-500">{errors.unit}</p>}
                         <Label htmlFor="price">Giá</Label>
-                        <Input id="price" name="price" type="number" value={formData.price} onChange={handleInputChange} />
+                        <Input
+                            id="price"
+                            name="price"
+                            type="number"
+                            value={formData.price}
+                            onChange={handleInputChange}
+                            placeholder="Nhập giá thuốc"
+                            title="Giá thuốc không được âm"
+                        />
                         {errors.price && <p className="text-red-500">{errors.price}</p>}
                         <Label htmlFor="quantity">Số lượng</Label>
-                        <Input id="quantity" name="quantity" type="number" value={formData.quantity} onChange={handleInputChange} />
+                        <Input
+                            id="quantity"
+                            name="quantity"
+                            type="number"
+                            value={formData.quantity}
+                            onChange={handleInputChange}
+                            placeholder="Nhập số lượng thuốc"
+                            title="Số lượng thuốc không được âm"
+                        />
                         {errors.quantity && <p className="text-red-500">{errors.quantity}</p>}
                         <Label htmlFor="expiry_date">Ngày hết hạn</Label>
                         <Input id="expiry_date" name="expiry_date" type="date" value={formData.expiry_date} onChange={handleInputChange} />
