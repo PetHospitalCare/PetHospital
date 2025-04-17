@@ -50,8 +50,8 @@ const signin = async (req, res) => {
 
     res.cookie("access_token", token, {
       path: "/",
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      secure: true,
       sameSite: "Lax",
       maxAge: 86400000 //1 ngày 
       // maxAge: 60000 // 1 phút
