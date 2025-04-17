@@ -13,8 +13,8 @@ export default defineConfig({
   },
   build: {
     outDir: '../PH_BE/public',
-    emptyOutDir: false
-  }
-  ,
+    emptyOutDir: true,
+    manifest: true
+  },
   base: '/',
 });
