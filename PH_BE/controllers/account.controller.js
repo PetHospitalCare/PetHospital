@@ -50,7 +50,7 @@ const signin = async (req, res) => {
 
     res.cookie("access_token", token, {
       domain: ".onrender.com", // Chú ý dấu chấm đầu tiên
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       sameSite: "None",
       maxAge: 86400000 //1 ngày 
