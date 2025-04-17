@@ -62,9 +62,9 @@ app.use("/notification", NotificationRoute)
 
 exports.io = io;
 require("./sockets")(io);
-app.use(express.static(path.join(__dirname, `/ph_fe/dist`)));
+app.use(express.static(path.join(__dirname, `../ph_fe/dist`)));
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, `/ph_fe/dist/index.html`));
+    res.sendFile(path.join(__dirname, `../ph_fe/dist/index.html`));
 });
 // Kết nối database
 db.connect().then(() => {
