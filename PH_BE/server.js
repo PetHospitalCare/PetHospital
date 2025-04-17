@@ -10,7 +10,7 @@ const { Server } = require("socket.io");
 const http = require("http");
 const { initScheduledTasks } = require("./utils/scheduledTask");
 const path = require("path");
-
+const fs = require('fs');
 
 const { ProductRouter, CategoryRouter, ServiceRouter, AccountRouter, PetRecordRouter, BookingRouter, MedicineRouter, PetRouter, ShoppingCartRouter, MedicalRoute, NewRouter, PaymentRouter
     , DashboardRouter, MessageRoute, NotificationRoute
@@ -40,11 +40,6 @@ app.use(cookieParser());
 app.use(bodyParser.json({ limit: "64mb" }));
 app.use(bodyParser.urlencoded({ limit: "64mb", extended: true }));
 // Define route dưới đây //
-app.use(express.static(path.join(__dirname, "../ph_fe/dist")));
-
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../ph_fe/dist/index.html"));
-});
 app.get("/test", async (req, res) => {
     return res.json({ message: "hello world" });
 })
@@ -66,7 +61,20 @@ app.use("/notification", NotificationRoute)
 
 exports.io = io;
 require("./sockets")(io);
-
+const distPath = path.join(__dirname, "../ph_fe/dist");
+if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+        const indexPath = path.join(distPath, "index.html");
+        if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+        } else {
+            res.status(404).send("Frontend not built yet");
+        }
+    });
+} else {
+    console.log("Warning: Frontend dist directory not found");
+}
 // Kết nối database
 db.connect().then(() => {
     // Khởi động scheduled tasks sau khi kết nối DB thành công
