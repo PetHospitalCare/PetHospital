@@ -2,8 +2,13 @@
   "name": "my-fullstack-app",
   "version": "1.0.0",
   "scripts": {
-    "postinstall": "cd ph_fe && npm install && npm run build",
-    "start": "cd PH_BE && node server.js"
+    "install-be": "cd PH_BE && npm install",
+    "install-fe": "cd ph_fe && npm install",
+    "build-fe": "cd ph_fe && npm run build",
+    "start": "cd PH_BE && node server.js",
+    "dev": "concurrently \"cd PH_BE && npm run dev\" \"cd ph_fe && npm run dev\"",
+    "install": "npm run install-be && npm run install-fe",
+    "build": "npm run build-fe"
   },
   "engines": {
     "node": ">=16.0.0"
