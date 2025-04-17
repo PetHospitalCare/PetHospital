@@ -49,10 +49,11 @@ const signin = async (req, res) => {
     const token = generateToken(account._id, account.role, account.username, account.email);
 
     res.cookie("access_token", token, {
+      domain: ".onrender.com", // Chú ý dấu chấm đầu tiên
       path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: "Lax",
+      sameSite: "None",
       maxAge: 86400000 //1 ngày 
       // maxAge: 60000 // 1 phút
     });
