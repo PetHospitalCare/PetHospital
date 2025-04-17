@@ -50,7 +50,6 @@ const signin = async (req, res) => {
 
     res.cookie("access_token", token, {
       domain: ".onrender.com", // Chú ý dấu chấm đầu tiên
-      path: "/",
       httpOnly: true,
       secure: true,
       sameSite: "None",
