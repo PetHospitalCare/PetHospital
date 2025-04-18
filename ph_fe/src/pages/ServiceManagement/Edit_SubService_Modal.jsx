@@ -37,8 +37,8 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!subServiceName || !price || !duration) {
-            alert("Vui lòng nhập đầy đủ thông tin.");
+        if (!subServiceName || !price) {
+            toast.error("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
 
@@ -63,13 +63,13 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
             // );
 
             if (response.data.success) {
-                alert("Cập nhật dịch vụ con thành công!");
+                toast.success("Cập nhật dịch vụ thành công!");
                 onUpdateService();
                 onClose();
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật dịch vụ con:", error);
-            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            toast.error("Cập nhật dịch vụ thất bại!");
         }
     };
 

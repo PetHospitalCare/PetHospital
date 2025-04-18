@@ -42,17 +42,13 @@ const UserProvider = ({ children }) => {
         }
     };
     useEffect(() => {
-        const jwtToken = Cookies.get("access_token");
-        if (jwtToken) {
-            try {
-                fetchUserData();
-            } catch (error) {
-                console.error("Lỗi khi decode token:", error);
-                setUser(null);
-            }
-        } else {
+        try {
+            fetchUserData();
+        } catch (error) {
+            console.error("Lỗi khi decode token:", error);
             setUser(null);
         }
+
         setLoading(false);
     }, []);
 
