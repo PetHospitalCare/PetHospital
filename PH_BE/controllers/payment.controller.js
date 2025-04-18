@@ -9,6 +9,9 @@ const transporter = nodemailer.createTransport({
         user: "namkhanh2703.work@gmail.com",
         pass: "tuff cyhw bwez qkcm",
     },
+    tls: {
+        rejectUnauthorized: false
+    }
 });
 
 const paymentVNPay = async (req, res) => {
@@ -88,7 +91,7 @@ const paymentVNPay = async (req, res) => {
             vnp_TxnRef: savedPayment._id,
             vnp_OrderInfo: savedPayment._id,
             vnp_OrderType: ProductCode.Other,
-            vnp_ReturnUrl: 'http://localhost:5173/payment-result',
+            vnp_ReturnUrl: 'https://pethospital.onrender.com/payment-result',
             vnp_Locale: VnpLocale.VN,
             vnp_CreateDate: dateFormat(now),
             vnp_ExpireDate: dateFormat(new Date(now.getTime() + 15 * 60 * 1000))
@@ -391,7 +394,7 @@ const sendEmailSuccessPayment = async (paymentInput, userKeyInput) => {
                         <p style="color: #555; margin-top: 20px;">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua hotline: <strong>+84 0985741249</strong>.</p>
         
                         <div style="text-align: center; margin-top: 20px;">
-                            <a href="http://localhost:5173/orders" 
+                            <a href="https://pethospital.onrender.com/orders" 
                                style="display: inline-block; padding: 12px 24px; background: #3498db; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px;">
                                Xem lại đơn hàng của bạn
                             </a>

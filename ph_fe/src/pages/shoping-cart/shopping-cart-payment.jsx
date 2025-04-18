@@ -51,8 +51,10 @@ export default function ShoppingCartPayment() {
             }
         } else {
             setTimeout(() => {
-                toast.warning('Vui lòng đăng nhập để mua hàng!');
-                navigate('/');
+                if (!user) {
+                    toast.warning('Vui lòng đăng nhập để mua hàng!');
+                    navigate('/');
+                }
             }, 2000)
         }
 
