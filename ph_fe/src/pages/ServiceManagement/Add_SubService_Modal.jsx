@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { useParams } from "react-router-dom";
 import { Services } from "../../services/Services";
+import { toast } from "sonner";
 
 export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
     const { id } = useParams();
@@ -28,8 +29,8 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!name || !price.dog || !price.cat || !duration) {
-            alert("Vui lòng nhập đầy đủ thông tin.");
+        if (!name || !price.dog || !price.cat) {
+            toast.error("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
         try {
@@ -44,13 +45,13 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
             });
 
             if (response.data.message === "Subservice added successfully") {
-                alert("Dịch vụ con đã được thêm!");
+                toast.success("Thêm dịch vụ thành công!");
                 onAddService();
                 handleClose();
             }
         } catch (error) {
-            console.error("Lỗi khi thêm dịch vụ con:", error);
-            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            console.error("Lỗi khi thêm dịch con:", error);
+            toast.error("Thêm dịch vụ  thất bại!");
         }
     };
 

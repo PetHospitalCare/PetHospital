@@ -29,6 +29,7 @@ const UserProvider = ({ children }) => {
                     email: response.data.account.email,
                     username: response.data.account.username,
                     phone: response.data.account.phone,
+                    address: response.data.account.address,
                     url: response.data?.account?.url,
                 });
             } else {
@@ -42,17 +43,13 @@ const UserProvider = ({ children }) => {
         }
     };
     useEffect(() => {
-        const jwtToken = Cookies.get("access_token");
-        if (jwtToken) {
-            try {
-                fetchUserData();
-            } catch (error) {
-                console.error("Lỗi khi decode token:", error);
-                setUser(null);
-            }
-        } else {
+        try {
+            fetchUserData();
+        } catch (error) {
+            console.error("Lỗi khi decode token:", error);
             setUser(null);
         }
+
         setLoading(false);
     }, []);
 
