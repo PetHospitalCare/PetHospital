@@ -29,6 +29,7 @@ const UserProvider = ({ children }) => {
                     email: response.data.account.email,
                     username: response.data.account.username,
                     phone: response.data.account.phone,
+                    address: response.data.account.address,
                     url: response.data?.account?.url,
                 });
             } else {
