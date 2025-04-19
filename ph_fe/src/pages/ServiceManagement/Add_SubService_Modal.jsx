@@ -80,7 +80,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium mb-2 text-left">Tên dịch vụ</label>
-                        <Input type="text" placeholder="Nhập tên dịch vụ" value={name} onChange={(e) => setName(e.target.value)} required />
+                        <Input type="text" placeholder="Nhập tên dịch vụ" value={name} onChange={(e) => setName(e.target.value)} />
                     </div>
 
 
@@ -99,7 +99,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                                     value={price.dog.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "dog")}
                                     className="pl-9"
-                                    required
+
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <span className="text-gray-500 sm:text-sm">VNĐ</span>
@@ -115,7 +115,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                                     value={price.cat.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "cat")}
                                     className="pl-9"
-                                    required
+
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <span className="text-gray-500 sm:text-sm">VNĐ</span>
