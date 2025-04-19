@@ -115,6 +115,7 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
                         <Input
                             id="phone"
                             name="phone"
+                            type="number"
                             value={formData.phone}
                             onChange={handleInputChange}
                             className="col-span-3"
