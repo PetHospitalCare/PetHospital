@@ -12,6 +12,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
 import { Services } from "@/services/Services";
+import { toast } from "sonner";
 
 export default function EditModal({ open, onClose, ServiceData, onUpdateService }) {
     const { id } = useParams();
@@ -37,7 +38,7 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!subServiceName || !price) {
+        if (!subServiceName || !price.dog || !price.cat) {
             toast.error("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
