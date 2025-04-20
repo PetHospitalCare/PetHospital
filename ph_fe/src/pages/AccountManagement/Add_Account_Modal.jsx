@@ -147,7 +147,7 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
                         </Label>
                         <Input
                             id="phone"
-                            type="tel"
+                            type="number"
                             placeholder="Ví dụ: 0987654321"
                             value={formData.phone}
                             onChange={handleInputChange}
