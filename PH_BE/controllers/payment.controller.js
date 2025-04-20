@@ -401,7 +401,7 @@ const sendEmailSuccessPayment = async (paymentInput, userKeyInput) => {
                         </div>
         
                         <p style="margin-top: 20px; text-align: center; font-size: 12px; color: #7f8c8d;">
-                            Địa chỉ: Văn phòng Pet Health, Tòa nhà Sông Đà, Số 54 Phạm Hùng, Nam Từ Liêm, TP. Hà Nội
+                            Địa chỉ: Đại học FPT Hà Nội - Khu Công nghệ cao Hòa Lạc, Km29 Đại lộ Thăng Long, huyện Thạch Thất, Hà Nội 
                         </p>
         
                         <div style="text-align: center; margin-top: 20px;">

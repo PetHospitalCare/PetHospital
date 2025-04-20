@@ -11,8 +11,8 @@ export default function Footer() {
                         <div className="flex items-start gap-2 text-gray-600">
                             <BuildingIcon className="w-5 h-5 mt-1 flex-shrink-0" />
                             <p className="text-sm text-left">
-                                Văn phòng Pet Health, Tòa nhà Sông Đà<br />
-                                Số 54 Phạm Hùng, Nam Từ Liêm, TP. Hà Nội
+                                Đại học FPT Hà Nội<br />
+                                Khu Công nghệ cao Hòa Lạc, Km29 Đại lộ Thăng Long, huyện Thạch Thất, Hà Nội
                             </p>
                         </div>
                         <div className="flex items-center gap-2 text-gray-600">
@@ -43,7 +43,7 @@ export default function Footer() {
                             </div>
                             <div className="text-left">8:00 - 12:00</div>
                         </div>
-                        
+
                         <div className="flex flex-col items-start gap-2 mt-4">
                             <h3 className="font-semibold text-blue-500 ">Theo dõi chúng tôi</h3>
                             <div className="flex gap-4">

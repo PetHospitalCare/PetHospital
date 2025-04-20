@@ -104,6 +104,9 @@ const CustomerChat = () => {
             </span>
         ));
     };
+    if (!user?.role?.includes('customer')) {
+        return null; // Don't render anything if user is not a customer
+    }
 
     // Chat button when closed
     if (!isOpen) {
