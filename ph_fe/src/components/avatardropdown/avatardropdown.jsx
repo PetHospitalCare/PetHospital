@@ -76,7 +76,7 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    {user?.user?.role !== "customer" && (
+                    {!user?.user?.role.includes("customer") && (
                         <Link to={getProfileLink(user.user.role)}>
                             <DropdownMenuItem>
                                 <LayoutDashboard />
