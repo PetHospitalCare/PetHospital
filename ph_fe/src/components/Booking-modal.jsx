@@ -320,7 +320,15 @@ export default function BookingDialog({ open, onClose }) {
                             </div>
                         )}
 
-                        <Link to={"/"} className="text-blue-500 block mt-2 hover:underline">Tạo hồ sơ thú cưng ở đây!</Link>
+                        <Link
+                            to="/profile"
+                            className="text-blue-500 block mt-2 hover:underline"
+                            onClick={() => {
+                                handleClose();
+                            }}
+                        >
+                            Tạo hồ sơ thú cưng ở đây!
+                        </Link>
                     </div>
                     <div>
                         <Label className="font-medium text-gray-700">Chọn loại lịch hẹn <span className="text-red-500">*</span></Label>
