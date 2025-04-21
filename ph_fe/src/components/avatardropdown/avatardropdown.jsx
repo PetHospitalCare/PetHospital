@@ -55,6 +55,7 @@ export default function DropdownMenuDemo(user) {
     const goToOrders = () => {
         navigate('/orders');
     }
+    console.log(user)
     const getProfileLink = (roles) => {
         if (roles?.includes("admin")) return "/Dashboard";
         if (roles?.includes("doctor")) return "/Schedule";
@@ -76,7 +77,7 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    {!user?.user?.role.includes("customer") && (
+                    {user?.user?.role && !user.user.role.includes("customer") && (
                         <Link to={getProfileLink(user.user.role)}>
                             <DropdownMenuItem>
                                 <LayoutDashboard />

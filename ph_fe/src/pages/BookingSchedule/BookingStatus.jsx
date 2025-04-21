@@ -356,10 +356,10 @@ export default function BookingStatus({ status, setCount }) {
                                     if (row.original.doctor_id) {
                                         // Nếu đã có doctor_id, cập nhật trạng thái ngay lập tức
                                         try {
-                                            const res = await BookingServices.AssignDoctor(booking, selectedDoctor);
+                                            const res = await BookingServices.AssignDoctor(row.original._id, row.original.doctor_id);
                                             if (res.status === 200) {
                                                 toast.success("Cập nhật thành công!");
-                                                onUpdate(); // Cập nhật lại danh sách
+                                                fetchBookings();
                                                 onOpenChange(false); // Đóng modal
                                             }
                                         } catch (error) {
@@ -367,7 +367,6 @@ export default function BookingStatus({ status, setCount }) {
                                             toast.error("Cập nhật thất bại, thử lại sau!");
                                         }
                                     } else {
-
                                         setOpenAssignDoctor(true);
                                         setSelectedBooking(row.original);
                                     }
