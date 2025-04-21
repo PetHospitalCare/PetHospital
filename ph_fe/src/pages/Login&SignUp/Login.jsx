@@ -59,7 +59,7 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
+    <div className="relative min-h-screen pt-16 flex items-center justify-center">
       {/* Background Image */}
       <div className="absolute inset-0 -z-10">
         <img
