@@ -107,7 +107,7 @@ const AssignDoctor = async (req, res) => {
                         
                         <!-- Logo -->
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png" alt="PetCare Logo" width="120">
+                            <img src="https://res.cloudinary.com/debx8syhr/image/upload/v1742756437/SDN301m/tnwxuppwnwsyfueef090.png" alt="PetCare Logo" width="120">
                         </div>
         
                         <h2 style="color: #2c3e50; text-align: center;">Xác nhận lịch hẹn khám thú cưng</h2>
@@ -126,7 +126,7 @@ const AssignDoctor = async (req, res) => {
         
                         <!-- Button CTA -->
                         <div style="text-align: center; margin-top: 20px;">
-                            <a href="https://your-petcare-website.com/appointments/${booking_id}" 
+                            <a href="https://pethospital.onrender.com/history-booking" 
                                style="display: inline-block; padding: 12px 24px; background: #3498db; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px;">
                                Xem chi tiết lịch hẹn
                             </a>
