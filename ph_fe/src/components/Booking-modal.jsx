@@ -158,13 +158,19 @@ export default function BookingDialog({ open, onClose }) {
         try {
             const response = await BookingServices.CreateNewBooking(formData);
             if (response.status === 201) {
-                toast.success(`Đặt lịch khám thành công!`, {
-                    description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
-                    action: {
-                        label: 'Xem chi tiết',
-                        onClick: () => navigate('/history-booking')
-                    }
-                });
+                if (user && user?.role?.includes("customer")) {
+                    toast.success(`Đặt lịch khám thành công!`, {
+                        description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
+                        action: {
+                            label: 'Xem chi tiết',
+                            onClick: () => navigate('/history-booking')
+                        }
+                    });
+                } else {
+                    toast.success(`Đặt lịch khám thành công!`, {
+                        description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
+                    });
+                }
                 handleClose();
             }
         } catch (error) {

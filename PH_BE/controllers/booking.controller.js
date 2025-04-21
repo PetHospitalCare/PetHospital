@@ -162,10 +162,10 @@ const AssignDoctor = async (req, res) => {
 const UpdateBooking = async (req, res) => {
     try {
         const { id } = req.params;
-        const { date, hour, service_id, sub_service_id, note } = req.body;
+        const { date, hour, service_id, sub_service_id, note, doctor_id } = req.body;
         const booking = await Booking.findByIdAndUpdate(
             id,
-            { date, hour, service_id, sub_service_id, note },
+            { date, hour, service_id, sub_service_id, note, doctor_id },
             { new: true }
         );
         if (!booking) {

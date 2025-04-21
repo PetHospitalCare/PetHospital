@@ -5,6 +5,7 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useContext } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -17,12 +18,17 @@ import {
 import PetInfo from "./PetInfo";
 import { useLocation } from "react-router-dom";
 import UserInfo from "./UserInfo";
-
+import { UserContext } from '@/contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 export default function UserProfile() {
     const location = useLocation();
     const pathParts = location.pathname.split("/");
     const profilePath = pathParts[1];
-
+    const navigate = useNavigate();
+    const { user } = useContext(UserContext);
+    if (!user) {
+        navigate("/login");
+    }
     return (
         <div className={profilePath == "admin" ? "w-full " : "container max-w-screen-2xl mx-auto pt-24 px-8 lg:px-16"}>
             {profilePath == "admin" ? (
