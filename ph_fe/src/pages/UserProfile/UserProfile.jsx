@@ -30,16 +30,16 @@ export default function UserProfile() {
         navigate("/login");
     }
     return (
-        <div className={profilePath == "admin" ? "w-full " : "container max-w-screen-2xl mx-auto pt-24 px-8 lg:px-16"}>
+        <div className={profilePath == "admin" ? "w-full " : "container max-w-screen-2xl mx-auto pt-24 px-8 lg:px-16"} >
             {profilePath == "admin" ? (
                 <div className="flex justify-center">
                     <div className="w-full max-w-3xl">
-                        <UserInfo />
+                        <UserInfo profilePath={profilePath} />
                     </div>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <UserInfo />
+                    <UserInfo profilePath={profilePath} />
                     <PetInfo />
                 </div>
             )}

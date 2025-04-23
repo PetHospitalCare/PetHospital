@@ -34,8 +34,10 @@ const accountSchema = new mongoose.Schema(
         role: {
             type: [String],
             enum: ["customer", "doctor", "admin", "staff"],
-
-        }
+        },
+        description: {
+            type: String,
+        },
     },
     { timestamps: true }
 );

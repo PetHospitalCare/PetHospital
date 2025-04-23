@@ -15,7 +15,7 @@ import {
     DialogClose
 } from "@/components/ui/dialog";
 
-export default function UserInfo({ ...props }) {
+export default function UserInfo({ profilePath, ...props }) {
     const [user, setUser] = React.useState(null);
     const [uploadDialogOpen, setUploadDialogOpen] = React.useState(false);
     const [imageFile, setImageFile] = React.useState(null);
@@ -26,7 +26,8 @@ export default function UserInfo({ ...props }) {
         dateOfBirth: "",
         phone: "",
         gender: "",
-        address: ""
+        address: "",
+        description: "",
     });
     const [errors, setErrors] = React.useState({});
     const [isLoading, setIsLoading] = React.useState(false);
@@ -45,6 +46,7 @@ export default function UserInfo({ ...props }) {
                     phone: response.data.account.phone || "",
                     gender: response.data.account.gender || "male",
                     address: response.data.account.address || "",
+                    description: response.data.account.description || "",
                 });
             }
         } catch (error) {
@@ -151,6 +153,7 @@ export default function UserInfo({ ...props }) {
                 gender: formData.gender,
                 address: formData.address ? formData.address : "",
                 dateOfBirth: formData.dateOfBirth || null,
+                description: formData.description || "",
             };
 
             // Gửi API cập nhật
@@ -288,6 +291,19 @@ export default function UserInfo({ ...props }) {
                         />
                         {errors.address && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.address}</p>}
                     </div>
+                    {(profilePath === "admin") && (
+                        <div className="mt-4">
+                            <Label className="text-gray-600 text-base sm:text-lg">Chi tiết</Label>
+                            <textarea
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                className="border-2 border-gray-400 focus:outline-none focus:border-blue-500 p-2 text-base sm:text-lg w-full rounded-md"
+                                placeholder="Nhập chi tiết thông tin"
+                                rows={4}
+                            />
+                        </div>
+                    )}
 
                     <div className="mt-6 flex justify-center sm:justify-end">
                         <Button

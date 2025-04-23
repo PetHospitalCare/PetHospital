@@ -271,7 +271,7 @@ const getCurrentUser = async (req, res) => {
 const updateUserAccount = async (req, res) => {
   try {
     const id = req.userId;
-    const { username, phone, gender, address, dateOfBirth } = req.body;
+    const { username, phone, gender, address, dateOfBirth, description } = req.body;
 
     // Cập nhật thông tin tài khoản
     const updatedAccount = await Account.findByIdAndUpdate(
@@ -281,7 +281,8 @@ const updateUserAccount = async (req, res) => {
         phone,
         gender,
         address,
-        dateOfBirth: new Date(dateOfBirth)
+        dateOfBirth: new Date(dateOfBirth),
+        description
       },
       { new: true, runValidators: true }
     ).select("-password");
