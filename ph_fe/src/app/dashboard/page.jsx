@@ -44,7 +44,6 @@ export default function Page({ children }) {
           const res = await MessageService.MarkNotificationAsRead();
         } catch (error) {
           console.error("Error marking notifications as read:", error);
-          toast.error("Không thể đánh dấu thông báo là đã đọc");
         }
       };
       markAllAsRead();

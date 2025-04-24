@@ -163,20 +163,33 @@ const UpdateBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const { date, hour, service_id, sub_service_id, note, doctor_id } = req.body;
+
+        const updateFields = {
+            date,
+            hour,
+            service_id,
+            sub_service_id,
+            note,
+        };
+
+        if (doctor_id) {
+            updateFields.doctor_id = doctor_id;
+        }
+
         const booking = await Booking.findByIdAndUpdate(
             id,
-            { date, hour, service_id, sub_service_id, note, doctor_id },
+            updateFields,
             { new: true }
         );
+
         if (!booking) {
             return res.status(404).json({ success: false, message: "Booking not found" });
         }
 
         res.status(200).json({ success: true, booking });
     } catch (error) {
-        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+        return res.status(500).json({ message: "Lỗi khi cập nhật booking", error });
     }
-
 }
 const getBookingbyId = async (req, res) => {
     try {

@@ -353,23 +353,9 @@ export default function BookingStatus({ status, setCount }) {
                         <button>
                             <Check className="size-6 p-1 mr-1 "
                                 onClick={async () => {
-                                    if (row.original.doctor_id) {
-                                        // Nếu đã có doctor_id, cập nhật trạng thái ngay lập tức
-                                        try {
-                                            const res = await BookingServices.AssignDoctor(row.original._id, row.original.doctor_id);
-                                            if (res.status === 200) {
-                                                toast.success("Cập nhật thành công!");
-                                                fetchBookings();
-                                                onOpenChange(false); // Đóng modal
-                                            }
-                                        } catch (error) {
-                                            console.error("Lỗi khi cập nhật cuộc hẹn:", error);
-                                            toast.error("Cập nhật thất bại, thử lại sau!");
-                                        }
-                                    } else {
-                                        setOpenAssignDoctor(true);
-                                        setSelectedBooking(row.original);
-                                    }
+
+                                    setOpenAssignDoctor(true);
+                                    setSelectedBooking(row.original);
                                 }}
                             />
                         </button>
@@ -380,6 +366,7 @@ export default function BookingStatus({ status, setCount }) {
                                 <Pen className="size-6 p-1 mr-1 " onClick={() => {
                                     setIsEditDialogOpen(true);
                                     setSelectedBooking(row.original)
+
                                 }} />
 
                             </button>
@@ -469,7 +456,8 @@ export default function BookingStatus({ status, setCount }) {
             <EditBookingDialog open={isEditDialogOpen}
                 onClose={() => setIsEditDialogOpen(false)}
                 bookingData={selectedBooking}
-                onUpdate={fetchBookings}>
+                onUpdate={fetchBookings}
+                status={status}>
 
             </EditBookingDialog>
             <AssignDoctor open={openAssignDoctor} onOpenChange={setOpenAssignDoctor} booking={selectedBooking} onUpdate={fetchBookings} />

@@ -40,7 +40,6 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
         try {
             // Validate inputs
             if (!fileInput || (!fileType?.includes('excel') && !fileType?.includes('spreadsheet'))) {
-                console.error('Invalid file type or no file provided')
                 return null
             }
 
