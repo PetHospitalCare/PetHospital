@@ -174,8 +174,8 @@ export default function ServiceResultDetail({ service }) {
                 </div>
             )}
 
-             {/* Pet care service */}
-             {service.service_id?.name === "Dịch vụ Lưu trú" && (
+            {/* Pet care service */}
+            {service.service_id?.name === "Dịch vụ Lưu trú" && (
                 <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
                     <div>
                         <p className="text-gray-600 text-sm mb-1">Hướng dẫn cho ăn</p>

@@ -26,7 +26,7 @@ const CustomerChat = () => {
                 if (!userNames[userId] && userId !== user._id) {
                     try {
                         const userData = await UserService.getAccountbyId(userId);
-                        const isCustomer = userData.data.account.role.includes('customer');
+                        const isCustomer = userData?.data?.account?.role.includes('customer');
                         let displayName;
 
                         if (isCustomer) {
