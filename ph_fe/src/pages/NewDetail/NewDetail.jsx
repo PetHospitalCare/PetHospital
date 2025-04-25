@@ -182,7 +182,7 @@ export default function NewDetail() {
                 <div className="divide-y mt-4">
                   {searchResults?.map((news) => (
                     <div key={news?._id} className="p-4 hover:bg-gray-50">
-                      <Link to={`/news/${news?._id}`} className="flex gap-3">
+                      <Link to={`/new-detail/${news?._id}`} className="flex gap-3">
                         {news?.images?.url ? (
                           <img
                             src={news?.images?.url}
@@ -228,7 +228,7 @@ export default function NewDetail() {
               <div className="divide-y">
                 {relatedNews?.map((news) => (
                   <div key={news?._id} className="p-4 hover:bg-gray-50">
-                    <Link to={`/news/${news?._id}`} className="flex gap-3">
+                    <Link to={`/new-detail/${news?._id}`} className="flex gap-3">
                       {news?.images?.url ? (
                         <img
                           src={news?.images?.url}

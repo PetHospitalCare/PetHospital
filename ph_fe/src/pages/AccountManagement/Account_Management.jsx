@@ -45,7 +45,10 @@ export default function AccountManagement() {
         try {
             const response = await UserService.getAllAccount();
             if (response.data.success) {
-                setData(response.data.accounts);
+                const filteredAccounts = response.data.accounts.filter(
+                    account => !account.role.includes('customer')
+                );
+                setData(filteredAccounts);
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu tài khoản:", error);

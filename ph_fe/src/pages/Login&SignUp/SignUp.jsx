@@ -133,10 +133,10 @@ export default function SignUp() {
                     alt="Background"
                 />
             </div>
-            
+
             {/* Thêm padding top để tránh đè lên header */}
-            <div className="min-h-screen flex items-center justify-center pt-16 sm:pt-20 md:pt-24 pb-4 px-4 md:p-6 lg:p-8 overflow-auto">
-                <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto my-4">
+            <div className="flex items-center justify-center min-h-screen mx-auto px-4 md:px-6 lg:px-8">
+                <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto my-20">
                     <div className="flex items-center justify-between mb-4">
                         <Link to="/Login" className="flex items-center text-gray-500 hover:text-gray-700">
                             <ArrowLeftIcon className="h-4 w-4 mr-2" />
@@ -145,9 +145,9 @@ export default function SignUp() {
                         <h1 className="text-xl sm:text-2xl font-bold text-center text-gray-700 flex-1">Đăng ký</h1>
                         <div className="w-16"></div> {/* Spacer cho cân đối layout */}
                     </div>
-                    
+
                     {errors.general && <p className="text-red-500 text-sm text-center mb-4">{errors.general}</p>}
-                    
+
                     {/* Form được đặt trong container có scroll nếu cần */}
                     <div className="max-h-[70vh] md:max-h-none overflow-y-auto pb-2">
                         <form className="space-y-3 md:space-y-4" onSubmit={handleSignUp}>
@@ -205,9 +205,8 @@ export default function SignUp() {
                                     <Button
                                         type="button"
                                         value="male"
-                                        className={`flex-1 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium ${
-                                            gender === "male" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
-                                        }`}
+                                        className={`flex-1 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium ${gender === "male" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+                                            }`}
                                         onClick={() => setGender("male")}
                                     >
                                         Nam
@@ -215,9 +214,8 @@ export default function SignUp() {
                                     <Button
                                         type="button"
                                         value="female"
-                                        className={`flex-1 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium ${
-                                            gender === "female" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
-                                        }`}
+                                        className={`flex-1 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium ${gender === "female" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+                                            }`}
                                         onClick={() => setGender("female")}
                                     >
                                         Nữ
