@@ -170,34 +170,66 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
                 tableLineWidth: 0.1
             })
 
-            // Add conclusion
-            if (formData.interpretation) {
-                pdf.setFontSize(12)
-                pdf.text('Nhận định:', margin, tableEndY + 15)
-                pdf.setFontSize(10)
-                pdf.text(formData.interpretation, margin, tableEndY + 20)
+            // Add conclusions with page break check
+            let conclusionY = tableEndY + 20;
+            const minSpaceNeeded = 100; // Minimum space needed for conclusions
+
+            // Check if there's enough space for conclusions
+            if (pageHeight - conclusionY < minSpaceNeeded) {
+                pdf.addPage();
+                conclusionY = margin;
             }
 
             // Add interpretation
+            if (formData.interpretation) {
+                pdf.setFontSize(12);
+                pdf.text('Nhận định:', margin, conclusionY);
+                pdf.setFontSize(10);
+                const interpretationLines = pdf.splitTextToSize(
+                    formData.interpretation,
+                    pageWidth - (margin * 2)
+                );
+                pdf.text(interpretationLines, margin, conclusionY + 10);
+                conclusionY += interpretationLines.length * 5 + 25;
+            }
+
+            // Add results
             if (formData.results) {
-                pdf.setFontSize(12)
-                pdf.text('Kết luận:', margin, tableEndY + 40)
-                pdf.setFontSize(10)
-                pdf.text(formData.results, margin, tableEndY + 45)
+                // Check if need new page for results
+                if (pageHeight - conclusionY < minSpaceNeeded) {
+                    pdf.addPage();
+                    conclusionY = margin;
+                }
+
+                pdf.setFontSize(12);
+                pdf.text('Kết luận:', margin, conclusionY);
+                pdf.setFontSize(10);
+                const resultLines = pdf.splitTextToSize(
+                    formData.results,
+                    pageWidth - (margin * 2)
+                );
+                pdf.text(resultLines, margin, conclusionY + 10);
+                conclusionY += resultLines.length * 5 + 25;
+            }
+
+            // Add signature section on new page if needed
+            if (pageHeight - conclusionY < 50) {
+                pdf.addPage();
+                conclusionY = margin;
             }
 
             // Add signature section
             const currentDate = format(new Date(), "'Ngày' dd 'tháng' MM 'năm' yyyy");
-            pdf.setFontSize(11)
-            pdf.text(`Hà Nội, ${currentDate}`, pageWidth - 40, tableEndY + 60, { align: 'center' })
-            pdf.text('Bác sĩ phụ trách', pageWidth - 40, tableEndY + 65, { align: 'center' })
-            pdf.setFontSize(10)
-            pdf.text('(Ký và ghi rõ họ tên)', pageWidth - 40, tableEndY + 90, { align: 'center' })
+            pdf.setFontSize(11);
+            pdf.text(`Hà Nội, ${currentDate}`, pageWidth - 40, conclusionY + 20, { align: 'center' });
+            pdf.text('Bác sĩ phụ trách', pageWidth - 40, conclusionY + 30, { align: 'center' });
+            pdf.setFontSize(10);
+            pdf.text('(Ký và ghi rõ họ tên)', pageWidth - 40, conclusionY + 40, { align: 'center' });
 
             // Add footer
-            pdf.setFontSize(8)
+            pdf.setFontSize(8);
             pdf.text('Pet Hospital - Chăm sóc thú cưng của bạn với tất cả sự yêu thương',
-                pageWidth / 2, pageHeight - 10, { align: 'center' })
+                pageWidth / 2, pageHeight - 10, { align: 'center' });
 
             // Generate PDF URL
             const blob = pdf.output('blob')
