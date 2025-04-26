@@ -13,8 +13,8 @@ import { BookingServices } from "@/services/BookingService";
 import { toast } from "sonner";
 import { User } from "lucide-react";
 import { UserService } from "@/services/UserService";
-
-export default function EditBookingDialog({ open, onClose, bookingData, onUpdate }) {
+import { format } from "date-fns"
+export default function EditBookingDialog({ open, onClose, bookingData, onUpdate, status }) {
     const [service, setService] = useState([]);
     const [pet, setPet] = useState([]);
     const [formData, setFormData] = useState({
@@ -110,7 +110,7 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
             subServiceId: selectedService?.subServices.length ? selectedService.subServices[0]._id : "",
         });
     };
-
+    console.log(selected)
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId) {
@@ -201,10 +201,16 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                                             <span className="font-medium">Loại:</span> {selected.type === "dog" ? "Chó" : "Mèo"}
                                         </p>
                                         <p className="text-sm text-gray-600">
-                                            <span className="font-medium">Tuổi:</span> {selected.age} tuổi
+                                            <span className="font-medium">Ngày sinh: </span>{selected?.dateOfBirth ? format(new Date(selected?.dateOfBirth), "dd-MM-yyyy") : ""}
                                         </p>
                                         <p className="text-sm text-gray-600">
                                             <span className="font-medium">Giới tính:</span> {selected.gender === 0 ? "Đực" : "Cái"}
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-medium">Giống:</span> {selected?.species}
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-medium">Cân nặng (kg): </span> {selected?.weight}
                                         </p>
                                     </div>
                                 </div>
@@ -245,39 +251,41 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                             </div>
                         )}
                     </div>
-                    <div>
-                        <Label className="font-medium text-gray-700">Bác sĩ phụ trách</Label>
-                        <Select
-                            value={formData.doctor_id}
-                            onValueChange={(value) => setFormData({ ...formData, doctor_id: value })}
-                        >
-                            <SelectTrigger className="bg-white border-gray-300 rounded-lg">
-                                <SelectValue placeholder="Chọn bác sĩ..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {doctors.map((doctor) => (
-                                    <SelectItem key={doctor._id} value={doctor._id}>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-8 h-8 rounded-full overflow-hidden">
-                                                {doctor.url ? (
-                                                    <img
-                                                        src={doctor.url}
-                                                        alt={doctor.username}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                                        <User size={16} className="text-gray-500" />
-                                                    </div>
-                                                )}
+                    {status === "confirm" && (
+                        <div>
+                            <Label className="font-medium text-gray-700">Bác sĩ phụ trách</Label>
+                            <Select
+                                value={formData.doctor_id}
+                                onValueChange={(value) => setFormData({ ...formData, doctor_id: value })}
+                            >
+                                <SelectTrigger className="bg-white border-gray-300 rounded-lg">
+                                    <SelectValue placeholder="Chọn bác sĩ..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {doctors.map((doctor) => (
+                                        <SelectItem key={doctor._id} value={doctor._id}>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-full overflow-hidden">
+                                                    {doctor.url ? (
+                                                        <img
+                                                            src={doctor.url}
+                                                            alt={doctor.username}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                            <User size={16} className="text-gray-500" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {doctor.username}
                                             </div>
-                                            {doctor.username}
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                     <div className="col-span-2">
                         <Label className="font-medium text-gray-700">Ghi chú</Label>
                         <Textarea name="note" value={formData.note} onChange={handleChange} placeholder="Nhập thông tin bổ sung..." className="bg-white border-gray-300 rounded-lg" />

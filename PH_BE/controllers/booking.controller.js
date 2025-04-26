@@ -107,7 +107,7 @@ const AssignDoctor = async (req, res) => {
                         
                         <!-- Logo -->
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png" alt="PetCare Logo" width="120">
+                            <img src="https://res.cloudinary.com/debx8syhr/image/upload/v1742756437/SDN301m/tnwxuppwnwsyfueef090.png" alt="PetCare Logo" width="120">
                         </div>
         
                         <h2 style="color: #2c3e50; text-align: center;">Xác nhận lịch hẹn khám thú cưng</h2>
@@ -126,7 +126,7 @@ const AssignDoctor = async (req, res) => {
         
                         <!-- Button CTA -->
                         <div style="text-align: center; margin-top: 20px;">
-                            <a href="https://your-petcare-website.com/appointments/${booking_id}" 
+                            <a href="https://pethospital.onrender.com/history-booking" 
                                style="display: inline-block; padding: 12px 24px; background: #3498db; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px;">
                                Xem chi tiết lịch hẹn
                             </a>
@@ -163,20 +163,33 @@ const UpdateBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const { date, hour, service_id, sub_service_id, note, doctor_id } = req.body;
+
+        const updateFields = {
+            date,
+            hour,
+            service_id,
+            sub_service_id,
+            note,
+        };
+
+        if (doctor_id) {
+            updateFields.doctor_id = doctor_id;
+        }
+
         const booking = await Booking.findByIdAndUpdate(
             id,
-            { date, hour, service_id, sub_service_id, note, doctor_id },
+            updateFields,
             { new: true }
         );
+
         if (!booking) {
             return res.status(404).json({ success: false, message: "Booking not found" });
         }
 
         res.status(200).json({ success: true, booking });
     } catch (error) {
-        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+        return res.status(500).json({ message: "Lỗi khi cập nhật booking", error });
     }
-
 }
 const getBookingbyId = async (req, res) => {
     try {

@@ -32,7 +32,7 @@ const signup = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({ error: "Email or phone number already exists" });
     }
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 
@@ -59,7 +59,7 @@ const signin = async (req, res) => {
 
     res.status(200).json(account);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 
@@ -71,7 +71,7 @@ const forgotPassword = async (req, res) => {
     if (!account) return res.status(404).json({ success: false, message: "Email không tồn tại." });
     res.status(200).json({ success: true, account });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 
@@ -136,10 +136,11 @@ const changePassword = async (req, res) => {
 // Lấy tất cả tài khoản
 const getallAccount = async (req, res) => {
   try {
-    const accounts = await Account.find({ role: { $ne: "customer" } }).sort({ createdAt: -1 });
+    // const accounts = await Account.find({ role: { $ne: "customer" } }).sort({ createdAt: -1 });
+    const accounts = await Account.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, accounts });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 

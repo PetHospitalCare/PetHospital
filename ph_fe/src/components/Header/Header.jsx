@@ -172,7 +172,7 @@ export default function Header() {
                     </Link> */}
                 </PopoverGroup>
                 <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-center border:">
-                    {user ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)
+                    {user && user._id ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)
                         :
                         <Link
                             to="/Login"

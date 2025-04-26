@@ -75,8 +75,8 @@ export default function BookingDialog({ open, onClose }) {
                 });
             }
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
-            toast.error("Không thể tải thông tin người dùng");
+            console.error(error);
+            toast.error(error);
         }
     };
     useEffect(() => {
