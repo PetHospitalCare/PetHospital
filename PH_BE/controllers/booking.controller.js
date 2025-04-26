@@ -272,7 +272,7 @@ const CreatePaymentBooking = async (req, res) => {
     const paymentLinkBody = {
         orderCode: ordercode,
         amount: booking.price,
-        description: `Thanh toán ${booking.payment.order_code}`,
+        description: `Thanh toán ${ordercode}`,
         cancelUrl: `${process.env.FRONT_END_URL}`,
         returnUrl: `${process.env.FRONT_END_URL}`,
     };
