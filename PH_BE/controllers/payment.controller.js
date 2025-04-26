@@ -79,17 +79,19 @@ const paymentVNPay = async (req, res) => {
             vnpayHost: 'https://sandbox.vnpayment.vn',
             testMode: true,
             hashAlgorithm: 'SHA512',
-            enableLog: false,
-            loggerFn: ignoreLogger,
+            enableLog: true,
+            loggerFn: console.log,
         });
 
         const now = new Date();
 
+        const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '117.0.0.1';
+
         const paymentUrl = vnpay.buildPaymentUrl({
-            vnp_Amount: savedPayment.totalPrice + savedPayment.shipFee,
-            vnp_IpAddr: '127.0.0.1',
-            vnp_TxnRef: savedPayment._id,
-            vnp_OrderInfo: savedPayment._id,
+            vnp_Amount: Math.round(savedPayment.totalPrice + savedPayment.shipFee),
+            vnp_IpAddr: clientIp,
+            vnp_TxnRef: String(savedPayment._id),
+            vnp_OrderInfo: String(savedPayment._id),
             vnp_OrderType: ProductCode.Other,
             vnp_ReturnUrl: 'https://pethospital.onrender.com/payment-result',
             vnp_Locale: VnpLocale.VN,
