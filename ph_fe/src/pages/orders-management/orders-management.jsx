@@ -46,7 +46,7 @@ import { PaymentService } from "@/services/PaymentService.js";
 export default function OrdersManagement() {
     const [data, setData] = useState([]);
     const [sorting, setSorting] = useState([
-        { id: "createdAt", desc: true }
+        { id: "timestamp", desc: true }
     ]);
     const [columnFilters, setColumnFilters] = useState([]);
     const [columnVisibility, setColumnVisibility] = useState({});
@@ -132,7 +132,8 @@ export default function OrdersManagement() {
                         address: shippingAddress,
                         status: payment.status,
                         createdAt: formattedDate,
-                        timestamp: timestamp
+                        timestamp: timestamp,
+                        method: payment.method
                     };
                 });
 
@@ -327,6 +328,10 @@ export default function OrdersManagement() {
 
                 return rowValue === filterValue;
             },
+        },
+        {
+            accessorKey: "method",
+            header: "Phương thức",
         },
         {
             accessorKey: "createdAt",
