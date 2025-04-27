@@ -73,15 +73,15 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
         }
 
         // Kiểm tra role
-        if (formData.role.length === 0) {
+        if (formData.roles.length === 0) {
             toast.error("Vui lòng chọn ít nhất một vai trò");
             return;
         }
 
         try {
-            const response = await UserService.updateAccount(account._id, formData);
+            const response = await UserService.createAccount(formData);
             toast.success("Cập nhật tài khoản thành công!");
-            onsuccess();
+            onSuccess();
             onOpenChange(false);
         } catch (error) {
             console.error("Lỗi khi cập nhật tài khoản:", error);

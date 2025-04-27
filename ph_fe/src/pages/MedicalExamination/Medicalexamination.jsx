@@ -347,9 +347,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             } else {
                 await MeidicalServices.CreateNewMedical(formDataToSubmit);
             }
-            for (let pair of formDataToSubmit.entries()) {
-                console.log('FormData entry:', pair[0], pair[1]);
-            }
+
 
             toast.success(isEditing ? "Cập nhật kết quả khám thành công!" : "Lưu kết quả khám thành công!");
             onOpenChange(false);

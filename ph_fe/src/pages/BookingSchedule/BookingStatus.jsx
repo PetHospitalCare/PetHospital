@@ -245,17 +245,16 @@ export default function BookingStatus({ status, setCount }) {
                         record => record.booking_id._id === row.original._id
                     );
                     if (record && record.services) {
+                        const serviceNames = record.services.map(service =>
+                            getSubServiceName(service.service_id, service.sub_service_id)
+                        );
                         return (
-                            <div className="space-y-1">
-                                {record.services.map((service, index) => (
-                                    <div key={index} className="text-sm">
-                                        {getSubServiceName(service.service_id, service.sub_service_id)}
-                                    </div>
-                                ))}
+                            <div className="w-[200px] text-sm break-words whitespace-normal">
+                                {serviceNames.join(", ")}
                             </div>
                         );
                     }
-                    return <div className="text-muted-foreground">Không có dịch vụ</div>;
+                    return <div className="text-muted-foreground w-[200px]">Không có dịch vụ</div>;
                 } else {
                     return (
                         <div className="">

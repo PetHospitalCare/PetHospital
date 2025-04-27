@@ -33,7 +33,6 @@ export default function PaymentDialog({ open, onOpenChange, booking, onPaymentCo
             try {
                 setIsLoading(true)
                 const response = await BookingServices.CreatePaymentBooking(booking?._id)
-                console.log("Response:", response)
                 if (response.status === 200) {
                     setQrCode(response.data.qrcode)
                     setOrderCode(response.data.ordercode)
@@ -46,7 +45,6 @@ export default function PaymentDialog({ open, onOpenChange, booking, onPaymentCo
             }
         }
     }
-    console.log("Payment Method:", orderCode)
     const handleCashPaymentSuccess = async () => {
         try {
             const response = await BookingServices.UpdatePayByCash(booking?._id)
