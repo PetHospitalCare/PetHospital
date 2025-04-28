@@ -47,6 +47,7 @@ const UserProvider = ({ children }) => {
             fetchUserData();
         } catch (error) {
             console.error("Lỗi khi decode token:", error);
+            toast.error("Có lỗi xảy ra khi xác thực người dùng");
             setUser(null);
         }
 

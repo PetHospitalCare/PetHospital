@@ -110,7 +110,6 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
             subServiceId: selectedService?.subServices.length ? selectedService.subServices[0]._id : "",
         });
     };
-    console.log(selected)
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId) {

@@ -42,14 +42,14 @@ export const StaffChat = () => {
                     try {
                         const userData = await UserService.getAccountbyId(userId);
                         // Check if roles array includes 'customer'
-                        const isCustomer = userData.data.account.role.includes('customer');
+                        const isCustomer = userData?.data?.account?.role.includes('customer');
                         let displayName;
 
                         if (isCustomer) {
                             displayName = `Khách hàng - ${userData.data.account.username}`;
                         } else {
-                            const roleDisplay = userData.data.account.role.includes('admin') ? 'Admin' : 'Nhân viên';
-                            displayName = `${roleDisplay} - ${userData.data.account.username}`;
+                            const roleDisplay = userData?.data?.account?.role.includes('admin') ? 'Admin' : 'Nhân viên';
+                            displayName = `${roleDisplay} - ${userData?.data?.account?.username}`;
                         }
 
                         setUserNames(prev => ({
@@ -104,7 +104,6 @@ export const StaffChat = () => {
     // Socket listeners for real-time updates
     useEffect(() => {
         const handleConversationUpdate = (conversation) => {
-            console.log("Conversation update received:", conversation); // Debug log
             setConversations(prevConversations => {
                 return prevConversations.map(conv => {
                     if (conv._id === conversation.conversationId) {
@@ -121,7 +120,6 @@ export const StaffChat = () => {
         };
 
         const handleNewConversation = (newConversation) => {
-            console.log("New conversation received:", newConversation); // Debug log
             setConversations(prevConversations => {
                 // Check if the conversation already exists
                 const exists = prevConversations.some(conv => conv._id === newConversation._id);
@@ -346,8 +344,8 @@ export const StaffChat = () => {
                                             )}
 
                                             <div className={`max-w-[70%] px-4 py-2 rounded-lg ${msg.sender === user._id
-                                                    ? 'bg-indigo-500 text-white ml-auto rounded-br-none'
-                                                    : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
+                                                ? 'bg-indigo-500 text-white ml-auto rounded-br-none'
+                                                : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
                                                 }`}>
                                                 <p className="text-sm whitespace-pre-wrap break-words">
                                                     {msg.content}
@@ -376,7 +374,7 @@ export const StaffChat = () => {
                                                         )}
                                                     </div>
                                                     <span className="text-xs text-gray-500 mt-1">
-                                                        {user.role === 'staff'
+                                                        {user?.role === 'staff'
                                                             ? `Nhân viên - ${user.username}`
                                                             : `Admin - ${user.username}`
                                                         }
@@ -406,8 +404,8 @@ export const StaffChat = () => {
                                         onClick={handleSend}
                                         disabled={!message.trim()}
                                         className={`p-2.5 rounded-full transition-colors ${message.trim()
-                                                ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                             }`}
                                     >
                                         <Send size={20} />

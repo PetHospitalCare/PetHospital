@@ -171,7 +171,7 @@ export default function Page({ children }) {
           </div>
 
           {/* Chuông thông báo */}
-          {!user?.role?.includes("doctor") && (
+          {(user?.role?.includes("staff") || user?.role?.includes("admin")) && (
             <div className="relative" ref={dropdownRef}>
               <div className="cursor-pointer relative" onClick={handleOpen}>
                 <Bell className="w-6 h-6 text-gray-700" />

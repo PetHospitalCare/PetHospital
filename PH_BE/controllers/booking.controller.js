@@ -259,11 +259,20 @@ const GetAllBookingByStatus = async (req, res) => {
 const CreatePaymentBooking = async (req, res) => {
     const { booking_id } = req.params;
     const booking = await Booking.findById(booking_id);
+    if (booking.payment && booking.payment.order_code) {
+        try {
+            await payOS.cancelPaymentLink(booking.payment.order_code);
+            console.log(`Cancelled existing payment for order: ${booking.payment.orderCode}`);
+        } catch (error) {
+            console.log("Error cancelling existing payment:", error);
+            // Continue even if cancel fails
+        }
+    }
     const ordercode = parseInt(Date.now().toString().slice(-7) + Math.floor(100 + Math.random() * 900));
     const paymentLinkBody = {
         orderCode: ordercode,
         amount: booking.price,
-        description: `Thanh toán ${booking.payment.order_code}`,
+        description: `Thanh toán ${ordercode}`,
         cancelUrl: `${process.env.FRONT_END_URL}`,
         returnUrl: `${process.env.FRONT_END_URL}`,
     };
@@ -273,13 +282,14 @@ const CreatePaymentBooking = async (req, res) => {
         {
             $set: {
                 "payment.qrcode": paymentLinkRes.qrCode,
-                "payment.orderCode": ordercode
+                "payment.order_code": ordercode
             }
         },
         { new: true } // Trả về document sau khi update
     );
     return res.status(200).json({
         qrcode: paymentLinkRes.qrCode,
+        ordercode: ordercode
 
         // checkoutUrl: paymentLinkRes.qrCode,
         // checkoutlink: paymentLinkRes.checkoutUrl,

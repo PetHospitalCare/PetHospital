@@ -1,6 +1,6 @@
 const db = require("../models");
 const Payment = db.payment;
-const { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } = require('vnpay');
+const { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat, getDateInGMT7} = require('vnpay');
 const nodemailer = require("nodemailer");
 const Account = db.account;
 const transporter = nodemailer.createTransport({
@@ -79,22 +79,28 @@ const paymentVNPay = async (req, res) => {
             vnpayHost: 'https://sandbox.vnpayment.vn',
             testMode: true,
             hashAlgorithm: 'SHA512',
-            enableLog: false,
-            loggerFn: ignoreLogger,
+            enableLog: true,
+            loggerFn: console.log,
         });
 
         const now = new Date();
+        const vnp_CreateDate = dateFormat(getDateInGMT7(now));
+        const expireDate = new Date(now.getTime() + 30 * 60 * 1000);
+        const vnp_ExpireDate = dateFormat(getDateInGMT7(expireDate));
+
+        const clientIpRaw = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '127.0.0.1';
+        const clientIp = clientIpRaw.split(',')[0].trim();
 
         const paymentUrl = vnpay.buildPaymentUrl({
-            vnp_Amount: savedPayment.totalPrice + savedPayment.shipFee,
-            vnp_IpAddr: '127.0.0.1',
-            vnp_TxnRef: savedPayment._id,
-            vnp_OrderInfo: savedPayment._id,
+            vnp_Amount: Math.round(savedPayment.totalPrice + savedPayment.shipFee),
+            vnp_IpAddr: clientIp,
+            vnp_TxnRef: String(savedPayment._id),
+            vnp_OrderInfo: String(savedPayment._id),
             vnp_OrderType: ProductCode.Other,
             vnp_ReturnUrl: 'https://pethospital.onrender.com/payment-result',
             vnp_Locale: VnpLocale.VN,
-            vnp_CreateDate: dateFormat(now),
-            vnp_ExpireDate: dateFormat(new Date(now.getTime() + 15 * 60 * 1000))
+            vnp_CreateDate: vnp_CreateDate,
+            vnp_ExpireDate: vnp_ExpireDate
         })
 
         if (shoppingCart) {

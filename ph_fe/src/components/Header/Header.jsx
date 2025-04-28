@@ -171,23 +171,24 @@ export default function Header() {
                         Liên hệ
                     </Link> */}
                 </PopoverGroup>
-                <div className="overflow-hidden lg:flex lg:flex-1 lg:justify-center border:">
-                    {user && user._id ? (<DropdownMenuDemo user={user}></DropdownMenuDemo>)
-                        :
+                <div className="hidden lg:flex lg:flex-1 lg:justify-end mr-24"> {/* Changed from overflow-hidden and justify-center */}
+                    {user && user._id ? (
+                        <DropdownMenuDemo user={user} />
+                    ) : (
                         <Link
                             to="/Login"
-                            className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 me-2 mb-2 rounded-full"
+                            className="text-sm/6 font-semibold text-[#FFFFFF] bg-[rgb(63_46_46_/var(--tw-bg-opacity,1))] px-5 py-2.5 rounded-full hover:bg-[#2c1f1f] transition-colors"
                         >
-                            Đăng nhập <span aria-hidden="true"></span>
+                            Đăng nhập
                         </Link>
-                    }
+                    )}
                 </div>
                 <ShoppingCartButton />
             </nav>
-            <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
-                <div className="fixed inset-0 z-10" />
-                <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
-                    <div className="flex items-center justify-between">
+            <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden relative z-[100]">
+                <div className="fixed inset-0 bg-black/25 z-[90]" aria-hidden="true" /> {/* Added backdrop with lower z-index */}
+                <DialogPanel className="fixed inset-y-0 right-0 z-[100] w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                    <div className="flex items-center justify-between relative z-[110]"> {/* Added relative positioning and highest z-index */}
                         <Link to="/" className="-m-1.5 p-1.5">
                             <span className="sr-only">Your Company</span>
                             <img
@@ -199,10 +200,10 @@ export default function Header() {
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="-m-2.5 rounded-md p-2.5 text-gray-700"
+                            className="-m-2.5 rounded-md p-2.5 text-gray-700 hover:bg-gray-100 relative z-[110]" // Added relative and z-index
                         >
                             <span className="sr-only">Close menu</span>
-                            <XMarkIcon aria-hidden="true" className="size-6" />
+                            <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                         </button>
                     </div>
 

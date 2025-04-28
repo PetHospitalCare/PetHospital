@@ -49,18 +49,25 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
-        // Reset states when appointment changes
-        setSelectedSubServices([]);
-        setFormData({});
-        setActiveTab("examination");
-        setConclusion({
-            prescription: [],
-            generalConclusion: "",
-            followUpDate: "",
-            notes: "",
-        });
-        setIsEditing(false);
-    }, [appointment?.id]); // Only run when appointment ID changes
+        // Reset all states when dialog opens or appointment changes
+        if (open) {
+            setSelectedSubServices([]);
+            setFormData({});
+            setActiveTab("examination");
+            setSearchTerm("");
+            setTotalPrice(0);
+            setMedicineTotalPrice(0);
+            setConclusion({
+                prescription: [],
+                generalConclusion: "",
+                followUpDate: "",
+                notes: "",
+            });
+            setIsEditing(false);
+            setIsSubmitting(false);
+            setServicesOpen(false);
+        }
+    }, [appointment?.id, open]); // Only run when appointment ID changes
     // Then replace the existing useEffect with this version
     useEffect(() => {
         async function loadAllData() {
@@ -70,7 +77,8 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                 // Load services
                 const servicesData = await fetchServices();
                 setServices(servicesData);
-
+                setSelectedSubServices([]);
+                setFormData({});
                 if (appointment) {
                     // Load appointment data
                     const data = await BookingServices.GetBookingbyId(appointment?.id);
@@ -339,9 +347,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             } else {
                 await MeidicalServices.CreateNewMedical(formDataToSubmit);
             }
-            for (let pair of formDataToSubmit.entries()) {
-                console.log('FormData entry:', pair[0], pair[1]);
-            }
+
 
             toast.success(isEditing ? "Cập nhật kết quả khám thành công!" : "Lưu kết quả khám thành công!");
             onOpenChange(false);
