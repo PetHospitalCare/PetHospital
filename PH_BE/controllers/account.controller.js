@@ -148,7 +148,7 @@ const getallAccount = async (req, res) => {
 // Tạo tài khoản mới
 const createNewAccount = async (req, res) => {
   try {
-    const { username, password, email, phone, role } = req.body;
+    const { username, password, email, phone, roles } = req.body;
     const existingAccount = await Account.findOne({
       $or: [
         { email: email },
@@ -167,14 +167,13 @@ const createNewAccount = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create new account
     const newAccount = new Account({
       username,
       password: hashedPassword,
       email,
       phone,
-      role
+      role: roles
     });
 
     const savedAccount = await newAccount.save();

@@ -77,7 +77,7 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
             toast.error("Vui lòng chọn ít nhất một vai trò");
             return;
         }
-
+        console.log("formData", formData)
         try {
             const response = await UserService.createAccount(formData);
             toast.success("Cập nhật tài khoản thành công!");

@@ -55,7 +55,6 @@ export default function Header() {
     const timeoutRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
-
     useEffect(() => {
         fetchCategories();
         const handleScroll = () => {
