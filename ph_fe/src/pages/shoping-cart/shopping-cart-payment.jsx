@@ -49,6 +49,13 @@ export default function ShoppingCartPayment() {
             if (user.phone) {
                 setPhoneNumber(user.phone);
             }
+        } else {
+            setTimeout(() => {
+                if (!user) {
+                    toast.warning('Vui lòng đăng nhập để mua hàng!');
+                    navigate('/');
+                }
+            }, 2000)
         }
 
         fetchProvinces();
@@ -397,7 +404,7 @@ export default function ShoppingCartPayment() {
         const isValid = validateForm();
 
         if (!user || !user._id) {
-            toast.warning('Bạn cần đăng nhập để mua hàng!');
+            toast.warning('Vui lòng đăng nhập để mua hàng!');
             return;
         }
 

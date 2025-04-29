@@ -71,7 +71,22 @@ const CreateNewBooking = async (req, res) => {
 
 const GetAllBooking = async (req, res) => {
     try {
-        const bookings = await Booking.find().populate("doctor_id").populate("pet_id")
+        const userId = req.userId;
+        const bookings = await Booking.find({ status: { $ne: "pending" }, doctor_id: userId }).populate("doctor_id").populate("pet_id")
+        return res.status(200).json(bookings);
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+    }
+}
+const GetAllBookingByStaffandAdmin = async (req, res) => {
+    try {
+        const bookings = await Booking.find({
+            status: { $ne: "pending" },
+            doctor_id: { $ne: null, $exists: true }
+        })
+            .populate("doctor_id")
+            .populate("pet_id")
+            .sort({ createdAt: -1 });
         return res.status(200).json(bookings);
     } catch (error) {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
@@ -92,7 +107,7 @@ const AssignDoctor = async (req, res) => {
                         
                         <!-- Logo -->
                         <div style="text-align: center; margin-bottom: 20px;">
-                            <img src="https://res.cloudinary.com/debx8syhr/image/upload/v1737553727/icon-removebg-preview_wtwzby.png" alt="PetCare Logo" width="120">
+                            <img src="https://res.cloudinary.com/debx8syhr/image/upload/v1742756437/SDN301m/tnwxuppwnwsyfueef090.png" alt="PetCare Logo" width="120">
                         </div>
         
                         <h2 style="color: #2c3e50; text-align: center;">Xác nhận lịch hẹn khám thú cưng</h2>
@@ -111,7 +126,7 @@ const AssignDoctor = async (req, res) => {
         
                         <!-- Button CTA -->
                         <div style="text-align: center; margin-top: 20px;">
-                            <a href="https://your-petcare-website.com/appointments/${booking_id}" 
+                            <a href="https://pethospital.onrender.com/history-booking" 
                                style="display: inline-block; padding: 12px 24px; background: #3498db; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px;">
                                Xem chi tiết lịch hẹn
                             </a>
@@ -147,21 +162,34 @@ const AssignDoctor = async (req, res) => {
 const UpdateBooking = async (req, res) => {
     try {
         const { id } = req.params;
-        const { date, hour, service_id, sub_service_id, note } = req.body;
+        const { date, hour, service_id, sub_service_id, note, doctor_id } = req.body;
+
+        const updateFields = {
+            date,
+            hour,
+            service_id,
+            sub_service_id,
+            note,
+        };
+
+        if (doctor_id) {
+            updateFields.doctor_id = doctor_id;
+        }
+
         const booking = await Booking.findByIdAndUpdate(
             id,
-            { date, hour, service_id, sub_service_id, note },
+            updateFields,
             { new: true }
         );
+
         if (!booking) {
             return res.status(404).json({ success: false, message: "Booking not found" });
         }
 
         res.status(200).json({ success: true, booking });
     } catch (error) {
-        return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
+        return res.status(500).json({ message: "Lỗi khi cập nhật booking", error });
     }
-
 }
 const getBookingbyId = async (req, res) => {
     try {
@@ -231,11 +259,20 @@ const GetAllBookingByStatus = async (req, res) => {
 const CreatePaymentBooking = async (req, res) => {
     const { booking_id } = req.params;
     const booking = await Booking.findById(booking_id);
+    if (booking.payment && booking.payment.order_code) {
+        try {
+            await payOS.cancelPaymentLink(booking.payment.order_code);
+            console.log(`Cancelled existing payment for order: ${booking.payment.orderCode}`);
+        } catch (error) {
+            console.log("Error cancelling existing payment:", error);
+            // Continue even if cancel fails
+        }
+    }
     const ordercode = parseInt(Date.now().toString().slice(-7) + Math.floor(100 + Math.random() * 900));
     const paymentLinkBody = {
         orderCode: ordercode,
         amount: booking.price,
-        description: `Thanh toán ${booking.payment.order_code}`,
+        description: `Thanh toán ${ordercode}`,
         cancelUrl: `${process.env.FRONT_END_URL}`,
         returnUrl: `${process.env.FRONT_END_URL}`,
     };
@@ -245,13 +282,14 @@ const CreatePaymentBooking = async (req, res) => {
         {
             $set: {
                 "payment.qrcode": paymentLinkRes.qrCode,
-                "payment.orderCode": ordercode
+                "payment.order_code": ordercode
             }
         },
         { new: true } // Trả về document sau khi update
     );
     return res.status(200).json({
         qrcode: paymentLinkRes.qrCode,
+        ordercode: ordercode
 
         // checkoutUrl: paymentLinkRes.qrCode,
         // checkoutlink: paymentLinkRes.checkoutUrl,
@@ -307,6 +345,7 @@ const UpdateBookingPaymentCash = async (req, res) => {
 }
 module.exports = {
     CreateNewBooking, GetAllBooking, AssignDoctor, UpdateBooking, getBookingByUser, getBookingbyId, CancelBookingById,
-    GetAllBookingByStatus, CreatePaymentBooking, receivehook, UpdateBookingPaymentCash
+    GetAllBookingByStatus, CreatePaymentBooking, receivehook, UpdateBookingPaymentCash,
+    GetAllBookingByStaffandAdmin
 };
 

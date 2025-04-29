@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const SubServiceSchema = new mongoose.Schema({
     name: { type: String, required: false },
-    duration: { type: Number, required: false },
     price: {
         dog: { type: Number, required: false },
         cat: { type: Number, required: false }

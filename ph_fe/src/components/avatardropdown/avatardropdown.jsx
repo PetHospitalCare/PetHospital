@@ -16,7 +16,8 @@ import {
     CalendarCheck,
     Contact,
     ShoppingBasket,
-    Lock
+    Lock,
+    LayoutDashboard
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -55,6 +56,13 @@ export default function DropdownMenuDemo(user) {
         navigate('/orders');
     }
 
+    const getProfileLink = (roles) => {
+        console.log(roles)
+        if (roles?.includes("admin")) return "/Dashboard";
+        if (roles?.includes("doctor")) return "/Schedule";
+        if (roles?.includes("staff")) return "/Booking_Management";
+        return "";
+    };
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -70,6 +78,14 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
+                    {user?.user?.role && !user.user.role.includes("customer") && (
+                        <Link to={getProfileLink(user?.user?.role)}>
+                            <DropdownMenuItem>
+                                <LayoutDashboard />
+                                <span>Trang quản lí</span>
+                            </DropdownMenuItem>
+                        </Link>
+                    )}
                     <Link to="/profile">
                         <DropdownMenuItem>
                             <Contact />

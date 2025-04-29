@@ -1,4 +1,5 @@
 import axios from "axios"
+import { toast } from "sonner";
 
 const instance = axios.create({
     baseURL: "https://pethospital.onrender.com",
@@ -13,6 +14,7 @@ instance.interceptors.response.use(
         // Thrown error for request with OK status code
         return response
     }, (error) => {
+
         const status = (error.response && error.response.status) || 500;
         switch (status) {
             // authentication (token related issues)
@@ -42,6 +44,10 @@ instance.interceptors.response.use(
 
             // unprocessable
             case 422: {
+                return error.response.data
+            }
+            case 500: {
+                toast.error("Không thể kết nối đến máy chủ, vui lòng thử lại sau!");
                 return error.response.data
             }
 

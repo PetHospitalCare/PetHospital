@@ -24,7 +24,7 @@ export default function PaymentDialog({ open, onOpenChange, booking, onPaymentCo
     const [paymentStatus, setPaymentStatus] = useState("pending")
     const [qrCode, setQrCode] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
-
+    const [orderCode, setOrderCode] = useState(null)
     const handlePaymentMethodChange = async (value) => {
         setPaymentMethod(value)
         if (value === "cash") {
@@ -35,6 +35,7 @@ export default function PaymentDialog({ open, onOpenChange, booking, onPaymentCo
                 const response = await BookingServices.CreatePaymentBooking(booking?._id)
                 if (response.status === 200) {
                     setQrCode(response.data.qrcode)
+                    setOrderCode(response.data.ordercode)
                 }
             } catch (error) {
                 toast.error("Không thể tạo mã QR")
@@ -44,7 +45,6 @@ export default function PaymentDialog({ open, onOpenChange, booking, onPaymentCo
             }
         }
     }
-
     const handleCashPaymentSuccess = async () => {
         try {
             const response = await BookingServices.UpdatePayByCash(booking?._id)
@@ -147,7 +147,7 @@ export default function PaymentDialog({ open, onOpenChange, booking, onPaymentCo
                                     </div>
                                     <div className="grid grid-cols-3 gap-1">
                                         <p className="font-medium">Nội dung CK:</p>
-                                        <p className="col-span-2">Thanh toán {booking?.payment?.order_code}</p>
+                                        <p className="col-span-2">Thanh toán {orderCode}</p>
                                     </div>
                                     <div className="grid grid-cols-3 gap-1">
                                         <p className="font-medium">Số tiền:</p>

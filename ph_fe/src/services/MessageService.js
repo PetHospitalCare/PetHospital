@@ -13,7 +13,6 @@ const getMessagesByConversationId = (conversationId) => {
     return axios.get(`/message/${conversationId}`);
 }
 
-
 export const MessageService = {
     fetchConversations,
     getConversationById,

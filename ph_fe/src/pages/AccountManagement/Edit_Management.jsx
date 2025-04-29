@@ -36,14 +36,39 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
     };
 
     const handleSubmit = async () => {
+        // Kiểm tra các trường bắt buộc
+        if (!formData.username.trim()) {
+            toast.error("Vui lòng nhập tên người dùng");
+            return;
+        }
+
+        if (!formData.phone.trim()) {
+            toast.error("Vui lòng nhập số điện thoại");
+            return;
+        }
+
+        // Kiểm tra định dạng số điện thoại
+        if (!/^[0-9]{10}$/.test(formData.phone)) {
+            toast.error("Số điện thoại phải có 10 chữ số");
+            return;
+        }
+
+        // Kiểm tra role
+        if (formData.role.length === 0) {
+            toast.error("Vui lòng chọn ít nhất một vai trò");
+            return;
+        }
+
         try {
             const response = await UserService.updateAccount(account._id, formData);
-            toast.success("Cập nhật tài khoản thành công!");
-            onsuccess();
-            onOpenChange(false);
-
+            if (response.status === 200) {
+                toast.success("Cập nhật tài khoản thành công!");
+                onsuccess();
+                onOpenChange(false);
+            }
         } catch (error) {
             console.error("Lỗi khi cập nhật tài khoản:", error);
+            toast.error("Có lỗi xảy ra khi cập nhật tài khoản");
         }
     }
 
@@ -90,6 +115,7 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
                         <Input
                             id="phone"
                             name="phone"
+                            type="number"
                             value={formData.phone}
                             onChange={handleInputChange}
                             className="col-span-3"

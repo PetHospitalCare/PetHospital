@@ -15,7 +15,6 @@ const ChatProvider = ({ children }) => {
         if (!socket || !user) return;
 
         // Load messages
-        // Load messages using service
         const response = await MessageService.getMessagesByConversationId(conversationId);
         setMessages(response.data);
 

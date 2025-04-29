@@ -13,7 +13,7 @@ cloudinary.config({
 const createNewMedicine = async (req, res) => {
     try {
         const files = req.files; // Danh sách file ảnh
-        const { name, description, type, pet_type, dosage, manufacturer, unit, price, quantity, expiry_date } = req.body;
+        const { name, description, type, pet_type, dosage, manufacturer, unit, price, expiry_date } = req.body;
 
         // Xử lý danh sách ảnh, tạo mảng `images`
         const images = files?.map((file) => ({
@@ -23,9 +23,9 @@ const createNewMedicine = async (req, res) => {
         const parsedPetType = typeof pet_type === "string" ? JSON.parse(pet_type) : pet_type;
 
         // Kiểm tra xem các trường cần thiết có tồn tại không
-        if (!name || !type || !price || !quantity) {
+        if (!name || !type || !price) {
             return res.status(400).json({
-                message: "Thiếu thông tin bắt buộc (name, type, price, quantity)"
+                message: "Thiếu thông tin bắt buộc (name, type, price)"
             });
         }
 
@@ -40,7 +40,6 @@ const createNewMedicine = async (req, res) => {
             manufacturer,
             unit,
             price,
-            quantity,
             expiry_date: expiry_date ? new Date(expiry_date) : null
         });
 

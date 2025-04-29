@@ -1,6 +1,6 @@
 const db = require("../models");
 const Payment = db.payment;
-const { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } = require('vnpay');
+const { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat, getDateInGMT7} = require('vnpay');
 const nodemailer = require("nodemailer");
 const Account = db.account;
 const transporter = nodemailer.createTransport({
@@ -9,6 +9,9 @@ const transporter = nodemailer.createTransport({
         user: "namkhanh2703.work@gmail.com",
         pass: "tuff cyhw bwez qkcm",
     },
+    tls: {
+        rejectUnauthorized: false
+    }
 });
 
 const paymentVNPay = async (req, res) => {
@@ -76,22 +79,28 @@ const paymentVNPay = async (req, res) => {
             vnpayHost: 'https://sandbox.vnpayment.vn',
             testMode: true,
             hashAlgorithm: 'SHA512',
-            enableLog: false,
-            loggerFn: ignoreLogger,
+            enableLog: true,
+            loggerFn: console.log,
         });
 
         const now = new Date();
+        const vnp_CreateDate = dateFormat(getDateInGMT7(now));
+        const expireDate = new Date(now.getTime() + 30 * 60 * 1000);
+        const vnp_ExpireDate = dateFormat(getDateInGMT7(expireDate));
+
+        const clientIpRaw = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '127.0.0.1';
+        const clientIp = clientIpRaw.split(',')[0].trim();
 
         const paymentUrl = vnpay.buildPaymentUrl({
-            vnp_Amount: savedPayment.totalPrice + savedPayment.shipFee,
-            vnp_IpAddr: '127.0.0.1',
-            vnp_TxnRef: savedPayment._id,
-            vnp_OrderInfo: savedPayment._id,
+            vnp_Amount: Math.round(savedPayment.totalPrice + savedPayment.shipFee),
+            vnp_IpAddr: clientIp,
+            vnp_TxnRef: String(savedPayment._id),
+            vnp_OrderInfo: String(savedPayment._id),
             vnp_OrderType: ProductCode.Other,
-            vnp_ReturnUrl: 'http://localhost:5173/payment-result',
+            vnp_ReturnUrl: 'https://pethospital.onrender.com/payment-result',
             vnp_Locale: VnpLocale.VN,
-            vnp_CreateDate: dateFormat(now),
-            vnp_ExpireDate: dateFormat(new Date(now.getTime() + 15 * 60 * 1000))
+            vnp_CreateDate: vnp_CreateDate,
+            vnp_ExpireDate: vnp_ExpireDate
         })
 
         if (shoppingCart) {
@@ -391,14 +400,14 @@ const sendEmailSuccessPayment = async (paymentInput, userKeyInput) => {
                         <p style="color: #555; margin-top: 20px;">Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua hotline: <strong>+84 0985741249</strong>.</p>
         
                         <div style="text-align: center; margin-top: 20px;">
-                            <a href="http://localhost:5173/orders" 
+                            <a href="https://pethospital.onrender.com/orders" 
                                style="display: inline-block; padding: 12px 24px; background: #3498db; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 5px;">
                                Xem lại đơn hàng của bạn
                             </a>
                         </div>
         
                         <p style="margin-top: 20px; text-align: center; font-size: 12px; color: #7f8c8d;">
-                            Địa chỉ: Văn phòng Pet Health, Tòa nhà Sông Đà, Số 54 Phạm Hùng, Nam Từ Liêm, TP. Hà Nội
+                            Địa chỉ: Đại học FPT Hà Nội - Khu Công nghệ cao Hòa Lạc, Km29 Đại lộ Thăng Long, huyện Thạch Thất, Hà Nội 
                         </p>
         
                         <div style="text-align: center; margin-top: 20px;">

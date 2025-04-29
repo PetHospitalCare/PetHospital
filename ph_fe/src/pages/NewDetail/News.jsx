@@ -81,7 +81,7 @@ export default function News() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {currentItems.map((news) => (
                                 <Link
-                                    to={`/news/${news._id}`}
+                                    to={`/new-detail/${news._id}`}
                                     key={news._id}
                                     className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                                 >
@@ -116,11 +116,10 @@ export default function News() {
                                 <button
                                     key={index}
                                     onClick={() => handlePageChange(index + 1)}
-                                    className={`px-4 py-2 mx-1 rounded-lg ${
-                                        currentPage === index + 1
+                                    className={`px-4 py-2 mx-1 rounded-lg ${currentPage === index + 1
                                             ? "bg-orange-500 text-white"
                                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                    }`}
+                                        }`}
                                 >
                                     {index + 1}
                                 </button>

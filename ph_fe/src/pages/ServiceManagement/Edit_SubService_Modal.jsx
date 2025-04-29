@@ -11,6 +11,8 @@ import {
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
+import { Services } from "@/services/Services";
+import { toast } from "sonner";
 
 export default function EditModal({ open, onClose, ServiceData, onUpdateService }) {
     const { id } = useParams();
@@ -36,8 +38,8 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!subServiceName || !price || !duration) {
-            alert("Vui lòng nhập đầy đủ thông tin.");
+        if (!subServiceName || !price.dog || !price.cat) {
+            toast.error("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
 
@@ -55,19 +57,20 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
             if (!ServiceData?._id) {
                 throw new Error("Missing service or sub-service ID");
             }
-            const response = await axios.put(
-                `http://localhost:9999/service/${id}/sub-service/${ServiceData._id}`,
-                updateData
-            );
+            const response = await Services.EditSubService(id, ServiceData._id, updateData);
+            // const response = await axios.put(
+            //     `http://localhost:9999/service/${id}/sub-service/${ServiceData._id}`,
+            //     updateData
+            // );
 
             if (response.data.success) {
-                alert("Cập nhật dịch vụ con thành công!");
+                toast.success("Cập nhật dịch vụ thành công!");
                 onUpdateService();
                 onClose();
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật dịch vụ con:", error);
-            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            toast.error("Cập nhật dịch vụ thất bại!");
         }
     };
 
@@ -101,7 +104,7 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
                                 <Input
                                     type="number"
                                     placeholder="Giá cho chó"
-                                    value={price.dog}
+                                    value={price?.dog.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "dog")}
                                     className="pl-9 pr-16"
                                     min="0"
@@ -119,7 +122,7 @@ export default function EditModal({ open, onClose, ServiceData, onUpdateService 
                                 <Input
                                     type="number"
                                     placeholder="Giá cho mèo"
-                                    value={price.cat.toLocaleString("vi-VN")}
+                                    value={price?.cat.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "cat")}
                                     className="pl-9 pr-16"
                                     min="0"

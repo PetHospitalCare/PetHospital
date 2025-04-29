@@ -29,6 +29,7 @@ const UserProvider = ({ children }) => {
                     email: response.data.account.email,
                     username: response.data.account.username,
                     phone: response.data.account.phone,
+                    address: response.data.account.address,
                     url: response.data?.account?.url,
                 });
             } else {
@@ -46,6 +47,7 @@ const UserProvider = ({ children }) => {
             fetchUserData();
         } catch (error) {
             console.error("Lỗi khi decode token:", error);
+            toast.error("Có lỗi xảy ra khi xác thực người dùng");
             setUser(null);
         }
 

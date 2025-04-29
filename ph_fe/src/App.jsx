@@ -43,8 +43,8 @@ import MedicalRecord from './pages/MedicalRecord.js/MedicalRecord.jsx';
 import HistoryBooking from './pages/HistoryBooking/HistoryBooking';
 import OrdersManagement from "@/pages/orders-management/orders-management.jsx";
 import News from './pages/NewDetail/News'
-export const socket = io.connect("https://pethospital.onrender.com");
-// export const socket = io.connect("http://localhost:9999",);
+// export const socket = io.connect("https://pethospital.onrender.com",);
+export const socket = io.connect("http://localhost:9999",);
 function App() {
   return (
     <BrowserRouter>
@@ -60,6 +60,7 @@ function App() {
           <Route path='/change-email' element={<ChangeEmail />} />
           <Route path='/news' element={<News />} />
           <Route path='/new-detail/:id' element={<NewDetail />} />
+          <Route path='/all-doctor' element={<AllDoctors />} />
           <Route path="/loading" element={<LoadingScreen />} />
           <Route path='/signup-success' element={<SignupSuccess />} />
           <Route path='/product' element={<ProductPage />} />

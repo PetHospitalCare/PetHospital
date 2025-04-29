@@ -12,6 +12,10 @@ const CreateNewSubService = (id, data) => {
 const DeleteSubService = (id, sid) => {
     return axios.delete(`/service/${id}/sub-service/${sid}`);
 };
+const EditSubService = (id, sid, data) => {
+    return axios.put(`/service/${id}/sub-service/${sid}`, data);
+}
 export const Services = {
-    getAllService, getAllServiceById, CreateNewSubService, DeleteSubService
+    getAllService, getAllServiceById, CreateNewSubService, DeleteSubService,
+    EditSubService
 };

@@ -41,7 +41,7 @@ export default function BookingDialog({ open, onClose }) {
     const minDate = today.toISOString().split('T')[0]
     const fetchService = async () => {
         try {
-            const response = await Services.getAllService("http://localhost:9999/service/get-all");
+            const response = await Services.getAllService();
             if (response.data.success) {
                 setService(response.data.services);
             }
@@ -75,8 +75,8 @@ export default function BookingDialog({ open, onClose }) {
                 });
             }
         } catch (error) {
-            console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
-            toast.error("Không thể tải thông tin người dùng");
+            console.error(error);
+            toast.error(error);
         }
     };
     useEffect(() => {
@@ -158,13 +158,19 @@ export default function BookingDialog({ open, onClose }) {
         try {
             const response = await BookingServices.CreateNewBooking(formData);
             if (response.status === 201) {
-                toast.success(`Đặt lịch khám thành công!`, {
-                    description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
-                    action: {
-                        label: 'Xem chi tiết',
-                        onClick: () => navigate('/history-booking')
-                    }
-                });
+                if (user && user?.role?.includes("customer")) {
+                    toast.success(`Đặt lịch khám thành công!`, {
+                        description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
+                        action: {
+                            label: 'Xem chi tiết',
+                            onClick: () => navigate('/history-booking')
+                        }
+                    });
+                } else {
+                    toast.success(`Đặt lịch khám thành công!`, {
+                        description: `Ngày ${formData.scheduleDate} lúc ${formData.scheduleTime} (Chờ bệnh viện xác nhận)`,
+                    });
+                }
                 handleClose();
             }
         } catch (error) {
@@ -320,7 +326,15 @@ export default function BookingDialog({ open, onClose }) {
                             </div>
                         )}
 
-                        <Link to={"/"} className="text-blue-500 block mt-2 hover:underline">Tạo hồ sơ thú cưng ở đây!</Link>
+                        <Link
+                            to="/profile"
+                            className="text-blue-500 block mt-2 hover:underline"
+                            onClick={() => {
+                                handleClose();
+                            }}
+                        >
+                            Tạo hồ sơ thú cưng ở đây!
+                        </Link>
                     </div>
                     <div>
                         <Label className="font-medium text-gray-700">Chọn loại lịch hẹn <span className="text-red-500">*</span></Label>
