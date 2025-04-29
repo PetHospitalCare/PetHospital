@@ -138,7 +138,7 @@ export default function Page({ children }) {
   const medicalRecordPath = `/${parts[1]}`;
   const projecttilte = project.find((item) => item.url === medicalRecordPath);
 
-  console.log("user: ", user)
+
 
   return (
     <SidebarProvider>
