@@ -117,11 +117,6 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         } else if (formData.price <= 0) {
             newErrors.price = "Giá thuốc phải lớn hơn 0";
         }
-        if (!formData.quantity){
-            newErrors.quantity = "Vui lòng nhập số lượng";
-        } else if (formData.quantity <= 0) {
-            newErrors.quantity = "Số lượng thuốc phải lớn hơn 0";
-        }
         if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
         if (!formData.expiry_date) {
             newErrors.expiry_date = "Vui lòng nhập ngày hết hạn";
@@ -148,7 +143,6 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         formDataToSend.append("manufacturer", formData.manufacturer);
         formDataToSend.append("unit", formData.unit);
         formDataToSend.append("price", formData.price);
-        formDataToSend.append("quantity", formData.quantity);
         formDataToSend.append("expiry_date", formData.expiry_date);
 
         formData.pet_type.forEach((type) => {
