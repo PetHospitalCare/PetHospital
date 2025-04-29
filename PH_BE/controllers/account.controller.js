@@ -32,7 +32,7 @@ const signup = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({ error: "Email or phone number already exists" });
     }
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 
@@ -59,7 +59,7 @@ const signin = async (req, res) => {
 
     res.status(200).json(account);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 
@@ -71,7 +71,7 @@ const forgotPassword = async (req, res) => {
     if (!account) return res.status(404).json({ success: false, message: "Email không tồn tại." });
     res.status(200).json({ success: true, account });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 
@@ -136,10 +136,11 @@ const changePassword = async (req, res) => {
 // Lấy tất cả tài khoản
 const getallAccount = async (req, res) => {
   try {
-    const accounts = await Account.find({ role: { $ne: "customer" } }).sort({ createdAt: -1 });
+    // const accounts = await Account.find({ role: { $ne: "customer" } }).sort({ createdAt: -1 });
+    const accounts = await Account.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, accounts });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Lỗi server" });
   }
 };
 
@@ -147,7 +148,7 @@ const getallAccount = async (req, res) => {
 // Tạo tài khoản mới
 const createNewAccount = async (req, res) => {
   try {
-    const { username, password, email, phone, role } = req.body;
+    const { username, password, email, phone, roles } = req.body;
     const existingAccount = await Account.findOne({
       $or: [
         { email: email },
@@ -166,14 +167,13 @@ const createNewAccount = async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create new account
     const newAccount = new Account({
       username,
       password: hashedPassword,
       email,
       phone,
-      role
+      role: roles
     });
 
     const savedAccount = await newAccount.save();
@@ -271,7 +271,7 @@ const getCurrentUser = async (req, res) => {
 const updateUserAccount = async (req, res) => {
   try {
     const id = req.userId;
-    const { username, phone, gender, address, dateOfBirth } = req.body;
+    const { username, phone, gender, address, dateOfBirth, description } = req.body;
 
     // Cập nhật thông tin tài khoản
     const updatedAccount = await Account.findByIdAndUpdate(
@@ -281,7 +281,8 @@ const updateUserAccount = async (req, res) => {
         phone,
         gender,
         address,
-        dateOfBirth: new Date(dateOfBirth)
+        dateOfBirth: new Date(dateOfBirth),
+        description
       },
       { new: true, runValidators: true }
     ).select("-password");

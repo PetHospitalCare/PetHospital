@@ -245,17 +245,16 @@ export default function BookingStatus({ status, setCount }) {
                         record => record.booking_id._id === row.original._id
                     );
                     if (record && record.services) {
+                        const serviceNames = record.services.map(service =>
+                            getSubServiceName(service.service_id, service.sub_service_id)
+                        );
                         return (
-                            <div className="space-y-1">
-                                {record.services.map((service, index) => (
-                                    <div key={index} className="text-sm">
-                                        {getSubServiceName(service.service_id, service.sub_service_id)}
-                                    </div>
-                                ))}
+                            <div className="w-[200px] text-sm break-words whitespace-normal">
+                                {serviceNames.join(", ")}
                             </div>
                         );
                     }
-                    return <div className="text-muted-foreground">Không có dịch vụ</div>;
+                    return <div className="text-muted-foreground w-[200px]">Không có dịch vụ</div>;
                 } else {
                     return (
                         <div className="">
@@ -353,24 +352,9 @@ export default function BookingStatus({ status, setCount }) {
                         <button>
                             <Check className="size-6 p-1 mr-1 "
                                 onClick={async () => {
-                                    if (row.original.doctor_id) {
-                                        // Nếu đã có doctor_id, cập nhật trạng thái ngay lập tức
-                                        try {
-                                            const res = await BookingServices.AssignDoctor(booking, selectedDoctor);
-                                            if (res.status === 200) {
-                                                toast.success("Cập nhật thành công!");
-                                                onUpdate(); // Cập nhật lại danh sách
-                                                onOpenChange(false); // Đóng modal
-                                            }
-                                        } catch (error) {
-                                            console.error("Lỗi khi cập nhật cuộc hẹn:", error);
-                                            toast.error("Cập nhật thất bại, thử lại sau!");
-                                        }
-                                    } else {
 
-                                        setOpenAssignDoctor(true);
-                                        setSelectedBooking(row.original);
-                                    }
+                                    setOpenAssignDoctor(true);
+                                    setSelectedBooking(row.original);
                                 }}
                             />
                         </button>
@@ -381,6 +365,7 @@ export default function BookingStatus({ status, setCount }) {
                                 <Pen className="size-6 p-1 mr-1 " onClick={() => {
                                     setIsEditDialogOpen(true);
                                     setSelectedBooking(row.original)
+
                                 }} />
 
                             </button>
@@ -470,7 +455,8 @@ export default function BookingStatus({ status, setCount }) {
             <EditBookingDialog open={isEditDialogOpen}
                 onClose={() => setIsEditDialogOpen(false)}
                 bookingData={selectedBooking}
-                onUpdate={fetchBookings}>
+                onUpdate={fetchBookings}
+                status={status}>
 
             </EditBookingDialog>
             <AssignDoctor open={openAssignDoctor} onOpenChange={setOpenAssignDoctor} booking={selectedBooking} onUpdate={fetchBookings} />

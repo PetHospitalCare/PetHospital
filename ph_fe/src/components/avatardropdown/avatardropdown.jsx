@@ -55,7 +55,9 @@ export default function DropdownMenuDemo(user) {
     const goToOrders = () => {
         navigate('/orders');
     }
+
     const getProfileLink = (roles) => {
+        console.log(roles)
         if (roles?.includes("admin")) return "/Dashboard";
         if (roles?.includes("doctor")) return "/Schedule";
         if (roles?.includes("staff")) return "/Booking_Management";
@@ -76,8 +78,8 @@ export default function DropdownMenuDemo(user) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    {user?.user?.role !== "customer" && (
-                        <Link to={getProfileLink(user.user.role)}>
+                    {user?.user?.role && !user.user.role.includes("customer") && (
+                        <Link to={getProfileLink(user?.user?.role)}>
                             <DropdownMenuItem>
                                 <LayoutDashboard />
                                 <span>Trang quản lí</span>

@@ -11,8 +11,10 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headless
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid';
 import { BookingServices } from "@/services/BookingService";
 import { toast } from "sonner";
-
-export default function EditBookingDialog({ open, onClose, bookingData, onUpdate }) {
+import { User } from "lucide-react";
+import { UserService } from "@/services/UserService";
+import { format } from "date-fns"
+export default function EditBookingDialog({ open, onClose, bookingData, onUpdate, status }) {
     const [service, setService] = useState([]);
     const [pet, setPet] = useState([]);
     const [formData, setFormData] = useState({
@@ -26,8 +28,10 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
         scheduleTime: "",
         pet_id: "",
         account_id: "",
+
         note: ""
     });
+    const [doctors, setDoctors] = useState([]);
     const [selected, setSelected] = useState();
 
     // Fetch services and pets
@@ -41,6 +45,17 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
             console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
         }
     };
+    const fetchDoctors = async () => {
+        try {
+            const response = await UserService.getAllDoctor();
+            if (response.data) {
+                setDoctors(response.data.doctor);
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách bác sĩ:", error);
+        }
+    };
+
 
     const fetchPet = async () => {
         try {
@@ -57,6 +72,7 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
     // Load booking data when modal opens
     useEffect(() => {
         fetchService();
+        fetchDoctors();
         if (bookingData) {
             setFormData({
                 name: bookingData.guest_name || "",
@@ -69,7 +85,8 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                 scheduleTime: bookingData.hour || "",
                 pet_id: bookingData.pet_id?._id || "",
                 account_id: bookingData.account_id?._id || "",
-                note: bookingData.note || ""
+                note: bookingData.note || "",
+                doctor_id: bookingData.doctor_id?._id || "",
             });
 
             setSelected(pet.find(p => p._id === bookingData.pet_id?._id));
@@ -93,7 +110,6 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
             subServiceId: selectedService?.subServices.length ? selectedService.subServices[0]._id : "",
         });
     };
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!formData.scheduleDate || !formData.scheduleTime || !formData.scheduleType || !formData.subServiceId) {
@@ -107,6 +123,7 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                 hour: formData.scheduleTime, // Giờ hẹn
                 service_id: formData.scheduleType, // Loại lịch hẹn
                 sub_service_id: formData.subServiceId, // Dịch vụ con
+                doctor_id: formData.doctor_id,
                 note: formData.note, // Ghi chú
             };
             const response = await BookingServices.UpdateBooking(bookingData._id, payload);
@@ -183,10 +200,16 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                                             <span className="font-medium">Loại:</span> {selected.type === "dog" ? "Chó" : "Mèo"}
                                         </p>
                                         <p className="text-sm text-gray-600">
-                                            <span className="font-medium">Tuổi:</span> {selected.age} tuổi
+                                            <span className="font-medium">Ngày sinh: </span>{selected?.dateOfBirth ? format(new Date(selected?.dateOfBirth), "dd-MM-yyyy") : ""}
                                         </p>
                                         <p className="text-sm text-gray-600">
                                             <span className="font-medium">Giới tính:</span> {selected.gender === 0 ? "Đực" : "Cái"}
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-medium">Giống:</span> {selected?.species}
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            <span className="font-medium">Cân nặng (kg): </span> {selected?.weight}
                                         </p>
                                     </div>
                                 </div>
@@ -195,6 +218,7 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                             <div className="mt-2 py-3 px-4 text-sm">Không có thông tin thú cưng</div>
                         )}
                     </div>
+
                     <div>
                         <Label className="font-medium text-gray-700">Chọn loại lịch hẹn <span className="text-red-500">*</span></Label>
                         <Select onValueChange={handleServiceChange} value={formData.scheduleType}>
@@ -226,6 +250,41 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                             </div>
                         )}
                     </div>
+                    {status === "confirm" && (
+                        <div>
+                            <Label className="font-medium text-gray-700">Bác sĩ phụ trách</Label>
+                            <Select
+                                value={formData.doctor_id}
+                                onValueChange={(value) => setFormData({ ...formData, doctor_id: value })}
+                            >
+                                <SelectTrigger className="bg-white border-gray-300 rounded-lg">
+                                    <SelectValue placeholder="Chọn bác sĩ..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {doctors.map((doctor) => (
+                                        <SelectItem key={doctor._id} value={doctor._id}>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-full overflow-hidden">
+                                                    {doctor.url ? (
+                                                        <img
+                                                            src={doctor.url}
+                                                            alt={doctor.username}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                            <User size={16} className="text-gray-500" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {doctor.username}
+                                            </div>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                     <div className="col-span-2">
                         <Label className="font-medium text-gray-700">Ghi chú</Label>
                         <Textarea name="note" value={formData.note} onChange={handleChange} placeholder="Nhập thông tin bổ sung..." className="bg-white border-gray-300 rounded-lg" />

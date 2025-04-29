@@ -117,11 +117,6 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         } else if (formData.price <= 0) {
             newErrors.price = "Giá thuốc phải lớn hơn 0";
         }
-        if (!formData.quantity){
-            newErrors.quantity = "Vui lòng nhập số lượng";
-        } else if (formData.quantity <= 0) {
-            newErrors.quantity = "Số lượng thuốc phải lớn hơn 0";
-        }
         if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
         if (!formData.expiry_date) {
             newErrors.expiry_date = "Vui lòng nhập ngày hết hạn";
@@ -148,7 +143,6 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
         formDataToSend.append("manufacturer", formData.manufacturer);
         formDataToSend.append("unit", formData.unit);
         formDataToSend.append("price", formData.price);
-        formDataToSend.append("quantity", formData.quantity);
         formDataToSend.append("expiry_date", formData.expiry_date);
 
         formData.pet_type.forEach((type) => {
@@ -257,17 +251,6 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                             title="Giá thuốc không được âm"
                         />
                         {errors.price && <p className="text-red-500">{errors.price}</p>}
-                        <Label htmlFor="quantity">Số lượng</Label>
-                        <Input
-                            id="quantity"
-                            name="quantity"
-                            type="number"
-                            value={formData.quantity}
-                            onChange={handleInputChange}
-                            placeholder="Nhập số lượng thuốc"
-                            title="Số lượng thuốc không được âm"
-                        />
-                        {errors.quantity && <p className="text-red-500">{errors.quantity}</p>}
                         <Label htmlFor="expiry_date">Ngày hết hạn</Label>
                         <Input id="expiry_date" name="expiry_date" type="date" value={formData.expiry_date} onChange={handleInputChange} />
                         {errors.expiry_date && <p className="text-red-500">{errors.expiry_date}</p>}

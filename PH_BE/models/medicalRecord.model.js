@@ -12,7 +12,6 @@ const MedicalRecordSchema = new mongoose.Schema(
         }],
         generalConclusion: { type: String },
         followUpDate: { type: Date },
-        result: { type: mongoose.Schema.Types.Mixed },
         prescription: [
             {
                 medicine: { type: mongoose.Schema.Types.ObjectId, ref: "Medicine" },

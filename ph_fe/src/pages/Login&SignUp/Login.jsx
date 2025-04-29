@@ -19,18 +19,29 @@ export default function Login() {
   }, [user, navigate]);
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    const { name, value } = e.target;
+  
+    // Trim khoảng trắng cho email
+    if (name === "email") {
+      setFormData({ ...formData, [name]: value.trimStart() });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  
+    setErrors({ ...errors, [name]: "" });
   };
-
+  
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email) {
+    const trimmedEmail = formData.email.trim(); // Loại bỏ khoảng trắng ở đầu và cuối email
+  
+    if (!trimmedEmail) {
       newErrors.email = "Vui lòng nhập email.";
     }
     if (!formData.password) {
       newErrors.password = "Vui lòng nhập mật khẩu.";
     }
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -38,6 +49,8 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
+    formData.email = formData.email.trim();
+
     if (!validateForm()) {
       return;
     }
@@ -59,7 +72,7 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
+    <div className="relative min-h-screen pt-16 flex items-center justify-center">
       {/* Background Image */}
       <div className="absolute inset-0 -z-10">
         <img

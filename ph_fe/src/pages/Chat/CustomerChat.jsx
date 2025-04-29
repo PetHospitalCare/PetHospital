@@ -26,14 +26,14 @@ const CustomerChat = () => {
                 if (!userNames[userId] && userId !== user._id) {
                     try {
                         const userData = await UserService.getAccountbyId(userId);
-                        const isCustomer = userData.data.account.role.includes('customer');
+                        const isCustomer = userData?.data?.account?.role.includes('customer');
                         let displayName;
 
                         if (isCustomer) {
-                            displayName = `Khách hàng - ${userData.data.account.username}`;
+                            displayName = `Khách hàng - ${userData?.data?.account?.username}`;
                         } else {
-                            const roleDisplay = userData.data.account.role.includes('admin') ? 'Admin' : 'Nhân viên';
-                            displayName = `${roleDisplay} - ${userData.data.account.username}`;
+                            const roleDisplay = userData?.data.account?.role.includes('admin') ? 'Admin' : 'Nhân viên';
+                            displayName = `${roleDisplay} - ${userData?.data?.account?.username}`;
                         }
 
                         setUserNames(prev => ({
@@ -104,6 +104,9 @@ const CustomerChat = () => {
             </span>
         ));
     };
+    if (!user?.role?.includes('customer')) {
+        return null; // Don't render anything if user is not a customer
+    }
 
     // Chat button when closed
     if (!isOpen) {

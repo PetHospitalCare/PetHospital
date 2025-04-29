@@ -27,7 +27,6 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
         manufacturer: "",
         unit: "",
         price: "",
-        quantity: "",
         expiry_date: ""
     });
     const [imageFiles, setImageFiles] = useState([]);
@@ -106,11 +105,6 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
             newErrors.price = "Vui lòng nhập giá thuốc";
         } else if (formData.price <= 0) {
             newErrors.price = "Giá thuốc phải lớn hơn 0";
-        }
-        if (!formData.quantity){
-            newErrors.quantity = "Vui lòng nhập số lượng";
-        } else if (formData.quantity <= 0) {
-            newErrors.quantity = "Số lượng thuốc phải lớn hơn 0";
         }
         if (!formData.pet_type.length) newErrors.pet_type = "Vui lòng chọn ít nhất một loại thú cưng";
         if (!formData.expiry_date) {
@@ -242,18 +236,6 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                             onChange={handleInputChange}
                         />
                         {errors.price && <p className="text-red-500">{errors.price}</p>}
-                    </div>
-                    <div>
-                        <Label htmlFor="quantity">Số lượng</Label>
-                        <Input
-                            id="quantity"
-                            type="number"
-                            value={formData.quantity}
-                            placeholder="Số lượng thuốc"
-                            title="Chỉ nhập số"
-                            onChange={handleInputChange}
-                        />
-                        {errors.quantity && <p className="text-red-500">{errors.quantity}</p>}
                     </div>
                     <div>
                         <Label htmlFor="expiry_date">Ngày hết hạn</Label>

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { useParams } from "react-router-dom";
 import { Services } from "../../services/Services";
+import { toast } from "sonner";
 
 export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
     const { id } = useParams();
@@ -28,8 +29,8 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!name || !price.dog || !price.cat || !duration) {
-            alert("Vui lòng nhập đầy đủ thông tin.");
+        if (!name || !price.dog || !price.cat) {
+            toast.error("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
         try {
@@ -44,13 +45,13 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
             });
 
             if (response.data.message === "Subservice added successfully") {
-                alert("Dịch vụ con đã được thêm!");
+                toast.success("Thêm dịch vụ thành công!");
                 onAddService();
                 handleClose();
             }
         } catch (error) {
-            console.error("Lỗi khi thêm dịch vụ con:", error);
-            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+            console.error("Lỗi khi thêm dịch con:", error);
+            toast.error("Thêm dịch vụ  thất bại!");
         }
     };
 
@@ -79,7 +80,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium mb-2 text-left">Tên dịch vụ</label>
-                        <Input type="text" placeholder="Nhập tên dịch vụ" value={name} onChange={(e) => setName(e.target.value)} required />
+                        <Input type="text" placeholder="Nhập tên dịch vụ" value={name} onChange={(e) => setName(e.target.value)} />
                     </div>
 
 
@@ -98,7 +99,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                                     value={price.dog.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "dog")}
                                     className="pl-9"
-                                    required
+
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <span className="text-gray-500 sm:text-sm">VNĐ</span>
@@ -114,7 +115,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                                     value={price.cat.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "cat")}
                                     className="pl-9"
-                                    required
+
                                 />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <span className="text-gray-500 sm:text-sm">VNĐ</span>

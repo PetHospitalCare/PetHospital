@@ -145,20 +145,9 @@ export default function MedicineManagerment() {
             enableHiding: true,
         },
         {
-            accessorKey: "quantity",
-            header: ({ column }) => (
-                <div className="text-center">
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        className="px-2"
-                    >
-                        SL
-                        <ArrowUpDown className="ml-1 h-4 w-4" />
-                    </Button>
-                </div>
-            ),
-            cell: ({ row }) => <div className="text-center">{row.getValue("quantity")}</div>,
+            accessorKey: "manufacturer",
+            header: () => <div className="text-center">Nhà sản xuất</div>,
+            cell: ({ row }) => <div className="text-center font-normal">{row.getValue("manufacturer")}</div>,
         },
         {
             accessorKey: "price",

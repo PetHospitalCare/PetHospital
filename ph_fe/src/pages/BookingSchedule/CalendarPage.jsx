@@ -128,7 +128,6 @@ export default function Calendar() {
             event.getFullYear() === today.getFullYear()
         );
     };
-    console.log(appointments);
     return (
         <div className="container mx-auto p-4">
             {loading ? (

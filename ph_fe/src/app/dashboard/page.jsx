@@ -8,13 +8,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { Bell } from "lucide-react";
+import { Bell, User } from "lucide-react";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { socket } from "../../App";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { MessageService } from "@/services/MessageService";
 import { toast } from "sonner";
-
+import { UserContext } from "@/contexts/UserContext";
 export default function Page({ children }) {
   const [navTitle, setNavTitle] = useState([]);
   const [navItems, setNavItems] = useState([]);
@@ -33,6 +33,7 @@ export default function Page({ children }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
 
   const handleOpen = useCallback(() => {
     setIsOpen((prev) => !prev); // Đảo ngược giá trị của isOpen
@@ -43,7 +44,6 @@ export default function Page({ children }) {
           const res = await MessageService.MarkNotificationAsRead();
         } catch (error) {
           console.error("Error marking notifications as read:", error);
-          toast.error("Không thể đánh dấu thông báo là đã đọc");
         }
       };
       markAllAsRead();
@@ -171,48 +171,50 @@ export default function Page({ children }) {
           </div>
 
           {/* Chuông thông báo */}
-          <div className="relative" ref={dropdownRef}>
-            <div className="cursor-pointer relative" onClick={handleOpen}>
-              <Bell className="w-6 h-6 text-gray-700" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                  {unreadCount}
-                </span>
+          {(user?.role?.includes("staff") || user?.role?.includes("admin")) && (
+            <div className="relative" ref={dropdownRef}>
+              <div className="cursor-pointer relative" onClick={handleOpen}>
+                <Bell className="w-6 h-6 text-gray-700" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
+
+              {/* Dropdown thông báo */}
+              {isOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg border z-50">
+                  <div className="p-3">
+                    <p className="font-semibold text-gray-700 text-lg">🔔 Thông báo</p>
+                    <Separator className="my-2" />
+                    {notifications.length > 0 ? (
+                      <ul className="max-h-64 overflow-auto">
+                        {notifications.map((notif, index) => (
+                          <li
+                            key={index}
+                            className="p-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg mb-2 cursor-pointer transition"
+                            onClick={() => {
+                              if (notif.type === "booking") {
+                                navigate("/Booking_Management");
+                              } else {
+                                navigate("/chat"); // Đường dẫn khác nếu không phải "booking"
+                              }
+                            }}
+                          >
+                            <p className="font-medium">{notif.message}</p>
+                            <p className="text-xs text-gray-500 mt-1">{formatTime(notif.time)}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-center text-gray-500 py-3">Không có thông báo</p>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
-
-            {/* Dropdown thông báo */}
-            {isOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-lg border z-50">
-                <div className="p-3">
-                  <p className="font-semibold text-gray-700 text-lg">🔔 Thông báo</p>
-                  <Separator className="my-2" />
-                  {notifications.length > 0 ? (
-                    <ul className="max-h-64 overflow-auto">
-                      {notifications.map((notif, index) => (
-                        <li
-                          key={index}
-                          className="p-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg mb-2 cursor-pointer transition"
-                          onClick={() => {
-                            if (notif.type === "booking") {
-                              navigate("/Booking_Management");
-                            } else {
-                              navigate("/chat"); // Đường dẫn khác nếu không phải "booking"
-                            }
-                          }}
-                        >
-                          <p className="font-medium">{notif.message}</p>
-                          <p className="text-xs text-gray-500 mt-1">{formatTime(notif.time)}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-center text-gray-500 py-3">Không có thông báo</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>

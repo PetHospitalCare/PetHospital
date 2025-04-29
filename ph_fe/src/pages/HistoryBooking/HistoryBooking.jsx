@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BookingServices } from "@/services/BookingService";
 import { Hand } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "@/contexts/UserContext";
+
 export default function HistoryBooking() {
     const [HBooking, setHBooking] = useState([]);
     const statusMapping = {
@@ -13,7 +15,10 @@ export default function HistoryBooking() {
         complete: "Đã hoàn thành",
     };
     const navigate = useNavigate();
-
+    const { user } = useContext(UserContext);
+    if (!user) {
+        navigate("/login");
+    }
     const fetchHBooking = async () => {
         try {
             const response = await BookingServices.GetHistoryBooking();
