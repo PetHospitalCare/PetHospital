@@ -257,17 +257,6 @@ export default function SheetDemo({ open, onOpenChange, medicine, onsuccess }) {
                             title="Giá thuốc không được âm"
                         />
                         {errors.price && <p className="text-red-500">{errors.price}</p>}
-                        <Label htmlFor="quantity">Số lượng</Label>
-                        <Input
-                            id="quantity"
-                            name="quantity"
-                            type="number"
-                            value={formData.quantity}
-                            onChange={handleInputChange}
-                            placeholder="Nhập số lượng thuốc"
-                            title="Số lượng thuốc không được âm"
-                        />
-                        {errors.quantity && <p className="text-red-500">{errors.quantity}</p>}
                         <Label htmlFor="expiry_date">Ngày hết hạn</Label>
                         <Input id="expiry_date" name="expiry_date" type="date" value={formData.expiry_date} onChange={handleInputChange} />
                         {errors.expiry_date && <p className="text-red-500">{errors.expiry_date}</p>}

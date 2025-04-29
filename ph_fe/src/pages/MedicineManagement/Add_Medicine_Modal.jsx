@@ -244,18 +244,6 @@ export default function AddMedicineDialog({ open, onOpenChange, onSuccess }) {
                         {errors.price && <p className="text-red-500">{errors.price}</p>}
                     </div>
                     <div>
-                        <Label htmlFor="quantity">Số lượng</Label>
-                        <Input
-                            id="quantity"
-                            type="number"
-                            value={formData.quantity}
-                            placeholder="Số lượng thuốc"
-                            title="Chỉ nhập số"
-                            onChange={handleInputChange}
-                        />
-                        {errors.quantity && <p className="text-red-500">{errors.quantity}</p>}
-                    </div>
-                    <div>
                         <Label htmlFor="expiry_date">Ngày hết hạn</Label>
                         <Input
                             id="expiry_date"
