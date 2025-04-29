@@ -19,29 +19,16 @@ import { vi } from "date-fns/locale"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 
-export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePriceChange }) {
+export function ConclusionForm({ conclusion, onChange, isReadOnly }) {
   const [medicines, setMedicines] = useState([])
   const [loading, setLoading] = useState(false)
-  const [totalMedicinePrice, setTotalMedicinePrice] = useState(0)
+
 
   // Create a minimum date string in YYYY-MM-DD format for today
   const today = new Date()
   const minDate = today.toISOString().split('T')[0]
 
-  const calculateTotalPrice = (prescriptions) => {
-    if (!prescriptions || !medicines.length) return 0;
 
-    const total = prescriptions.reduce((sum, item) => {
-      const medicine = medicines.find(m => m._id === item.medicine_id);
-      const quantity = parseInt(item.quantity) || 0;
-      const price = medicine?.price || 0;
-      return sum + (price * quantity);
-    }, 0);
-
-    setTotalMedicinePrice(total);
-    onMedicinePriceChange(total);
-    return total;
-  };
 
   useEffect(() => {
     if (medicines.length === 0) {
@@ -80,11 +67,7 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
     onChange("prescription", formattedPrescriptions);
   }, [medicines]);
 
-  useEffect(() => {
-    if (medicines.length > 0 && conclusion?.prescription) {
-      calculateTotalPrice(conclusion.prescription);
-    }
-  }, [medicines]);
+
 
   const handleAddPrescription = () => {
     const newPrescription = {
@@ -110,7 +93,7 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
       instructions: ""
     }
     onChange("prescription", updatedPrescriptions)
-    calculateTotalPrice(updatedPrescriptions);
+
   }
 
   const handleRemovePrescription = (index) => {
@@ -125,7 +108,7 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
       [field]: value
     }
     onChange("prescription", updatedPrescriptions)
-    calculateTotalPrice(updatedPrescriptions);
+
   }
 
   const handleConclusionChange = (e) => {
