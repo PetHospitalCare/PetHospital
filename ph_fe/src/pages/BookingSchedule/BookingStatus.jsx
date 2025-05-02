@@ -85,7 +85,7 @@ export default function BookingStatus({ status, setCount }) {
                 const response = await MeidicalServices.getAllMedicalRecords();
                 const complete = response?.data?.data?.filter(record => record.booking_id?.status === status);
                 const bookings = complete.map(record => record.booking_id)
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
                 setAllData(bookings);
                 setData(bookings);
                 setMedicalRecord(complete);

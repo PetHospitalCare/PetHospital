@@ -229,7 +229,7 @@ export default function Calendar() {
                                                     };
 
                                                     const eventStartMinutes = getMinutes(event.startHour);
-                                                    const eventEndMinutes = eventStartMinutes + event.duration;
+                                                    const eventEndMinutes = eventStartMinutes + 30;
 
                                                     const endHourIndex = HOURS.reduce((prevIdx, h, idx) => {
                                                         return getMinutes(h) <= eventEndMinutes ? idx : prevIdx;

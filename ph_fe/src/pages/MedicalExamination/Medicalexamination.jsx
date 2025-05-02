@@ -472,7 +472,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         <Dialog modal={false} open={open} onOpenChange={(isOpen) => {
             onOpenChange(isOpen);
         }}>
-            <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
+            <DialogContent className="max-w-6xl max-h-[100vh] overflow-hidden p-0">
                 <DialogHeader className="px-6 pt-6 pb-2">
                     <DialogTitle>Kết quả khám</DialogTitle>
                     {conclusion?.createdAt ? (
