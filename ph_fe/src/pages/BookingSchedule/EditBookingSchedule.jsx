@@ -33,7 +33,37 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
     });
     const [doctors, setDoctors] = useState([]);
     const [selected, setSelected] = useState();
+    const getAvailableHours = () => {
+        const currentDate = new Date();
+        const selectedDate = new Date(formData.scheduleDate);
+        const isToday = selectedDate.toDateString() === currentDate.toDateString();
 
+        const allHours = [
+            "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
+            "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
+        ];
+
+        if (!isToday) return allHours;
+
+        const currentHour = currentDate.getHours();
+        const currentMinutes = currentDate.getMinutes();
+        const currentTime = currentHour + (currentMinutes / 60);
+
+        return allHours.filter(time => {
+            const [hours, minutes] = time.split(":").map(Number);
+            const appointmentTime = hours + (minutes / 60);
+            // Add 1 hour buffer for preparation
+            return appointmentTime > (currentTime + 1);
+        });
+    };
+    useEffect(() => {
+        if (formData.scheduleDate) {
+            const availableHours = getAvailableHours();
+            if (!availableHours.includes(formData.scheduleTime)) {
+                setFormData(prev => ({ ...prev, scheduleTime: "" }));
+            }
+        }
+    }, [formData.scheduleDate]);
     // Fetch services and pets
     const fetchService = async () => {
         try {
@@ -165,7 +195,15 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                         <div className="w-1/2">
                             <Label className="font-medium text-gray-700">Chọn ngày hẹn <span className="text-red-500">*</span></Label>
                             <div className="relative">
-                                <Input type="date" name="scheduleDate" value={formData.scheduleDate} onChange={handleChange} required className="bg-white border-gray-300 rounded-lg pl-3 pr-10 w-full" />
+                                <Input
+                                    type="date"
+                                    name="scheduleDate"
+                                    value={formData.scheduleDate}
+                                    onChange={handleChange}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    required
+                                    className="bg-white border-gray-300 rounded-lg pl-3 pr-10 w-full"
+                                />
                             </div>
                         </div>
                         <div className="w-1/2">
@@ -175,9 +213,17 @@ export default function EditBookingDialog({ open, onClose, bookingData, onUpdate
                                     <SelectValue placeholder="Chọn giờ..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"].map((time) => (
-                                        <SelectItem key={time} value={time}>{time}</SelectItem>
-                                    ))}
+                                    {getAvailableHours().length > 0 ? (
+                                        getAvailableHours().map((time) => (
+                                            <SelectItem key={time} value={time}>{time}</SelectItem>
+                                        ))
+                                    ) : (
+                                        <div className="p-2 text-sm text-gray-500 text-center">
+                                            {formData.scheduleDate === new Date().toISOString().split('T')[0]
+                                                ? "Không còn giờ trống cho ngày hôm nay"
+                                                : "Vui lòng chọn ngày"}
+                                        </div>
+                                    )}
                                 </SelectContent>
                             </Select>
                         </div>
