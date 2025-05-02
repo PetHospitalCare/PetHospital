@@ -162,10 +162,6 @@ export default function Calendar() {
                                 <div className="w-4 h-4 bg-yellow-100 rounded"></div>
                                 <span className="text-sm text-gray-600">Chờ khám</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 bg-red-100 rounded"></div>
-                                <span className="text-sm text-gray-600">Đã hủy</span>
-                            </div>
                         </div>
                     </div>
 
@@ -256,12 +252,7 @@ export default function Calendar() {
                                                             <div className="text-xs mt-1 italic border-t pt-1 truncate">
                                                                 <span className="font-medium">BS:</span> {event.doctor}
                                                             </div>
-                                                            {event.status === 'cancel' ? (
-                                                                <div className="flex items-center gap-1 text-xs text-red-700 mt-2 font-medium bg-red-50 p-1.5 rounded-md">
-                                                                    <AlertCircle className="w-4 h-4" />
-                                                                    <span>Đã hủy</span>
-                                                                </div>
-                                                            ) : event.status ? (
+                                                            {event.status ? (
                                                                 <div className="flex items-center gap-1 text-xs text-green-700 mt-2 font-medium bg-green-50 p-1.5 rounded-md">
                                                                     <CheckCircle2 className="w-4 h-4" />
                                                                     <span>Đã khám xong</span>

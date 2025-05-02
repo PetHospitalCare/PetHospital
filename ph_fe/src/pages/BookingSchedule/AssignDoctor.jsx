@@ -42,7 +42,10 @@ const AssignDoctor = ({ open, onOpenChange, booking, onUpdate }) => {
         setLoading(true);
         try {
             const res = await BookingServices.AssignDoctor(booking?._id, selectedDoctor);
-            if (res?.success === true) {
+            console.log("res", res);
+            console.log("status", res?.status);
+            console.log("success", res?.success);
+            if (res?.status === 200) {
                 toast.success(res?.message);
                 onUpdate();
                 onOpenChange(false);
