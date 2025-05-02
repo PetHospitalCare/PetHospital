@@ -591,7 +591,7 @@ export default function BookingStatus({ status, setCount }) {
             </div>
             <div className="flex items-center justify-between py-4">
                 <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-700">Số sản phẩm mỗi trang:</span>
+                    <span className="text-sm text-gray-700">Số lượng mỗi trang:</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="h-8 px-2">
