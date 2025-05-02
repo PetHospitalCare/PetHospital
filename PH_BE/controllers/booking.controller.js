@@ -72,7 +72,7 @@ const CreateNewBooking = async (req, res) => {
 const GetAllBooking = async (req, res) => {
     try {
         const userId = req.userId;
-        const bookings = await Booking.find({ status: { $ne: "pending" }, doctor_id: userId }).populate("doctor_id").populate("pet_id")
+        const bookings = await Booking.find({ status: { $nin: ["pending", "cancel"] }, doctor_id: userId }).populate("doctor_id").populate("pet_id")
         return res.status(200).json(bookings);
     } catch (error) {
         return res.status(500).json({ message: "Lỗi khi lấy danh sách booking", error });
@@ -111,7 +111,7 @@ const AssignDoctor = async (req, res) => {
             doctor_id: doctor_id,
             date: bookingToAssign.date,
             hour: bookingToAssign.hour,
-            status: { $in: ["confirm", "in-progress"] },
+            status: { $in: ["confirm"] },
             _id: { $ne: booking_id } // Exclude current booking
         });
 
@@ -138,7 +138,7 @@ const AssignDoctor = async (req, res) => {
 
         // Send confirmation email
         await transporter.sendMail({
-            to: booking.guest_email,
+            to: updatedBooking.guest_email,
             subject: "Xác nhận đặt lịch khám tại PetCare",
             html: `
                 <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
@@ -150,14 +150,14 @@ const AssignDoctor = async (req, res) => {
                         </div>
         
                         <h2 style="color: #2c3e50; text-align: center;">Xác nhận lịch hẹn khám thú cưng</h2>
-                        <p style="text-align: center; color: #555;">Chào <b>${booking?.guest_name}</b>,</p>
+                        <p style="text-align: center; color: #555;">Chào <b>${updatedBooking?.guest_name}</b>,</p>
                         
                         <p style="color: #555;">Bạn đã đặt lịch khám thành công tại <b>PetCare</b>. Dưới đây là thông tin chi tiết:</p>
         
                         <div style="background: #ecf7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                            <p><strong>Bác sĩ phụ trách:</strong> ${booking.doctor_id.username}</p>
-                            <p><strong>Ngày khám:</strong> ${new Date(booking.date).toLocaleDateString('vi-VN')}</p>
-                            <p><strong>Thời gian:</strong> ${booking?.hour}</p>
+                            <p><strong>Bác sĩ phụ trách:</strong> ${updatedBooking?.doctor_id?.username}</p>
+                            <p><strong>Ngày khám:</strong> ${new Date(updatedBooking.date).toLocaleDateString('vi-VN')}</p>
+                            <p><strong>Thời gian:</strong> ${updatedBooking?.hour}</p>
                             <p><strong>Địa điểm:</strong> PetCare Hospital - Hòa Lạc, Hà Nội</p>
                         </div>
         
