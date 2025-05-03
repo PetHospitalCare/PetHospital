@@ -30,9 +30,6 @@ const bookingSchema = new mongoose.Schema(
                 type: String
             },
             date: { type: Date }
-
-
-
         }
     },
     { timestamps: true }

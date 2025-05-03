@@ -136,8 +136,13 @@ const changePassword = async (req, res) => {
 // Lấy tất cả tài khoản
 const getallAccount = async (req, res) => {
   try {
+    const userId = req.userId;
     // const accounts = await Account.find({ role: { $ne: "customer" } }).sort({ createdAt: -1 });
-    const accounts = await Account.find().sort({ createdAt: -1 });
+    const accounts = await Account.find({
+      _id: { $ne: userId },
+      role: { $ne: "customer" }
+    }).sort({ createdAt: -1 });
+
     res.status(200).json({ success: true, accounts });
   } catch (error) {
     res.status(500).json({ error: "Lỗi server" });
@@ -253,13 +258,29 @@ const getAllDoctor = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     const userId = req.userId; // Lấy userId từ middleware verifyToken
-
+    const userRole = req.userRole;
     const user = await Account.findById(userId).select("-password"); // Loại bỏ mật khẩu khi trả về
 
     if (!user) {
       return res.status(404).json({ success: false, message: "Không tìm thấy người dùng." });
     }
+    // Compare role arrays
+    const hasRoleChanged = Array.isArray(userRole) && Array.isArray(user.role) && (
+      userRole.length !== user.role.length ||
+      !userRole.every(role => user.role.includes(role))
+    );
 
+    // Generate new token if roles have changed
+    if (hasRoleChanged) {
+      const newToken = generateToken(user._id, user.role, user.username, user.email);
+      res.cookie("access_token", newToken, {
+        path: "/",
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        maxAge: 86400000 // 1 ngày
+      });
+    }
     res.status(200).json({ success: true, account: user });
   } catch (error) {
     console.error("Lỗi khi lấy thông tin người dùng:", error);

@@ -77,7 +77,7 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
             toast.error("Vui lòng chọn ít nhất một vai trò");
             return;
         }
-        console.log("formData", formData)
+
         try {
             const response = await UserService.createAccount(formData);
             toast.success("Cập nhật tài khoản thành công!");
@@ -115,7 +115,7 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="email" className="text-right">
-                            Email hoặc account
+                            Account name
                         </Label>
                         <Input
                             id="email"
