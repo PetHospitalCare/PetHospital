@@ -32,7 +32,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
         const fetchUserData = async () => {
             try {
                 const response = await UserService.getCurrentUser();
-                if (response.data.success) {
+                if (response?.data?.success) {
                     setUser({
                         _id: response.data.account._id,
                         role: response.data.account.role,
