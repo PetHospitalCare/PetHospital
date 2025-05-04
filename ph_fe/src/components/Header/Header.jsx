@@ -16,6 +16,28 @@ import {
     PopoverPanel,
 } from '@headlessui/react'
 import {
+    Cloud,
+    CreditCard,
+    Github,
+    Keyboard,
+    LifeBuoy,
+    LogOut,
+    Mail,
+    MessageSquare,
+    Plus,
+    PlusCircle,
+    Settings,
+    User,
+    UserPlus,
+    Users,
+    CalendarCheck,
+    Contact,
+    ShoppingBasket,
+    Lock,
+    LayoutDashboard
+} from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
     ArrowPathIcon,
     Bars3Icon,
     ChartPieIcon,
@@ -104,6 +126,13 @@ export default function Header() {
             // If we're not on the home page, navigate to home page with hash
             navigate(`/#${sectionId}`);
         }
+    };
+    const getProfileLink = (roles) => {
+        console.log(roles)
+        if (roles?.includes("admin")) return "/Dashboard";
+        if (roles?.includes("doctor")) return "/Schedule";
+        if (roles?.includes("staff")) return "/Booking_Management";
+        return "";
     };
 
     return (
@@ -254,9 +283,95 @@ export default function Header() {
                                     Liên hệ
                                 </button>
                             </div>
+
+
                             <div className="py-6">
                                 {user ? (
-                                    <DropdownMenuDemo user={user} />
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2 px-3">
+                                            <Avatar>
+                                                <AvatarImage src={user?.url} alt="User Avatar" />
+                                                <AvatarFallback>{user?.username?.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            <span className="text-sm font-medium">Xin chào {user?.username}!</span>
+                                        </div>
+
+                                        <div className="border-t border-gray-200 my-2" /> {/* Separator */}
+
+                                        {user?.role && !user.role.includes("customer") && (
+                                            <Link
+                                                to={getProfileLink(user?.role)}
+                                                className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <LayoutDashboard className="h-4 w-4" />
+                                                    <span>Trang quản lí</span>
+                                                </div>
+                                            </Link>
+                                        )}
+
+                                        <Link
+                                            to="/profile"
+                                            className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Contact className="h-4 w-4" />
+                                                <span>Thông tin cá nhân</span>
+                                            </div>
+                                        </Link>
+
+                                        <Link
+                                            to="/history-booking"
+                                            className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <CalendarCheck className="h-4 w-4" />
+                                                <span>Lịch sử đặt lịch</span>
+                                            </div>
+                                        </Link>
+
+                                        <button
+                                            onClick={() => {
+                                                goToOrders();
+                                                setMobileMenuOpen(false);
+                                            }}
+                                            className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 w-full text-left"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <ShoppingBasket className="h-4 w-4" />
+                                                <span>Đơn hàng</span>
+                                            </div>
+                                        </button>
+
+                                        <Link
+                                            to="/change-password"
+                                            className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Lock className="h-4 w-4" />
+                                                <span>Đổi mật khẩu</span>
+                                            </div>
+                                        </Link>
+
+                                        <div className="border-t border-gray-200 my-2" /> {/* Separator */}
+
+                                        <button
+                                            onClick={() => {
+                                                handleLogout();
+                                                setMobileMenuOpen(false);
+                                            }}
+                                            className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 w-full text-left"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <LogOut className="h-4 w-4" />
+                                                <span>Log out</span>
+                                            </div>
+                                        </button>
+                                    </div>
                                 ) : (
                                     <Link
                                         to="/Login"

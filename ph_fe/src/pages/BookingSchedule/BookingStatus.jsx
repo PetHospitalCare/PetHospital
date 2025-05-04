@@ -85,7 +85,7 @@ export default function BookingStatus({ status, setCount }) {
                 const response = await MeidicalServices.getAllMedicalRecords();
                 const complete = response?.data?.data?.filter(record => record.booking_id?.status === status);
                 const bookings = complete.map(record => record.booking_id)
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
                 setAllData(bookings);
                 setData(bookings);
                 setMedicalRecord(complete);
@@ -591,7 +591,7 @@ export default function BookingStatus({ status, setCount }) {
             </div>
             <div className="flex items-center justify-between py-4">
                 <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-700">Số sản phẩm mỗi trang:</span>
+                    <span className="text-sm text-gray-700">Số lượng mỗi trang:</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="h-8 px-2">

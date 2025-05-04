@@ -39,6 +39,37 @@ export default function BookingDialog({ open, onClose }) {
     const navigate = useNavigate();
     const today = new Date()
     const minDate = today.toISOString().split('T')[0]
+    const getAvailableHours = () => {
+        const currentDate = new Date();
+        const selectedDate = new Date(formData.scheduleDate);
+        const isToday = selectedDate.toDateString() === currentDate.toDateString();
+
+        const allHours = [
+            "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
+            "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
+        ];
+
+        if (!isToday) return allHours;
+
+        const currentHour = currentDate.getHours();
+        const currentMinutes = currentDate.getMinutes();
+        const currentTime = currentHour + (currentMinutes / 60);
+
+        return allHours.filter(time => {
+            const [hours, minutes] = time.split(":").map(Number);
+            const appointmentTime = hours + (minutes / 60);
+            // Add 1 hour buffer for preparation
+            return appointmentTime > currentTime;
+        });
+    };
+    useEffect(() => {
+        if (formData.scheduleDate) {
+            const availableHours = getAvailableHours();
+            if (!availableHours.includes(formData.scheduleTime)) {
+                setFormData(prev => ({ ...prev, scheduleTime: "" }));
+            }
+        }
+    }, [formData.scheduleDate]);
     const fetchService = async () => {
         try {
             const response = await Services.getAllService();
@@ -102,7 +133,7 @@ export default function BookingDialog({ open, onClose }) {
             setSelected(pet[0]);
             setFormData((prev) => ({ ...prev, pet_id: pet[0]._id }));
         }
-    }, [pet]);
+    }, [pet, open]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -255,14 +286,24 @@ export default function BookingDialog({ open, onClose }) {
                         </div>
                         <div className="w-1/2">
                             <Label className="font-medium text-gray-700">Chọn giờ hẹn <span className="text-red-500">*</span></Label>
-                            <Select onValueChange={(value) => setFormData({ ...formData, scheduleTime: value })}>
+                            <Select
+                                onValueChange={(value) => setFormData({ ...formData, scheduleTime: value })}
+                                value={formData.scheduleTime}
+                            >
                                 <SelectTrigger className="bg-white border-gray-300 rounded-lg w-full">
                                     <SelectValue placeholder="Chọn giờ..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"].map((time) => (
-                                        <SelectItem key={time} value={time}>{time}</SelectItem>
+                                    {getAvailableHours().map((time) => (
+                                        <SelectItem key={time} value={time}>
+                                            {time}
+                                        </SelectItem>
                                     ))}
+                                    {getAvailableHours().length === 0 && (
+                                        <div className="p-2 text-sm text-gray-500 text-center">
+                                            Không còn giờ trống cho ngày hôm nay
+                                        </div>
+                                    )}
                                 </SelectContent>
                             </Select>
                         </div>

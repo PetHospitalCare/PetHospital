@@ -97,7 +97,7 @@ export default function SheetDemo({ open, onOpenChange, account, onsuccess }) {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="email" className="text-right">
-                            Email
+                            Account Name
                         </Label>
                         <Input
                             id="email"

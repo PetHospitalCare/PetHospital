@@ -17,6 +17,7 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(formData.fileUrl || null);
     const [showPreview, setShowPreview] = useState(false);
+    const [previewWindow, setPreviewWindow] = useState(null);
     const [pdfUrl, setPdfUrl] = useState(null);
     let tableEndY = 0
 
@@ -268,20 +269,54 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
     // Modify handlePreviewClick function
     const handlePreviewClick = async () => {
         try {
-            // Cleanup existing PDF URL
-            if (pdfUrl) {
-                URL.revokeObjectURL(pdfUrl);
-                setPdfUrl(null);
-            }
-
-            const fileSource = previewUrl || formData.fileUrl;
+            const fileSource = selectedFile || formData.fileUrl;
             const fileType = formData.fileData?.type || formData.fileType;
 
-            if (fileSource && fileType) {
-                const url = await handleExcelToPdf(fileSource, fileType);
-                if (url) {
-                    setPdfUrl(url);
-                    window.open(url, '_blank');
+            if (!fileSource || !fileType) {
+                toast.error('Không tìm thấy file');
+                return;
+            }
+
+            // Close previous preview window if exists
+            if (previewWindow && !previewWindow.closed) {
+                previewWindow.close();
+            }
+
+            // Create blob from file if it's a File object
+            let fileBlob;
+            if (fileSource instanceof File) {
+                fileBlob = fileSource;
+            } else {
+                try {
+                    const response = await fetch(fileSource);
+                    if (!response.ok) throw new Error('Failed to fetch file');
+                    fileBlob = await response.blob();
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    toast.error('Không thể tải file');
+                    return;
+                }
+            }
+
+            // Generate PDF
+            const url = await handleExcelToPdf(fileBlob, fileType);
+
+            if (url) {
+                // Open new window
+                const newWindow = window.open('', '_blank');
+                setPreviewWindow(newWindow);
+
+                if (newWindow) {
+                    // Load PDF in new window
+                    newWindow.location.href = url;
+
+                    // Cleanup when window closes
+                    newWindow.addEventListener('unload', () => {
+                        // Small delay before revoking to ensure PDF loads
+                        setTimeout(() => {
+                            URL.revokeObjectURL(url);
+                        }, 1000);
+                    });
                 }
             }
         } catch (error) {
@@ -290,18 +325,24 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
         }
     };
 
-    // Add cleanup in useEffect
+    // Update cleanup useEffect
     useEffect(() => {
         return () => {
-            // Cleanup URLs when component unmounts or updates
+            // Close preview window on unmount
+            if (previewWindow && !previewWindow.closed) {
+                previewWindow.close();
+            }
+
+            // Cleanup URLs
             if (previewUrl && !formData.fileUrl) {
                 URL.revokeObjectURL(previewUrl);
             }
             if (pdfUrl) {
                 URL.revokeObjectURL(pdfUrl);
+                setPdfUrl(null);
             }
         };
-    }, [previewUrl, formData.fileUrl, pdfUrl]);
+    }, [previewUrl, formData.fileUrl, pdfUrl, previewWindow]);
 
     return (
         <Card className="mb-4">

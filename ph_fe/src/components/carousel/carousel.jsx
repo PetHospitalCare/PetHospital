@@ -23,7 +23,7 @@ export default function TestimonialAndNews() {
                         .map(service => ({
                             image: service.publicId,
                             quote: service.description,
-                            url: service.url,
+                            url: service?.url,
                             author: service.name,
                         }));
                     setServices(filteredServices);
@@ -51,7 +51,7 @@ export default function TestimonialAndNews() {
         fetchServices();
         fetchNews();
     }, []);
-
+    console.log("services", services);
     useEffect(() => {
         if (selectedIndex !== null) {
             setSelectedIndex(null);
@@ -148,7 +148,7 @@ export default function TestimonialAndNews() {
                                                             transform: `translate(-50%, -50%) ${index === centerIndex ? 'scale(1.05)' : 'scale(1)'}`,
                                                         }}>
                                                         <img
-                                                            src={"https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/05/anh-cho-hai-1.jpg"}
+                                                            src={`${service.url} `}
                                                             alt={`Service ${index + 1}`}
                                                             className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
                                                         />

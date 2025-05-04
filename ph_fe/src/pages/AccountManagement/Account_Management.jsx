@@ -90,7 +90,7 @@ export default function AccountManagement() {
         },
         {
             accessorKey: "email",
-            header: () => <div className="text-center">Email</div>,
+            header: () => <div className="text-center">Account name</div>,
             cell: ({ row }) => <div className=" text-center">{row.getValue("email")}</div>,
         },
         {

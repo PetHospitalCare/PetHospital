@@ -19,28 +19,21 @@ import { vi } from "date-fns/locale"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 
-export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePriceChange }) {
+export function ConclusionForm({ conclusion, onChange, isReadOnly }) {
   const [medicines, setMedicines] = useState([])
   const [loading, setLoading] = useState(false)
-  const [totalMedicinePrice, setTotalMedicinePrice] = useState(0)
+  const [searchQueries, setSearchQueries] = useState({});
 
   // Create a minimum date string in YYYY-MM-DD format for today
   const today = new Date()
   const minDate = today.toISOString().split('T')[0]
 
-  const calculateTotalPrice = (prescriptions) => {
-    if (!prescriptions || !medicines.length) return 0;
 
-    const total = prescriptions.reduce((sum, item) => {
-      const medicine = medicines.find(m => m._id === item.medicine_id);
-      const quantity = parseInt(item.quantity) || 0;
-      const price = medicine?.price || 0;
-      return sum + (price * quantity);
-    }, 0);
-
-    setTotalMedicinePrice(total);
-    onMedicinePriceChange(total);
-    return total;
+  const handleSearchChange = (index, value) => {
+    setSearchQueries(prev => ({
+      ...prev,
+      [index]: value
+    }));
   };
 
   useEffect(() => {
@@ -80,11 +73,7 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
     onChange("prescription", formattedPrescriptions);
   }, [medicines]);
 
-  useEffect(() => {
-    if (medicines.length > 0 && conclusion?.prescription) {
-      calculateTotalPrice(conclusion.prescription);
-    }
-  }, [medicines]);
+
 
   const handleAddPrescription = () => {
     const newPrescription = {
@@ -110,7 +99,7 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
       instructions: ""
     }
     onChange("prescription", updatedPrescriptions)
-    calculateTotalPrice(updatedPrescriptions);
+
   }
 
   const handleRemovePrescription = (index) => {
@@ -125,7 +114,7 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
       [field]: value
     }
     onChange("prescription", updatedPrescriptions)
-    calculateTotalPrice(updatedPrescriptions);
+
   }
 
   const handleConclusionChange = (e) => {
@@ -224,21 +213,34 @@ export function ConclusionForm({ conclusion, onChange, isReadOnly, onMedicinePri
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {medicines.map((medicine) => (
-                      <SelectItem
-                        key={medicine._id}
-                        value={medicine._id}
-                        disabled={medicine.quantity <= 0} // Vô hiệu hóa nếu thuốc hết hàng
-                      >
-                        <div className="flex flex-col">
-                          <div>{medicine.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {medicine.type} • {medicine.unit} •{" "}
-                            {medicine.quantity > 0 ? `Còn ${medicine.quantity}` : "Hết hàng"}
+                    <div className="flex items-center gap-2 p-2 border-b">
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                      <input
+                        className="flex w-full rounded-md bg-transparent py-1.5 px-2 text-sm outline-none placeholder:text-muted-foreground"
+                        placeholder="Tìm kiếm thuốc..."
+                        value={searchQueries[index] || ""}
+                        onChange={(e) => handleSearchChange(index, e.target.value)}
+                        onClick={(e) => e.stopPropagation()} // Prevent select from closing
+                      />
+                    </div>
+                    {medicines
+                      .filter(medicine =>
+                        medicine.name.toLowerCase().includes((searchQueries[index] || "").toLowerCase()) ||
+                        medicine.type.toLowerCase().includes((searchQueries[index] || "").toLowerCase())
+                      )
+                      .map((medicine) => (
+                        <SelectItem
+                          key={medicine._id}
+                          value={medicine._id}
+                        >
+                          <div className="flex flex-col">
+                            <div>{medicine.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {medicine.type} • {medicine.unit}
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    ))}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>

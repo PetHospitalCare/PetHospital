@@ -177,7 +177,9 @@ const getAllRevenueByTime = async (req, res) => {
             {
                 $match: {
                     ...dateFilter,
-                    "payment.status": true
+                    status: 'complete',
+                    "payment.status": true,
+
                 }
             }
         ];
@@ -324,7 +326,7 @@ const getDataforCard = async (req, res) => {
         switch (timeRange) {
             case 'today':
                 dateFilter = {
-                    createdAt: {
+                    updatedAt: {
                         $gte: moment().startOf('day').toDate(),
                         $lte: moment().endOf('day').toDate()
                     }
@@ -332,7 +334,7 @@ const getDataforCard = async (req, res) => {
                 break;
             case 'week':
                 dateFilter = {
-                    createdAt: {
+                    updatedAt: {
                         $gte: moment().startOf('week').toDate(),
                         $lte: moment().endOf('week').toDate()
                     }
@@ -340,7 +342,7 @@ const getDataforCard = async (req, res) => {
                 break;
             case 'month':
                 dateFilter = {
-                    createdAt: {
+                    updatedAt: {
                         $gte: moment().startOf('month').toDate(),
                         $lte: moment().endOf('month').toDate()
                     }
@@ -348,7 +350,7 @@ const getDataforCard = async (req, res) => {
                 break;
             case 'year':
                 dateFilter = {
-                    createdAt: {
+                    updatedAt: {
                         $gte: moment().startOf('year').toDate(),
                         $lte: moment().endOf('year').toDate()
                     }
@@ -472,7 +474,7 @@ const getDataforCard = async (req, res) => {
                 { $limit: 5 }
             ]),
             Account.countDocuments({ ...dateFilter, role: 'customer' }),
-            Booking.aggregate([{ $match: { ...dateFilter, "payment.status": true, price: { $exists: true, $gt: 0 } } }, { $group: { _id: null, total: { $sum: "$price" } } }]),
+            Booking.aggregate([{ $match: { ...dateFilter, "payment.status": true, status: "complete", price: { $exists: true, $gt: 0 } } }, { $group: { _id: null, total: { $sum: "$price" } } }]),
             Payment.aggregate([{ $match: { ...dateFilter, status: 1, totalPrice: { $exists: true, $gt: 0 } } }, { $group: { _id: null, total: { $sum: "$totalPrice" } } }])
         ]);
 

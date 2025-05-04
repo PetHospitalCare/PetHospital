@@ -42,16 +42,24 @@ const AssignDoctor = ({ open, onOpenChange, booking, onUpdate }) => {
         setLoading(true);
         try {
             const res = await BookingServices.AssignDoctor(booking?._id, selectedDoctor);
-            if (res.status === 200) {
-                toast.success("Cập nhật thành công!");
+            console.log("res", res);
+            console.log("status", res?.status);
+            console.log("success", res?.success);
+            if (res?.status === 200) {
+                toast.success(res?.message);
                 onUpdate();
-                onOpenChange(false); // Đóng modal
+                onOpenChange(false);
+            } else if (res?.success === false) {
+                // Handle conflict or other errors
+                toast.error(res?.message || "Có lỗi xảy ra");
+
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật cuộc hẹn:", error);
-            toast.error("Cập nhật thất bại, thử lại sau!");
+            toast.error(error.response?.data?.message || "Lỗi khi cập nhật cuộc hẹn");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (

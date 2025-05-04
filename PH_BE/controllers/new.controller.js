@@ -36,17 +36,17 @@ const CreateNew = async (req, res) => {
     try {
         const userId = req.userId;
         const { title, content } = req.body;
-        
+
         // Get the uploaded image file (assuming it's using Multer like your medicine module)
         const file = req.file;  // For single file upload
-        
+
         // Check required fields
         if (!title || !content) {
             return res.status(400).json({
                 message: "Thiếu thông tin bắt buộc (title, content)"
             });
         }
-        
+
         // Process image if it exists
         let imageData = {};
         if (file) {
@@ -55,7 +55,7 @@ const CreateNew = async (req, res) => {
                 publicId: file.filename  // Public ID for Cloudinary
             };
         }
-        
+
         // Create a new news post
         const newPost = new New({
             title,
@@ -63,10 +63,10 @@ const CreateNew = async (req, res) => {
             images: imageData,
             createdBy: userId
         });
-        
+
         // Save to database
         const savedNews = await newPost.save();
-        
+
         return res.status(201).json({
             message: "Tạo bài viết thành công",
             news: savedNews
@@ -84,31 +84,31 @@ const EditNew = async (req, res) => {
         const userId = req.userId;
         const { title, content } = req.body;
         let imageData = {};
-        
+
         const news = await New.findById(id);
         if (!news) {
             return res.status(404).json({ message: "Bài viết không tồn tại" });
         }
-        
+
         if (req.file) {
             // Xóa ảnh cũ nếu có
             if (news.images && news.images.publicId) {
                 await cloudinary.uploader.destroy(news.images.publicId);
             }
-            
+
             imageData = {
                 url: req.file.path,
                 publicId: req.file.filename
             };
         }
-        
+
         const updatedNews = await New.findByIdAndUpdate(id, {
             title,
             content,
             ...(Object.keys(imageData).length > 0 && { images: imageData }),
             updatedBy: userId
         }, { new: true });
-        
+
         return res.status(200).json({
             message: "Cập nhật bài viết thành công",
             news: updatedNews

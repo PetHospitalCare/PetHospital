@@ -42,7 +42,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         prescription: [],
         notes: "",
     });
-    const [medicineTotalPrice, setMedicineTotalPrice] = useState(0);
+
     const [services, setServices] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [petInfo, setpetInfo] = useState({});
@@ -56,7 +56,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             setActiveTab("examination");
             setSearchTerm("");
             setTotalPrice(0);
-            setMedicineTotalPrice(0);
+
             setConclusion({
                 prescription: [],
                 generalConclusion: "",
@@ -316,7 +316,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     instructions: item.instructions
                 })),
                 note: conclusion?.notes || "",
-                totalPrice: totalPrice + medicineTotalPrice,
+                totalPrice: totalPrice,
             };
 
             // Thêm medical record data
@@ -472,7 +472,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         <Dialog modal={false} open={open} onOpenChange={(isOpen) => {
             onOpenChange(isOpen);
         }}>
-            <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
+            <DialogContent className="max-w-6xl max-h-[100vh] overflow-hidden p-0">
                 <DialogHeader className="px-6 pt-6 pb-2">
                     <DialogTitle>Kết quả khám</DialogTitle>
                     {conclusion?.createdAt ? (
@@ -600,7 +600,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                                 </TabsContent>
                                 <TabsContent value="conclusion" className="mt-4 flex-1 overflow-hidden">
                                     <ScrollArea className="h-[calc(90vh-240px)]">
-                                        <ConclusionForm onMedicinePriceChange={setMedicineTotalPrice}
+                                        <ConclusionForm
                                             conclusion={conclusion} isReadOnly={isReadOnly} onChange={handleConclusionChange} />
                                     </ScrollArea>
                                 </TabsContent>
