@@ -43,6 +43,10 @@ export default function Page({ children }) {
       const markAllAsRead = async () => {
         try {
           const res = await MessageService.MarkNotificationAsRead();
+          setNotifications(prev => prev.map(notif => ({
+            ...notif,
+            isRead: true
+          })));
         } catch (error) {
           console.error("Error marking notifications as read:", error);
         }

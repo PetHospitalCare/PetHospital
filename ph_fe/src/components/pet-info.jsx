@@ -14,7 +14,7 @@ export function PetInfo({ petInfo }) {
                 </div>
                 <div className="grid grid-cols-2">
                     <span className="text-muted-foreground">Loại:</span>
-                    <span>{petInfo?.type}</span>
+                    <span>{petInfo?.type == "dog" ? "Chó" : "Mèo"}</span>
                 </div>
                 <div className="grid grid-cols-2">
                     <span className="text-muted-foreground">Giống:</span>

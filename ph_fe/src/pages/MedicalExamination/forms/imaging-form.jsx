@@ -159,7 +159,7 @@ export function ImagingForm({ formData, onChange, subService, petInfo, isReadOnl
         `Số điện thoại: ${petInfo?.phone || ''}`,
         `Email: ${petInfo?.email || ''}`,
         `Địa chỉ: ${petInfo?.address || ''}`
-      ], pageWidth / 2 - 20, infoStartY);
+      ], pageWidth / 2 - 30, infoStartY);
 
       // Add pet image if available
       if (petInfo?.url) {

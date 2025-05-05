@@ -41,14 +41,14 @@ export default function ResetPassword() {
                     newPassword
                 });
             }
-            console.log("Response:", response);
+
             if (response.status === 200) {
                 toast.success(`${isChangePassword ? "Đổi" : "Đặt lại"} mật khẩu thành công!`);
                 if (isChangePassword) {
                     navigate("/");
-                } else{
+                } else {
                     navigate("/login");
-                }      
+                }
             } else {
                 setConfirmCurrentPassword(response.message || `${isChangePassword ? "Đổi" : "Đặt lại"} mật khẩu thất bại.`);
             }

@@ -51,7 +51,6 @@ export default function TestimonialAndNews() {
         fetchServices();
         fetchNews();
     }, []);
-    console.log("services", services);
     useEffect(() => {
         if (selectedIndex !== null) {
             setSelectedIndex(null);

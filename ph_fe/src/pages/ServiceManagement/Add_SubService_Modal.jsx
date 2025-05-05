@@ -96,6 +96,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                                 <Input
                                     type="number"
                                     placeholder="Giá cho chó"
+                                    min={0}
                                     value={price.dog.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "dog")}
                                     className="pl-9"
@@ -112,6 +113,7 @@ export default function Add_Modal({ open, onClose, onAddService = () => { } }) {
                                 <Input
                                     type="number"
                                     placeholder="Giá cho mèo"
+                                    min={0}
                                     value={price.cat.toLocaleString("vi-VN")}
                                     onChange={(e) => handlePriceChange(e, "cat")}
                                     className="pl-9"
