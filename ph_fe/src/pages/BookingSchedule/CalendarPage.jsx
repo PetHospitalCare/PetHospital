@@ -75,7 +75,7 @@ export default function Calendar() {
             console.error("Lỗi khi lấy dữ liệu booking:", error);
         }
     };
-    console.log(appointments);
+
     // Get sub-service information
     const getSubService = (serviceId, subServiceId) => {
         const service = services.find(s => s._id === serviceId);
@@ -213,16 +213,6 @@ export default function Calendar() {
                                                 eventDate.getFullYear() === currentDate.getFullYear() &&
                                                 eventDate.getMonth() === currentDate.getMonth() &&
                                                 eventDate.getDate() === currentDate.getDate();
-
-                                            // Debug để kiểm tra
-                                            console.log({
-                                                eventDate: eventDate.toLocaleDateString(),
-                                                currentDate: currentDate.toLocaleDateString(),
-                                                isSameDay,
-                                                hour,
-                                                eventHour: event.startHour,
-                                                timeMatch: eventStartMinutes === currentSlotMinutes
-                                            });
 
                                             return isSameDay && eventStartMinutes === currentSlotMinutes;
                                         });

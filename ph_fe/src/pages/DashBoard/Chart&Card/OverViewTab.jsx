@@ -56,7 +56,7 @@ export default function OverviewTab({ stats, timeRange }) {
                 setLoading(true);
                 const response = await DashBoardServices.GetBookingDataByTime(timeRange);
                 const apiData = response.data.data;
-                console.log("apiData", apiData);
+
                 setSummaryData(response.data.summary || {});
 
                 if (timeRange === "all") {
