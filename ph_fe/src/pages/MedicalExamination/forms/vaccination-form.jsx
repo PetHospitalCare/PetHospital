@@ -19,7 +19,8 @@ export function VaccinationForm({ petInfo, formData, onChange, subService, isRea
             img.src = url
         })
     }
-
+    const today = new Date()
+    const minDate = today.toISOString().split('T')[0]
     const handleGeneratePDF = async () => {
         try {
             // Initialize PDF with UTF-8 support
@@ -197,6 +198,7 @@ export function VaccinationForm({ petInfo, formData, onChange, subService, isRea
                         type="date"
                         value={formData.nextDate || ""}
                         onChange={(e) => onChange("nextDate", e.target.value)}
+                        min={minDate}
                         disabled={isReadOnly}
                     />
                 </div>
