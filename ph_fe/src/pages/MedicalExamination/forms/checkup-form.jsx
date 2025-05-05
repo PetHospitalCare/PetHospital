@@ -81,7 +81,7 @@ export function CheckupForm({ petInfo, formData, onChange, subService, isReadOnl
       ], leftColX, infoStartY)
 
       // Middle column - Owner info
-      const middleColX = pageWidth / 2 - 20
+      const middleColX = pageWidth / 2 - 30
       pdf.text([
         `Chủ nuôi: ${petInfo?.ownerName || ''}`,
         `Số điện thoại: ${petInfo?.phone || ''}`,
