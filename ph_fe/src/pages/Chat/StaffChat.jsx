@@ -226,7 +226,7 @@ export const StaffChat = () => {
     const unreadCount = notifications.length;
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className="flex h-screen bg-gray-50 overflow-hidden">
             {/* Sidebar */}
             <div className="hidden md:flex flex-col w-80 border-r border-gray-200 bg-white">
                 {/* Sidebar Header */}

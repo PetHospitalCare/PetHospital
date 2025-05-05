@@ -79,7 +79,7 @@ export function VaccinationForm({ petInfo, formData, onChange, subService, isRea
             ], leftColX, infoStartY)
 
             // Middle column - Owner info
-            const middleColX = pageWidth / 2 - 20
+            const middleColX = pageWidth / 2 - 30
             pdf.text([
                 `Chủ nuôi: ${petInfo?.ownerName || ''}`,
                 `Số điện thoại: ${petInfo?.phone || ''}`,
