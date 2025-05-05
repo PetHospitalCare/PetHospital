@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { Bell, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   SidebarInset,
   SidebarProvider,
@@ -193,17 +194,32 @@ export default function Page({ children }) {
                         {notifications.map((notif, index) => (
                           <li
                             key={index}
-                            className="p-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg mb-2 cursor-pointer transition"
+                            className={cn(
+                              "p-3 hover:bg-gray-100 text-gray-700 rounded-lg mb-2 cursor-pointer transition relative",
+                              notif.isRead ? "bg-gray-50" : "bg-blue-50 border-l-4 border-blue-500"
+                            )}
                             onClick={() => {
                               if (notif.type === "booking") {
                                 navigate("/Booking_Management");
                               } else {
-                                navigate("/chat"); // Đường dẫn khác nếu không phải "booking"
+                                navigate("/chat");
                               }
                             }}
                           >
-                            <p className="font-medium">{notif.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">{formatTime(notif.time)}</p>
+                            {!notif.isRead && (
+                              <span className="absolute w-2 h-2 bg-blue-500 rounded-full top-4 right-4" />
+                            )}
+                            <div className="flex items-start">
+                              <div className="flex-1">
+                                <p className={cn(
+                                  "font-medium",
+                                  !notif.isRead && "text-blue-700"
+                                )}>
+                                  {notif.message}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">{formatTime(notif.time)}</p>
+                              </div>
+                            </div>
                           </li>
                         ))}
                       </ul>
