@@ -10,7 +10,7 @@ accountRouter.post("/reset-password", AccountController.resetPassword);
 accountRouter.post("/change-password", verifyToken, AccountController.changePassword)
 accountRouter.post("/send-otp", OTPController.sendOTP);
 accountRouter.post("/verify-otp", OTPController.verifyOTP);
-accountRouter.get("/get-all", verifyToken, authorize("admin"), AccountController.getallAccount);
+accountRouter.get("/get-all", verifyToken, AccountController.getallAccount);
 accountRouter.post("/createnewaccount", verifyToken, authorize("admin"), AccountController.createNewAccount);
 accountRouter.delete("/delete:id", verifyToken, authorize("staff", "admin"), AccountController.deleteAccount);
 accountRouter.put("/edit/:id", AccountController.editaccount);

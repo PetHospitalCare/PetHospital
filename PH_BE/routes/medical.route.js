@@ -18,7 +18,7 @@ const handleUpload = (req, res, next) => {
     });
 };
 MedicalRoute.get("/get-by-booking/:id", MedicalController.getMedicalbyBookingId);
-MedicalRoute.post("/create", handleUpload, MedicalController.createMedicalRecord);
+MedicalRoute.post("/create", verifyToken, authorize("doctor"), handleUpload, MedicalController.createMedicalRecord);
 MedicalRoute.put("/update/:id", uploadCloud.array('files'), MedicalController.updateMedicalRecord);
 MedicalRoute.get("/get-all", MedicalController.getAllMedicalRecords);
 MedicalRoute.get("/get-by-user/:id", MedicalController.getOneMedicalByUser);
