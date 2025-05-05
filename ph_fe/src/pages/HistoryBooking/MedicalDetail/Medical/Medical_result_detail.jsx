@@ -16,7 +16,7 @@ export default function ServiceResultDetail({ service }) {
 
     const result = service.result;
     if (!result) return <div className="text-center py-10 text-gray-500">Không có kết quả cho dịch vụ này</div>;
-
+    const validImages = result?.images?.filter(img => img.url);
     return (
         <div className="bg-white rounded-lg">
             <h3 className="font-bold text-lg mb-4 pb-2 border-b text-[#3F2E2E] flex items-center">
@@ -71,13 +71,14 @@ export default function ServiceResultDetail({ service }) {
             )}
 
             {/* Ultrasound & X-ray service */}
-            {service.service_id?.name === "Siêu âm & X-quang" && (
+            {service?.service_id?.name === "Siêu âm & X-quang" && (
                 <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                    {result.images && result.images.length > 0 && (
+
+                    {validImages && validImages?.length > 0 && (
                         <div>
                             <p className="text-gray-600 text-sm mb-2">Hình ảnh</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {result.images.map((img, idx) => (
+                                {validImages.map((img, idx) => (
                                     <div
                                         key={idx}
                                         className="relative group aspect-square rounded-lg overflow-hidden border cursor-pointer"
@@ -89,7 +90,7 @@ export default function ServiceResultDetail({ service }) {
                                             className="object-cover w-full h-full transition-transform group-hover:scale-105"
                                         />
                                         <p className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 text-center">
-                                            {`Ảnh ${idx + 1}`}
+                                            {`Ảnh ${idx + 1} `}
                                         </p>
                                     </div>
                                 ))}
@@ -98,7 +99,7 @@ export default function ServiceResultDetail({ service }) {
                                 open={index >= 0}
                                 index={index}
                                 close={() => setIndex(-1)}
-                                slides={result.images.map(img => ({ src: img.url }))}
+                                slides={validImages.map(img => ({ src: img.url }))}
                                 plugins={[Zoom, Thumbnails, Share, Fullscreen]}
                                 zoom={{
                                     maxZoomPixelRatio: 3,

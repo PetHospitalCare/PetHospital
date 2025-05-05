@@ -22,5 +22,6 @@ MedicalRoute.post("/create", verifyToken, authorize("doctor"), handleUpload, Med
 MedicalRoute.put("/update/:id", uploadCloud.array('files'), MedicalController.updateMedicalRecord);
 MedicalRoute.get("/get-all", MedicalController.getAllMedicalRecords);
 MedicalRoute.get("/get-by-user/:id", MedicalController.getOneMedicalByUser);
+MedicalRoute.get("/get-by-pet/:id", MedicalController.getAllMedicalRecordsByPet);
 module.exports = MedicalRoute;
 

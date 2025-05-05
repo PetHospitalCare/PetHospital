@@ -24,10 +24,14 @@ const getAllMedicalRecords = () => {
 const getOneMedicalRecords = (id) => {
     return axios.get(`/medical/get-by-user/${id}`);
 };
+const getHistorybyPet = (id) => {
+    return axios.get(`/medical/get-by-pet/${id}`);
+};
 export const MeidicalServices = {
-    getMedicalByBookingId, 
-    CreateNewMedical, 
-    UpdateMedical, 
-    getAllMedicalRecords, 
-    getOneMedicalRecords
+    getMedicalByBookingId,
+    CreateNewMedical,
+    UpdateMedical,
+    getAllMedicalRecords,
+    getOneMedicalRecords,
+    getHistorybyPet
 };
