@@ -43,6 +43,7 @@ const SendMailTakeMedical = async () => {
             },
             status: 'confirm'
         }).populate('pet_id').populate('doctor_id');
+        console.log(todayBookings)
         // Send emails for each booking
         for (const booking of todayBookings) {
             const mailOptions = {
