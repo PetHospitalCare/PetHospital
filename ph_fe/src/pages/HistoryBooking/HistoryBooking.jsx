@@ -1,37 +1,57 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BookingServices } from "@/services/BookingService";
-import { Hand } from "lucide-react";
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "@/contexts/UserContext";
 
 export default function HistoryBooking() {
     const [HBooking, setHBooking] = useState([]);
+    const [filteredBookings, setFilteredBookings] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [statusFilter, setStatusFilter] = useState(""); // Trạng thái lọc
+    const itemsPerPage = 8; // Số mục mỗi trang
+
     const statusMapping = {
         pending: "Chờ xác nhận",
         cancel: "Đã hủy",
         confirm: "Chờ khám",
         complete: "Đã hoàn thành",
     };
+
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
     if (!user) {
         navigate("/login");
     }
+
     const fetchHBooking = async () => {
         try {
             const response = await BookingServices.GetHistoryBooking();
             if (response.data.success) {
-                // Sắp xếp dữ liệu mới nhất
                 const sortedBookings = response.data.booking.sort(
                     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
                 );
                 setHBooking(sortedBookings);
+                setFilteredBookings(sortedBookings); // Khởi tạo danh sách lọc
             }
         } catch (error) {
             console.error("Lỗi khi lấy lịch sử đặt lịch:", error);
         }
+    };
+
+    const handleFilterChange = (e) => {
+        const selectedStatus = e.target.value;
+        setStatusFilter(selectedStatus);
+
+        if (selectedStatus) {
+            const filtered = HBooking.filter((booking) => booking?.status === selectedStatus);
+            setFilteredBookings(filtered);
+        } else {
+            setFilteredBookings(HBooking); // Hiển thị tất cả nếu không chọn trạng thái
+        }
+
+        setCurrentPage(1); // Reset về trang đầu tiên
     };
 
     const HandleClick = (bookingId) => {
@@ -42,6 +62,13 @@ export default function HistoryBooking() {
         fetchHBooking();
     }, []);
 
+    // Tính toán dữ liệu phân trang
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredBookings.slice(indexOfFirstItem, indexOfLastItem);
+
+    const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
+
     return (
         <div className="container mx-auto pt-28 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20">
             {/* Header */}
@@ -50,10 +77,26 @@ export default function HistoryBooking() {
             </div>
             <hr className="h-1 bg-[#3F2E2E] border-none" />
 
+            {/* Filter */}
+            <div className="mt-6 flex justify-end">
+                <select
+                    value={statusFilter}
+                    onChange={handleFilterChange}
+                    className="border border-gray-300 rounded px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="">Tất cả trạng thái</option>
+                    {Object.entries(statusMapping).map(([key, value]) => (
+                        <option key={key} value={key}>
+                            {value}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             {/* Booking List */}
             <div className="mt-8 space-y-6 mb-8">
-                {HBooking.length > 0 ? (
-                    HBooking.map((booking) => (
+                {currentItems.length > 0 ? (
+                    currentItems.map((booking) => (
                         <div
                             key={booking._id}
                             className="flex flex-col md:flex-row bg-white rounded border-2 shadow-lg overflow-hidden relative"
@@ -122,6 +165,29 @@ export default function HistoryBooking() {
                     </div>
                 )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center space-x-2">
+                    <Button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                    >
+                        Trước
+                    </Button>
+                    <span className="text-sm font-medium">
+                        Trang {currentPage} / {totalPages}
+                    </span>
+                    <Button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                    >
+                        Sau
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
