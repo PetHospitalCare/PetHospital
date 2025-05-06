@@ -493,28 +493,29 @@ export default function BookingStatus({ status, setCount }) {
                             />
                         </PopoverContent>
                     </Popover>
-
-                    {/* Doctor filter */}
-                    <Select
-                        value={selectedDoctor}
-                        onValueChange={(value) => {
-                            setSelectedDoctor(value);
-                            setCurrentPageIndex(0);
-                        }}
-                    >
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Lọc theo bác sĩ" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Tất cả bác sĩ</SelectItem>
-                            {doctor.map((doc) => (
-                                <SelectItem key={doc._id} value={doc._id}>
-                                    {doc.username}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
+                    {status !== "pending" && (<>
+                        {/* Doctor filter */}
+                        <Select
+                            value={selectedDoctor}
+                            onValueChange={(value) => {
+                                setSelectedDoctor(value);
+                                setCurrentPageIndex(0);
+                            }}
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Lọc theo bác sĩ" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Tất cả bác sĩ</SelectItem>
+                                {doctor.map((doc) => (
+                                    <SelectItem key={doc._id} value={doc._id}>
+                                        {doc.username}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </>
+                    )}
                     {/* Reset filters button */}
                     {(selectedDate || selectedDoctor !== "all") && (
                         <Button

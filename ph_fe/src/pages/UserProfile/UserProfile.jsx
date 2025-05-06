@@ -5,7 +5,7 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -26,8 +26,18 @@ export default function UserProfile() {
     const profilePath = pathParts[1];
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
+
+    // Sửa lại điều kiện check
+    useEffect(() => {
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+    }, [user, navigate]);
+
+    // Nếu chưa có user thì return null để tránh render UI
     if (!user) {
-        navigate("/login");
+        return null;
     }
     return (
         <div className={profilePath == "admin" ? "w-full " : "container max-w-screen-2xl mx-auto pt-24 px-8 lg:px-16"} >
