@@ -52,7 +52,7 @@ const SendMailTakeMedical = async () => {
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                         <h2 style="color: #2563eb;">Xin chào ${booking.guest_name}!</h2>
-                        <p>Chúng tôi xin nhắc nhở bạn về lịch khám cho thú cưng <strong>${booking?.pet_id?.name ? booking.pet_id.name : `${booking.type}`}</strong> hôm nay:</p>
+                        <p>Chúng tôi xin nhắc nhở bạn về lịch khám cho thú cưng <strong>${booking?.pet_id?.name ? booking.pet_id.name : `${booking?.type}`}</strong> hôm nay:</p>
                         <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
                             <p><strong>⏰ Thời gian:</strong> ${booking.hour}</p>
                             <p><strong>👨‍⚕️ Bác sĩ:</strong> ${booking.doctor_id.username}</p>
