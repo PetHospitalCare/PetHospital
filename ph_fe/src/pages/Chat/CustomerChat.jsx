@@ -167,12 +167,12 @@ const CustomerChat = () => {
 
             {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto" style={{ maxHeight: '360px' }}>
-                {messages.length === 0 ? (
+                {messages?.length === 0 ? (
                     <div className="text-center text-gray-500 py-4">
                         <p>Bắt đầu trò chuyện với nhân viên hỗ trợ</p>
                     </div>
                 ) : (
-                    messages.map((msg, index) => (
+                    messages?.map((msg, index) => (
                         <div
                             key={msg._id || index}
                             className={`mb-3 flex items-start ${msg.sender === user._id ? 'justify-end' : 'justify-start'}`}
