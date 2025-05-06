@@ -212,8 +212,11 @@ export async function fetchServices() {
   try {
     const response = await Services.getAllService();
     if (response.data.success) {
-
-      return response.data.services
+      const filteredServices = response.data.services.map(service => ({
+        ...service,
+        subServices: service.subServices.filter(sub => sub.status === 'active')
+      })).filter(service => service.subServices.length > 0);
+      return filteredServices;
     }
   } catch (error) {
     console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);

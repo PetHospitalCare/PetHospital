@@ -74,7 +74,11 @@ export default function BookingDialog({ open, onClose }) {
         try {
             const response = await Services.getAllService();
             if (response.data.success) {
-                setService(response.data.services);
+                const filteredServices = response.data.services.map(service => ({
+                    ...service,
+                    subServices: service.subServices.filter(sub => sub.status === 'active')
+                })).filter(service => service.subServices.length > 0);
+                setService(filteredServices);
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu dịch vụ:", error);
