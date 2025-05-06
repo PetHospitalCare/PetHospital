@@ -60,6 +60,10 @@ export default function CreateAccountDialog({ open, onOpenChange, onSuccess }) {
             toast.error("Vui lòng nhập tên người dùng");
             return;
         }
+        if (!formData.password.trim()) {
+            toast.error("Vui lòng nhập mật khẩu");
+            return;
+        }
 
         if (!formData.phone.trim()) {
             toast.error("Vui lòng nhập số điện thoại");

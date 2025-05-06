@@ -15,7 +15,7 @@ instance.interceptors.response.use(
         return response
     }, (error) => {
 
-        const status = (error.response && error.response.status) || 500;
+        const status = (error.response && error.response.status);
         switch (status) {
             // authentication (token related issues)
             case 401: {
