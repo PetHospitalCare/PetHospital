@@ -26,6 +26,7 @@ import { ConclusionForm } from "./forms/conclusion-form"
 import { serviceNameToType } from "./services"
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 export default function MedicalExaminationDialog({ open, onOpenChange, appointment, isReadOnly = false }) {
     const [selectedSubServices, setSelectedSubServices] = useState([]);
@@ -42,12 +43,13 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
         prescription: [],
         notes: "",
     });
-
+    const [history, setHistory] = useState([]);
     const [services, setServices] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [petInfo, setpetInfo] = useState({});
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
     useEffect(() => {
         // Reset all states when dialog opens or appointment changes
         if (open) {
@@ -56,7 +58,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             setActiveTab("examination");
             setSearchTerm("");
             setTotalPrice(0);
-
+            setHistory([])
             setConclusion({
                 prescription: [],
                 generalConclusion: "",
@@ -68,7 +70,15 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
             setServicesOpen(false);
         }
     }, [appointment?.id, open]); // Only run when appointment ID changes
-    // Then replace the existing useEffect with this version
+    const fetchHistory = async (petId) => {
+        try {
+            const response = await MeidicalServices.getHistorybyPet(petId);
+            const data = response?.data?.data.filter(item => item?._id !== appointment?.id);
+            setHistory(data || []);
+        } catch (error) {
+            console.error('Error fetching history:', error);
+        }
+    };
     useEffect(() => {
         async function loadAllData() {
             if (!appointment || !open) return;
@@ -84,6 +94,7 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                     const data = await BookingServices.GetBookingbyId(appointment?.id);
                     if (data?.data?.success) {
                         setpetInfo({
+                            id: data?.data?.booking?.pet_id?._id,
                             name: data?.data?.booking?.pet_id?.name,
                             type: data?.data?.booking?.type,
                             breed: data?.data?.booking?.pet_id?.species,
@@ -97,7 +108,9 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                             note: data?.data?.booking?.note,
                         });
                     }
-
+                    if (data?.data?.booking?.pet_id?._id) {
+                        await fetchHistory(data?.data?.booking?.pet_id?._id);
+                    }
                     // Load medical record
                     const recordData = await MeidicalServices.getMedicalByBookingId(appointment?.id);
                     if (recordData.data.data) {
@@ -139,6 +152,21 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
 
         loadAllData();
     }, [appointment, open]);
+
+    // useEffect(() => {
+    //     const fetchHistory = async () => {
+    //         try {
+    //             const response = await MeidicalServices.getHistorybyPet(petInfo.id);
+    //             setHistory(response.data || []);
+    //         } catch (error) {
+    //             console.error('Error fetching history:', error);
+    //         }
+    //     };
+    //     if (petInfo?.id) {
+    //         fetchHistory();
+    //     }
+    // }, [petInfo?.id, open]);
+
     const handleSubServiceToggle = (subService) => {
         if (!subService || !subService?._id) {
             console.error("Invalid sub-service:", subService);
@@ -502,6 +530,53 @@ export default function MedicalExaminationDialog({ open, onOpenChange, appointme
                             </div>
 
                             <PetInfo petInfo={petInfo} />
+
+
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <label className="font-medium">Lịch sử khám</label>
+                                    <span className="text-xs text-muted-foreground">
+                                        {isHistoryLoading ? (
+                                            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                                        ) : (
+                                            `${history?.length} lượt khám`
+                                        )}
+                                    </span>
+                                </div>
+                                <div className="space-y-2 max-h-48 overflow-y-auto">
+                                    {isHistoryLoading ? (
+                                        <div className="flex items-center justify-center py-4">
+                                            <div className="text-sm text-gray-500">Đang tải lịch sử...</div>
+                                        </div>
+                                    ) : (
+                                        history.map((record) => (
+                                            <div
+                                                key={record?._id}
+                                                className="p-3 border rounded-lg hover:bg-gray-50"
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className="text-sm font-medium">
+                                                            {format(new Date(record?.date), 'dd/MM/yyyy')} - {record.hour}
+                                                        </span>
+                                                        <p className="text-xs text-muted-foreground mt-1">
+                                                            Bsi: {record?.doctor_id?.username}
+                                                        </p>
+                                                    </div>
+                                                    <Link to={`/MedicalRecord/${record._id}`} target="_blank" rel="noopener noreferrer">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                        >
+                                                            Xem chi tiết
+                                                        </Button>
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
 
                             <div className="space-y-2">
                                 <label>Dịch vụ sử dụng</label>

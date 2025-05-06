@@ -79,6 +79,7 @@ export default function ResetPassword() {
             if (response.status === 200) {
                 toast.success(`${isChangePassword ? "Đổi" : "Đặt lại"} mật khẩu thành công!`);
                 navigate(isChangePassword ? "/" : "/login");
+
             } else {
                 setConfirmCurrentPassword(response.message || `${isChangePassword ? "Đổi" : "Đặt lại"} mật khẩu thất bại.`);
             }

@@ -8,9 +8,8 @@ const GetOrCreateConversation = async (req, res) => {
         let conversation = await Conversation.findOne({
             customerId: req.params.customerId
         }).populate('staffParticipants', 'username avatar');
-        const account = await Account.findById(req.params.customerId);
-        const isCustomer = account?.role.includes('customer');
-        if (!conversation && !isCustomer) {
+
+        if (!conversation) {
             conversation = await Conversation.create({
                 customerId: req.params.customerId,
             });

@@ -128,7 +128,7 @@ export default function Header() {
         }
     };
     const getProfileLink = (roles) => {
-        console.log(roles)
+
         if (roles?.includes("admin")) return "/Dashboard";
         if (roles?.includes("doctor")) return "/Schedule";
         if (roles?.includes("staff")) return "/Booking_Management";

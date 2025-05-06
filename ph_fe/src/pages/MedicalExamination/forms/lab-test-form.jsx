@@ -20,7 +20,6 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
     const [previewWindow, setPreviewWindow] = useState(null);
     const [pdfUrl, setPdfUrl] = useState(null);
     let tableEndY = 0
-
     const loadImage = (url) => {
         return new Promise((resolve, reject) => {
             const img = new Image()
@@ -120,12 +119,12 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
             ], leftColX, infoStartY)
 
             // Middle column - Owner info
-            const middleColX = pageWidth / 2 - 20
+            const middleColX = pageWidth / 2 - 30
             pdf.text([
                 `Chủ nuôi: ${petInfo?.ownerName || ''}`,
                 `Số điện thoại: ${petInfo?.phone || ''}`,
                 `Email: ${petInfo?.email || ''}`,  // Added comma here
-                `Địa chỉ: ${petInfo?.add || ''}`
+
             ], middleColX, infoStartY)
 
             // Right column - Pet image
@@ -142,7 +141,6 @@ export function LabTestForm({ petInfo, formData, onChange, subService, isReadOnl
             pdf.text([
                 `${subService.parentName}: ${subService.name}`,
                 `Ngày xét nghiệm: ${new Date().toLocaleDateString('vi-VN')}`,
-                `Mã phiếu: ${formData.id || 'N/A'}`
             ], margin + 5, serviceBoxY + 10)
 
             // Add table

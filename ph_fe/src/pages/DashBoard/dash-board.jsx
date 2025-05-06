@@ -65,7 +65,7 @@ export default function Dashboard() {
             try {
                 setIsLoading(true)
                 const response = await DashBoardServices.getStatForCard(timeRange)
-                console.log("card", response.data.data)
+
                 setStats(response.data.data)
             } catch (error) {
                 console.error("Failed to fetch dashboard data:", error)

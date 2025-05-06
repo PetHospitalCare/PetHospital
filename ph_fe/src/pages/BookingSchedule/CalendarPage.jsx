@@ -16,7 +16,9 @@ const DAYS = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", 
 export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(() => {
         const today = new Date();
-        return new Date(today.setDate(today.getDate() - ((today.getDay() + 6) % 7)));
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(today.setDate(diff));
     });
     const [appointments, setAppointments] = useState([]);
     const [services, setServices] = useState([]);
@@ -97,8 +99,10 @@ export default function Calendar() {
     // Get the start of the week
     const getWeekStart = (date) => {
         const d = new Date(date);
-        d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-        return d;
+        const day = d.getDay();
+        // Điều chỉnh để Thứ 2 là ngày đầu tuần (1)
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
     };
 
     // Get the date range text for the current week
@@ -193,6 +197,9 @@ export default function Calendar() {
                                     {DAYS.map((_, index) => {
                                         const filteredAppointments = appointments.filter(event => {
                                             const eventDate = new Date(event.date);
+                                            const currentDate = new Date(weekStart);
+                                            currentDate.setDate(weekStart.getDate() + index);
+
                                             const getMinutes = (time) => {
                                                 const [hour, minute] = time.split(":").map(Number);
                                                 return hour * 60 + minute;
@@ -201,14 +208,14 @@ export default function Calendar() {
                                             const eventStartMinutes = getMinutes(event.startHour);
                                             const currentSlotMinutes = getMinutes(hour);
 
-                                            return (
-                                                eventDate >= weekStart &&
-                                                eventDate < new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000) &&
-                                                eventDate.getDay() === (index + 1) % 7 &&
-                                                eventStartMinutes === currentSlotMinutes // Only show in starting time slot
-                                            );
-                                        });
+                                            // So sánh chính xác ngày tháng năm
+                                            const isSameDay =
+                                                eventDate.getFullYear() === currentDate.getFullYear() &&
+                                                eventDate.getMonth() === currentDate.getMonth() &&
+                                                eventDate.getDate() === currentDate.getDate();
 
+                                            return isSameDay && eventStartMinutes === currentSlotMinutes;
+                                        });
                                         return (
                                             <div
                                                 key={index}

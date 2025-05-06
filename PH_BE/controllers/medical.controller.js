@@ -284,4 +284,19 @@ const getOneMedicalByUser = async (req, res) => {
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
-module.exports = { getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord, getAllMedicalRecords, getOneMedicalByUser };
+
+const getAllMedicalRecordsByPet = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const medicalRecords = await Booking.find({ pet_id: id, status: "complete" }).
+            populate("doctor_id")
+            .sort({ updatedAt: -1 });
+        res.status(200).json({ success: true, data: medicalRecords });
+    } catch (err) {
+        console.error("Error in getAllMedicalRecords:", err);
+    }
+}
+module.exports = {
+    getMedicalbyBookingId, createMedicalRecord, updateMedicalRecord, getAllMedicalRecords, getOneMedicalByUser,
+    getAllMedicalRecordsByPet
+};
