@@ -44,7 +44,7 @@ const AssignDoctor = ({ open, onOpenChange, booking, onUpdate }) => {
             const res = await BookingServices.AssignDoctor(booking?._id, selectedDoctor);
 
             if (res?.status === 200) {
-                toast.success(res?.message);
+                toast.success("Cập nhật Bác Sĩ khám thành công");
                 onUpdate();
                 onOpenChange(false);
             } else if (res?.success === false) {
