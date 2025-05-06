@@ -11,20 +11,55 @@ export default function ResetPassword() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [confirmCurrentPassword, setConfirmCurrentPassword] = useState("");
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
+    const [newPasswordError, setNewPasswordError] = useState(""); // NEW
     const [isLoading, setIsLoading] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
     const isChangePassword = location.pathname === "/change-password";
 
+    const validateNewPassword = (password) => {
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!password) {
+            return "Vui lòng nhập mật khẩu.";
+        } else if (!passwordRegex.test(password)) {
+            return "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ in hoa, số và ký tự đặc biệt.";
+        }
+        return "";
+    };
+
+    const handleNewPasswordChange = (e) => {
+        const password = e.target.value;
+        setNewPassword(password);
+        const error = validateNewPassword(password);
+        setNewPasswordError(error);
+    };
+
     const handleConfirmPasswordChange = (e) => {
-        setConfirmPassword(e.target.value);
-        setConfirmPasswordError(e.target.value !== newPassword ? "Mật khẩu xác nhận không khớp" : "");
+        const confirmPasswordValue = e.target.value;
+        setConfirmPassword(confirmPasswordValue);
+        setConfirmPasswordError(
+            confirmPasswordValue !== newPassword ? "Mật khẩu xác nhận không khớp" : ""
+        );
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+
+        // Validate mật khẩu mới trước khi gửi
+        const newPasswordValidationError = validateNewPassword(newPassword);
+        if (newPasswordValidationError) {
+            setNewPasswordError(newPasswordValidationError);
+            setIsLoading(false);
+            return;
+        }
+
+        if (confirmPassword !== newPassword) {
+            setConfirmPasswordError("Mật khẩu xác nhận không khớp");
+            setIsLoading(false);
+            return;
+        }
 
         try {
             let response;
@@ -41,14 +76,10 @@ export default function ResetPassword() {
                     newPassword
                 });
             }
-
             if (response.status === 200) {
                 toast.success(`${isChangePassword ? "Đổi" : "Đặt lại"} mật khẩu thành công!`);
-                if (isChangePassword) {
-                    navigate("/");
-                } else {
-                    navigate("/login");
-                }
+                navigate(isChangePassword ? "/" : "/login");
+
             } else {
                 setConfirmCurrentPassword(response.message || `${isChangePassword ? "Đổi" : "Đặt lại"} mật khẩu thất bại.`);
             }
@@ -100,10 +131,13 @@ export default function ResetPassword() {
                             <Input
                                 type="password"
                                 value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
+                                onChange={handleNewPasswordChange}
                                 placeholder="Nhập mật khẩu mới"
                                 required
                             />
+                            {newPasswordError && (
+                                <p className="text-red-500 text-sm">{newPasswordError}</p>
+                            )}
                         </div>
 
                         <div>
