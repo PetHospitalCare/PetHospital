@@ -50,7 +50,7 @@ export default function Home() {
                         Veterinary Hospital
                     </h1>
                     <h2 className="text-xl font-medium mt-2 sm:text-2xl lg:text-3xl">
-                        PET HEALTH CENTRE
+                        PET HOSPITAL
                     </h2>
                 </div>
             </div>
